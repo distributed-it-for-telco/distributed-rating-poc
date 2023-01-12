@@ -1,0 +1,31 @@
+
+[[models]]
+path = "../interfaces"
+files = [
+    "rating-agent.smithy"    
+]
+
+[[models]]
+# Location of dependencies may be either a path to a directory, or a url prefix
+# If a relative path is used, it is relative to the location of this codegen.toml
+#path = "/path/to/my-interfaces"
+url = "https://wasmcloud.github.io/interfaces/idl/org.wasmcloud"
+files = [ "wasmcloud-core.smithy", "wasmcloud-model.smithy" ]
+
+
+[html]
+output_dir = "html"
+
+[html.parameters]
+minified = true
+
+[rust]
+
+# top-level output directory for rust files.
+output_dir = "."
+
+[rust.parameters]
+
+[[rust.files]]
+path = "src/interface.rs"
+namespace = "co.uk.orange.rating.agent"

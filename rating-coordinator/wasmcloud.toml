@@ -1,0 +1,7 @@
+name = "sony-rating-agent"
+language = "rust"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = ["wasmcloud:keyvalue"]
