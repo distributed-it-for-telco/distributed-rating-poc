@@ -1,7 +1,7 @@
 name = "rating_coordinator"
 language = "rust"
 type = "actor"
-version = "0.1.0"
+version = "0.1.1"
 
 [actor]
 claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
