@@ -5,6 +5,8 @@ on:
     paths:
       - "rating-agents/netflix-rating-agent/src/**"
       - "rating-agents/netflix-rating-agent/Cargo.*"
+env:
+  working-directory: "rating-agents/netflix-rating-agent"
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
@@ -13,11 +15,13 @@ jobs:
       - name: Add wasm32-unknown-unknown
         run: rustup target add wasm32-unknown-unknown
       - name: Check formatting
+        working-directory: ${{ env.working-directory }}
         run: cargo fmt -- --check
-        shell: bash
       - name: Build actor
+        working-directory: ${{ env.working-directory }}
         run: cargo build
       - name: Check lints with clippy
+        working-directory: ${{ env.working-directory }}
         run: |
           rustup component add clippy
           cargo clippy
