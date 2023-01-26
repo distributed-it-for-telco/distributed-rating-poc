@@ -1,3 +1,4 @@
+# TEMPLATE: not done yet
 name: Release to GHCR
 on:
   workflow_dispatch:
