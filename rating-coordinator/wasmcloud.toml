@@ -1,7 +1,8 @@
-name = "sony-rating-agent"
+name = "rating_coordinator"
 language = "rust"
 type = "actor"
 version = "0.1.0"
 
 [actor]
-claims = ["wasmcloud:keyvalue"]
+claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
+call_alias = "ratingcoordinator"
