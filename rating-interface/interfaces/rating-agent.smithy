@@ -11,6 +11,7 @@
 metadata package = [ 
   { 
     namespace: "co.uk.orange.rating.agent",
+    crate: "rating_coordinator"
   }
 ]
 

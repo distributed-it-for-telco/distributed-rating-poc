@@ -1,7 +1,8 @@
-name = "orange-rating-agent"
+name = "orange_rating_agent"
 language = "rust"
 type = "actor"
 version = "0.1.0"
 
 [actor]
-claims = ["wasmcloud:keyvalue"]
+claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
+call_alias = "agent/orange"

@@ -1,7 +1,9 @@
 use types::{ServiceUsageRequest, ServiceUsageRatingRequest, ServiceUsageResponse, AuthorizationStatus, BillingInformation, RequestApproval, ServiceUsageRatingResponse};
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize};
+use rating_interface::{RatingAgentSender, RatingAgent, RatingRequest};
+use wasmcloud_interface_logging::{debug, error, info, warn};
 
 mod types;
 
@@ -15,8 +17,10 @@ impl HttpServer for ApiGatewayActor {
     
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
         let trimmed_path: Vec<&str> = req.path.trim_matches('/').split('/').collect();
+        info!("This is an info level log!");
 
         match (req.method.as_ref(), trimmed_path.as_slice()) {
+            ("POST", ["usage", "rating"]) => request_rate(ctx, deser(&req.body)?).await,
             ("POST", ["usage", "requests"]) => request_usage(ctx, deser(&req.body)?).await,
             ("POST", ["usage", "rating_events"]) => record_rated_usage(ctx, deser(&req.body)?).await,
             (_, _) => Ok(HttpResponse::not_found())
@@ -34,6 +38,13 @@ async fn request_usage(_ctx: &Context, _request: ServiceUsageRequest) -> RpcResu
         ],
     };
     HttpResponse::json(resp, 200)
+}
+
+async fn request_rate(_ctx: &Context, _request: RatingRequest) -> RpcResult<HttpResponse> {
+    let rating = RatingAgentSender::to_actor("ratingcoordinator")
+                                .rate_usage(_ctx, &_request).await?;
+    
+    HttpResponse::json(rating, 200)
 }
 
 async fn record_rated_usage(_ctx: &Context, _request: ServiceUsageRatingRequest) -> RpcResult<HttpResponse> {
