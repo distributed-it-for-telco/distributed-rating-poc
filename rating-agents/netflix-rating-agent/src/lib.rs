@@ -1,5 +1,5 @@
-use wasmbus_rpc::actor::prelude::*;
 use interface::*;
+use wasmbus_rpc::actor::prelude::*;
 
 #[allow(dead_code)]
 mod interface;
@@ -14,6 +14,4 @@ impl RatingAgent for NetflixRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         todo!()
     }
-
 }
-

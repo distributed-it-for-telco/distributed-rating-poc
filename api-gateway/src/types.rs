@@ -3,10 +3,10 @@
 
 use std::collections::HashMap;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-/// A request for authorization to consume the amount and type of service 
+/// A request for authorization to consume the amount and type of service
 /// as indicated by the usage data field
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct ServiceUsageRequest {
@@ -14,7 +14,7 @@ pub struct ServiceUsageRequest {
     pub language: Option<String>,
     pub offer_id: Option<String>,
     // Arbitrary JSON payload indicating the details of the usage request
-    pub usage_data: Value
+    pub usage_data: Value,
 }
 
 /// The response from a request to authorize rated usage. Indicates
@@ -24,7 +24,7 @@ pub struct ServiceUsageRequest {
 pub struct ServiceUsageResponse {
     pub authorization_status: AuthorizationStatus,
     pub billing_information: BillingInformation,
-    pub request_approvals: Vec<RequestApproval>
+    pub request_approvals: Vec<RequestApproval>,
 }
 
 /// A request to record rated usage (past tense) from a device using the rating SDK.
@@ -37,7 +37,7 @@ pub struct ServiceUsageRatingRequest {
     pub language: Option<String>,
     pub offer_id: Option<String>,
     pub authorization_key: String,
-    pub effective_usage: Value
+    pub effective_usage: Value,
 }
 
 /// A reply to a ServiceUsageRatingRequest
@@ -45,16 +45,16 @@ pub struct ServiceUsageRatingRequest {
 
 pub struct ServiceUsageRatingResponse {
     pub authorization_status: AuthorizationStatus,
-    pub billing_information: BillingInformation
-}   
+    pub billing_information: BillingInformation,
+}
 
 /// Billing data returned in a service usage authorization response
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct BillingInformation {
-    pub price: u32, 
+    pub price: u32,
     pub unit: PriceUnit,
-    pub messages: Vec<String>
-}  
+    pub messages: Vec<String>,
+}
 
 /// Authorization status returned in response to a service usage request
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
@@ -73,7 +73,7 @@ pub enum AuthorizationStatusType {
     Denied,
     Granted,
     StatusOne,
-    StatusTwo
+    StatusTwo,
 }
 
 /// Monetary unit used in billing data
@@ -82,7 +82,7 @@ pub enum PriceUnit {
     #[default]
     GBP,
     USD,
-    EUR
+    EUR,
 }
 
 /// An approval indicator from a request. A list of these are returned in response to a request
@@ -90,6 +90,5 @@ pub enum PriceUnit {
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct RequestApproval {
     pub approval_type: String,
-    pub data: HashMap<String, String>
+    pub data: HashMap<String, String>,
 }
-
