@@ -1,6 +1,6 @@
-# Makefile for netflix-rating-agent
+# Makefile for streaming-rating-agent
 
-PROJECT  = netflix_rating_agent
+PROJECT  = streaming_rating_agent
 VERSION  = $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[] .version' | head -1)
 REVISION = 0
 # list of all contract claims for actor signing (space-separated)
@@ -11,9 +11,9 @@ REG_URL  = localhost:5000/v2/$(PROJECT):$(VERSION)
 PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
 
 # friendly name for the actor
-ACTOR_NAME = "Rating Agent - netflix"
+ACTOR_NAME = "Rating Agent - streaming"
 # optional call alias for actor
-ACTOR_ALIAS=rater_netflix
+ACTOR_ALIAS=rater_streaming
 
 include ../actor.mk
 

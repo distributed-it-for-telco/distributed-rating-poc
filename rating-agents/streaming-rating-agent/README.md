@@ -1,3 +1,3 @@
-# Netflix Rating Agent
-TBD
+# Streaming Rating Agent
 
+TBD

@@ -1,12 +1,12 @@
 [package]
-name = "netflix-rating-agent"
+name = "streaming-rating-agent"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "netflix_rating_agent"
+name = "streaming_rating_agent"
 
 [dependencies]
 async-trait = "0.1"
