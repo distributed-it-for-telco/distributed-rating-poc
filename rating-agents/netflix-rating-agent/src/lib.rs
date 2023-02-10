@@ -1,8 +1,5 @@
-use interface::*;
+use rating_interface::*;
 use wasmbus_rpc::actor::prelude::*;
-
-#[allow(dead_code)]
-mod interface;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
