@@ -1,4 +1,4 @@
-# Makefile for sony-rating-agent
+# Makefile for video-rating-agent
 
 PROJECT  = rating_coordinator
 VERSION  = $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[] .version' | head -1)

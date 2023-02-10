@@ -1,12 +1,12 @@
-name: Build and check rating-agents/sony-rating-agent actor
+name: Build and check rating-agents/video-rating-agent actor
 on:
   pull_request:
     branches: [main]
     paths:
-      - "rating-agents/sony-rating-agent/src/**"
-      - "rating-agents/sony-rating-agent/Cargo.*"
+      - "rating-agents/video-rating-agent/src/**"
+      - "rating-agents/video-rating-agent/Cargo.*"
 env:
-  working-directory: "rating-agents/sony-rating-agent"
+  working-directory: "rating-agents/video-rating-agent"
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
@@ -25,7 +25,7 @@ jobs:
         run: |
           rustup component add clippy
           cargo clippy
-      # Once you've written unit tests for the rating-agents/sony-rating-agent actor, you can uncomment
+      # Once you've written unit tests for the rating-agents/video-rating-agent actor, you can uncomment
       # the two lines below to automatically run tests
       # - name: Test actor
       #   run: cargo test --target x86_64-unknown-linux-gnu -- --nocapture

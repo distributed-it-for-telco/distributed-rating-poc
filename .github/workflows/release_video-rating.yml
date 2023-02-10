@@ -1,15 +1,15 @@
-name: Release rating-agents/sony-rating-agent to GHCR
+name: Release rating-agents/video-rating-agent to GHCR
 on:
   workflow_dispatch:
   push:
     branches: [main]
     tags:
-      - "sony-rating-agent-v*"
+      - "video-rating-agent-v*"
 env:
-  working-directory: rating-agents/sony-rating-agent
+  working-directory: rating-agents/video-rating-agent
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASH_SONY_RATING_SUBJECT_KEY }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_VIDEO_RATING_SUBJECT_KEY }}
   WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
 jobs:
   build_signed_actor:
