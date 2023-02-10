@@ -1,4 +1,4 @@
-name = "sony-rating-agent"
+name = "sony_rating_agent"
 language = "rust"
 type = "actor"
 version = "0.1.0"
