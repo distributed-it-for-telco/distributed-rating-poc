@@ -1,6 +1,8 @@
+use rating_interface::{
+    RatingAgent, RatingAgentReceiver, RatingAgentSender, RatingRequest, RatingResponse,
+};
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_logging::{info};
-use rating_interface::{RatingAgent, RatingRequest, RatingResponse, RatingAgentSender, RatingAgentReceiver};
+use wasmcloud_interface_logging::info;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
@@ -18,10 +20,8 @@ impl RatingAgent for RatingAgentCoordinatorActor {
 
         // let mut ratings = Vec::new();
         // for agent in agents {
-            let rating_agent = RatingAgentSender::to_actor(&format!("agent/{}", "orange"));
-            let rating = rating_agent
-                .rate_usage(_ctx, _arg)
-                .await.expect("msg");
+        let rating_agent = RatingAgentSender::to_actor(&format!("agent/{}", "orange"));
+        let rating = rating_agent.rate_usage(_ctx, _arg).await.expect("msg");
 
         //    ratings.push(rating.clone());
         // }
@@ -29,14 +29,12 @@ impl RatingAgent for RatingAgentCoordinatorActor {
         RpcResult::Ok(rating)
 
         // RpcResult::Ok(
-        //     RatingResponse { 
-        //         authorization_status: AuthorizationStatus::default(), 
+        //     RatingResponse {
+        //         authorization_status: AuthorizationStatus::default(),
         //         billing_information: BillingInformation::default()
         //     }
         // )
 
         // RpcResult::Err(RpcError::NotImplemented)
     }
-
 }
-

@@ -17,6 +17,7 @@ futures = "0.3"
 form_urlencoded = "1.0"
 wasmbus-rpc = "0.11"
 wasmcloud-interface-keyvalue = "0.9.1"
+rating_interface = { path = "../../rating-interface/rust" }
 
 # build-dependencies needed for build.rs
 [build-dependencies]

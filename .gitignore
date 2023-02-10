@@ -10,3 +10,5 @@ Cargo.lock
 **/*.rs.bk
 
 /build/
+
+host_config.json

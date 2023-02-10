@@ -1,24 +1,21 @@
-name: Release to GHCR
+name: Release rating-agents/orange-rating-agent to GHCR
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - "**"
-      - "src/**"
-      - "Cargo.*"
     tags:
-      - "v*"
+      - "orange-rating-agent-v*"
 env:
+  working-directory: rating-agents/orange-rating-agent
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASH_SUBJECT_KEY }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_ORANGE_RATING_SUBJECT_KEY }}
   WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
 jobs:
   build_signed_actor:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: wasmcloud/common-actions/install-wash@main
       - name: Add wasm32-unknown-unknown
         run: rustup target add wasm32-unknown-unknown
@@ -27,6 +24,7 @@ jobs:
       # - name: Test actor
       #   run: cargo test --target x86_64-unknown-linux-gnu -- --nocapture
       - name: Build and sign wasmCloud actor
+        working-directory: ${{ env.working-directory }}
         env:
           WASH_ISSUER_KEY: ${{ env.WASH_ISSUER_KEY }}
           WASH_SUBJECT_KEY: ${{ env.WASH_SUBJECT_KEY }}
@@ -35,21 +33,22 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: wasmcloud-actor
-          path: build/*.wasm
+          path: ${{ env.working-directory }}/build/*.wasm
 
   github_release:
     if: startswith(github.ref, 'refs/tags/') # Only run on tag push
     needs: build_signed_actor
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: wasmcloud/common-actions/install-wash@main
       - name: Download signed actor
         uses: actions/download-artifact@v2
         with:
           name: wasmcloud-actor
-          path: build
+          path: ${{ env.working-directory }}/build
       - name: Create release text
+        working-directory: ${{ env.working-directory }}
         run: |
           export oci_version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')
           export claims=$(wash claims inspect build/*.wasm)
@@ -71,17 +70,19 @@ jobs:
     needs: build_signed_actor
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: wasmcloud/common-actions/install-wash@main
       - name: Download signed actor
         uses: actions/download-artifact@v2
         with:
           name: wasmcloud-actor
-          path: build
+          path: ${{ env.working-directory }}/build
       - name: Determine actor name
+        working-directory: ${{ env.working-directory }}
         run: |
           echo "actor-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
       - name: Determine actor version
+        working-directory: ${{ env.working-directory }}
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
         run: |
           echo "actor-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
