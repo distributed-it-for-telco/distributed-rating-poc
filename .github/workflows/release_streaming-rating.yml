@@ -1,15 +1,15 @@
-name: Release rating-agents/netflix-rating-agent to GHCR
+name: Release rating-agents/streaming-rating-agent to GHCR
 on:
   workflow_dispatch:
   push:
     branches: [main]
     tags:
-      - "netflix-rating-agent-v*"
+      - "streaming-rating-agent-v*"
 env:
-  working-directory: rating-agents/netflix-rating-agent
+  working-directory: rating-agents/streaming-rating-agent
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASH_NETFLIX_RATING_SUBJECT_KEY }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_STREAMING_RATING_SUBJECT_KEY }}
   WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
 jobs:
   build_signed_actor:

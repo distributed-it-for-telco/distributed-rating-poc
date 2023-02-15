@@ -1,2 +1,0 @@
-# Sony Rating Agent
-TBD
