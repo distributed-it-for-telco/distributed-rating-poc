@@ -15,7 +15,7 @@ const KNOWN_AGENTS_NAMES: &[&str] = &["orange"];
 impl RatingAgent for RatingAgentCoordinatorActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         // should call different rating agents here
-        let agents = KNOWN_AGENTS_NAMES.to_vec();
+        let _agents = KNOWN_AGENTS_NAMES.to_vec();
         info!("Hello I'm your rating coordinator");
 
         // let mut ratings = Vec::new();

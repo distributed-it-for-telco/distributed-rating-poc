@@ -11,7 +11,7 @@
 metadata package = [ 
   { 
     namespace: "co.uk.orange.rating.agent",
-    crate: "rating_coordinator"
+    crate: "rating_interface"
   }
 ]
 
@@ -29,7 +29,7 @@ service RatingAgent {
 }
 
 operation RateUsage {
-    input: RatingRequest
+    input: RatingRequest,
     output: RatingResponse
 }
 

@@ -1,0 +1,7 @@
+name = "orange-customer-product-inventory"
+language = "rust"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]

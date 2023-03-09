@@ -13,3 +13,5 @@ Cargo.lock
 
 host_config.json
 *.nk
+
+.smithy.lsp.log

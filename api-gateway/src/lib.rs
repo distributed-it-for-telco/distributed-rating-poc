@@ -6,7 +6,7 @@ use types::{
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
-use wasmcloud_interface_logging::{debug, error, info, warn};
+use wasmcloud_interface_logging::{info};
 
 mod types;
 
