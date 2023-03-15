@@ -20,7 +20,7 @@ impl RatingAgent for RatingAgentCoordinatorActor {
 
         // let mut ratings = Vec::new();
         // for agent in agents {
-        let rating_agent = RatingAgentSender::to_actor(&format!("agent/{}", "orange"));
+        let rating_agent = RatingAgentSender::to_actor(&format!("agent/{}", "orange_vod"));
         let rating = rating_agent.rate_usage(_ctx, _arg).await.expect("msg");
 
         //    ratings.push(rating.clone());

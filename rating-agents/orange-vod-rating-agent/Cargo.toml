@@ -1,12 +1,12 @@
 [package]
-name = "orange_rating_agent"
+name = "orange_vod_rating_agent"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "orange_rating_agent"
+name = "orange_vod_rating_agent"
 
 [dependencies]
 async-trait = "0.1"
