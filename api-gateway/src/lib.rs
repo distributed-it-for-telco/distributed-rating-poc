@@ -1,4 +1,4 @@
-use rating_interface::{RatingAgent, RatingAgentSender, RatingRequest};
+use rating_interface::{RatingAgent, RatingAgentSender, RatingRequest, MockAgentSender, MockAgent};
 use serde::Deserialize;
 use types::{
     AuthorizationStatus, BillingInformation, RequestApproval, ServiceUsageRatingRequest,
@@ -20,13 +20,13 @@ impl HttpServer for ApiGatewayActor {
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
         let trimmed_path: Vec<&str> = req.path.trim_matches('/').split('/').collect();
         info!("This is an info level log!");
+        info!("Trimmed Path: {:?}", trimmed_path);
 
         match (req.method.as_ref(), trimmed_path.as_slice()) {
             ("POST", ["usage", "rating"]) => request_rate(ctx, deser(&req.body)?).await,
             ("POST", ["usage", "requests"]) => request_usage(ctx, deser(&req.body)?).await,
-            ("POST", ["usage", "rating_events"]) => {
-                record_rated_usage(ctx, deser(&req.body)?).await
-            }
+            ("POST", ["usage", "rating_events"]) => record_rated_usage(ctx, deser(&req.body)?).await,
+            ("POST", ["seed", "orange", "customer", "inventory"]) => seed_data_for_orange_cust_inventory(ctx).await,
             (_, _) => Ok(HttpResponse::not_found()),
         }
     }
@@ -48,6 +48,15 @@ async fn request_rate(_ctx: &Context, _request: RatingRequest) -> RpcResult<Http
         .await?;
 
     HttpResponse::json(rating, 200)
+}
+
+async fn seed_data_for_orange_cust_inventory(_ctx: &Context) -> RpcResult<HttpResponse> {
+
+    MockAgentSender::to_actor(&format!("mock/{}", "orange_invetory"))
+        .seed(_ctx)
+        .await?;
+    
+    Ok(HttpResponse::default())
 }
 
 async fn record_rated_usage(

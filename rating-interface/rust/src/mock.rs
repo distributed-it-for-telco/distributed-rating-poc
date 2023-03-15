@@ -22,11 +22,334 @@ use wasmbus_rpc::{
 #[allow(dead_code)]
 pub const SMITHY_VERSION: &str = "1.0";
 
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct CustomerDetails {}
+
+// Encode CustomerDetails as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_customer_details<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    _val: &CustomerDetails,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(0)?;
+    Ok(())
+}
+
+// Decode CustomerDetails from cbor input stream
+#[doc(hidden)]
+pub fn decode_customer_details(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<CustomerDetails, RpcError> {
+    let __result = {
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct CustomerDetails, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                d.skip()?;
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                d.str()?;
+                d.skip()?;
+            }
+        }
+        CustomerDetails {}
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct DataItem {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<String>,
+}
+
+// Encode DataItem as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_data_item<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &DataItem,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(1)?;
+    if let Some(val) = val.value.as_ref() {
+        e.str("value")?;
+        e.str(val)?;
+    } else {
+        e.null()?;
+    }
+    Ok(())
+}
+
+// Decode DataItem from cbor input stream
+#[doc(hidden)]
+pub fn decode_data_item(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<DataItem, RpcError> {
+    let __result = {
+        let mut value: Option<Option<String>> = Some(None);
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct DataItem, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        value = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "value" => {
+                        value = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        }
+        DataItem {
+            value: value.unwrap(),
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct OfferDetails {}
+
+// Encode OfferDetails as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_offer_details<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    _val: &OfferDetails,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(0)?;
+    Ok(())
+}
+
+// Decode OfferDetails from cbor input stream
+#[doc(hidden)]
+pub fn decode_offer_details(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<OfferDetails, RpcError> {
+    let __result = {
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct OfferDetails, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                d.skip()?;
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                d.str()?;
+                d.skip()?;
+            }
+        }
+        OfferDetails {}
+    };
+    Ok(__result)
+}
+/// Description of the rating mock service
+/// wasmbus.actorReceive
+#[async_trait]
+pub trait CustomerInventoryAgent {
+    async fn get_customer_info<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<CustomerDetails>;
+    async fn get_customer_offer_details<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<OfferDetails>;
+}
+
+/// CustomerInventoryAgentReceiver receives messages defined in the CustomerInventoryAgent service trait
+/// Description of the rating mock service
+#[doc(hidden)]
+#[async_trait]
+pub trait CustomerInventoryAgentReceiver: MessageDispatch + CustomerInventoryAgent {
+    async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
+        match message.method {
+            "GetCustomerInfo" => {
+                let value: String = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
+
+                let resp = CustomerInventoryAgent::get_customer_info(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
+                Ok(buf)
+            }
+            "GetCustomerOfferDetails" => {
+                let value: String = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
+
+                let resp =
+                    CustomerInventoryAgent::get_customer_offer_details(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
+                Ok(buf)
+            }
+            _ => Err(RpcError::MethodNotHandled(format!(
+                "CustomerInventoryAgent::{}",
+                message.method
+            ))),
+        }
+    }
+}
+
+/// CustomerInventoryAgentSender sends messages to a CustomerInventoryAgent service
+/// Description of the rating mock service
+/// client for sending CustomerInventoryAgent messages
+#[derive(Debug)]
+pub struct CustomerInventoryAgentSender<T: Transport> {
+    transport: T,
+}
+
+impl<T: Transport> CustomerInventoryAgentSender<T> {
+    /// Constructs a CustomerInventoryAgentSender with the specified transport
+    pub fn via(transport: T) -> Self {
+        Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> CustomerInventoryAgentSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl CustomerInventoryAgentSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
+#[async_trait]
+impl<T: Transport + std::marker::Sync + std::marker::Send> CustomerInventoryAgent
+    for CustomerInventoryAgentSender<T>
+{
+    #[allow(unused)]
+    async fn get_customer_info<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<CustomerDetails> {
+        let buf = wasmbus_rpc::common::serialize(&arg.to_string())?;
+
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "CustomerInventoryAgent.GetCustomerInfo",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: CustomerDetails = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': CustomerDetails", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn get_customer_offer_details<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<OfferDetails> {
+        let buf = wasmbus_rpc::common::serialize(&arg.to_string())?;
+
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "CustomerInventoryAgent.GetCustomerOfferDetails",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: OfferDetails = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': OfferDetails", e)))?;
+        Ok(value)
+    }
+}
+
 /// Description of the rating mock service
 /// wasmbus.actorReceive
 #[async_trait]
 pub trait MockAgent {
     async fn seed(&self, ctx: &Context) -> RpcResult<()>;
+    async fn get_data_item<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<DataItem>;
 }
 
 /// MockAgentReceiver receives messages defined in the MockAgent service trait
@@ -39,6 +362,15 @@ pub trait MockAgentReceiver: MessageDispatch + MockAgent {
             "Seed" => {
                 let _resp = MockAgent::seed(self, ctx).await?;
                 let buf = Vec::new();
+                Ok(buf)
+            }
+            "GetDataItem" => {
+                let value: String = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
+
+                let resp = MockAgent::get_data_item(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
                 Ok(buf)
             }
             _ => Err(RpcError::MethodNotHandled(format!(
@@ -99,6 +431,130 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> MockAgent for MockAge
                 ctx,
                 Message {
                     method: "MockAgent.Seed",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+    #[allow(unused)]
+    async fn get_data_item<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<DataItem> {
+        let buf = wasmbus_rpc::common::serialize(&arg.to_string())?;
+
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "MockAgent.GetDataItem",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: DataItem = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': DataItem", e)))?;
+        Ok(value)
+    }
+}
+
+/// Description of the rating mock service
+/// wasmbus.actorReceive
+#[async_trait]
+pub trait UsageCollector {
+    async fn store<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<()>;
+}
+
+/// UsageCollectorReceiver receives messages defined in the UsageCollector service trait
+/// Description of the rating mock service
+#[doc(hidden)]
+#[async_trait]
+pub trait UsageCollectorReceiver: MessageDispatch + UsageCollector {
+    async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
+        match message.method {
+            "Store" => {
+                let value: String = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
+
+                let _resp = UsageCollector::store(self, ctx, &value).await?;
+                let buf = Vec::new();
+                Ok(buf)
+            }
+            _ => Err(RpcError::MethodNotHandled(format!(
+                "UsageCollector::{}",
+                message.method
+            ))),
+        }
+    }
+}
+
+/// UsageCollectorSender sends messages to a UsageCollector service
+/// Description of the rating mock service
+/// client for sending UsageCollector messages
+#[derive(Debug)]
+pub struct UsageCollectorSender<T: Transport> {
+    transport: T,
+}
+
+impl<T: Transport> UsageCollectorSender<T> {
+    /// Constructs a UsageCollectorSender with the specified transport
+    pub fn via(transport: T) -> Self {
+        Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> UsageCollectorSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl UsageCollectorSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
+#[async_trait]
+impl<T: Transport + std::marker::Sync + std::marker::Send> UsageCollector
+    for UsageCollectorSender<T>
+{
+    #[allow(unused)]
+    async fn store<TS: ToString + ?Sized + std::marker::Sync>(
+        &self,
+        ctx: &Context,
+        arg: &TS,
+    ) -> RpcResult<()> {
+        let buf = wasmbus_rpc::common::serialize(&arg.to_string())?;
+
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "UsageCollector.Store",
                     arg: Cow::Borrowed(&buf),
                 },
                 None,

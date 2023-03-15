@@ -15,7 +15,51 @@ use org.wasmcloud.model#wasmbus
 @wasmbus( actorReceive: true )
 service MockAgent {
   version: "0.1",
-  operations: [ Seed ]
+  operations: [ Seed, GetDataItem ]
 }
 
-operation Seed {}
+/// Description of the rating mock service
+@wasmbus( actorReceive: true )
+service CustomerInventoryAgent {
+  version: "0.1",
+  operations: [ GetCustomerInfo, GetCustomerOfferDetails ]
+}
+
+/// Description of the rating mock service
+@wasmbus( actorReceive: true )
+service UsageCollector {
+  version: "0.1",
+  operations: [ Store ]
+}
+
+operation Seed {
+}
+
+operation GetCustomerInfo {
+  input: String,
+  output: CustomerDetails
+}
+
+operation GetCustomerOfferDetails {
+  input: String,
+  output: OfferDetails
+}
+
+operation GetDataItem {
+  input: String,
+  output: DataItem
+}
+
+operation Store {
+  input: String
+}
+
+structure DataItem {
+    value: String
+}
+
+structure CustomerDetails {
+}
+
+structure OfferDetails {
+}

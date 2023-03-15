@@ -1,7 +1,8 @@
-name = "orange-customer-product-inventory"
+name = "orange_customer_product_inventory"
 language = "rust"
 type = "actor"
 version = "0.1.0"
 
 [actor]
 claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
+call_alias = "mock/orange_invetory"
