@@ -11,9 +11,7 @@ REG_URL  = localhost:5000/v2/$(PROJECT):$(VERSION)
 PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
 
 # friendly name for the actor
-ACTOR_NAME = "Rating Agent - Orange"
-# optional call alias for actor
-ACTOR_ALIAS=rater_orange
+ACTOR_NAME = "Rating Agent - Orange VOD"
 
 include ../actor.mk
 

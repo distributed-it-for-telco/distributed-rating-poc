@@ -8,33 +8,15 @@ use wasmcloud_interface_logging::info;
 #[services(Actor, RatingAgent)]
 struct RatingAgentCoordinatorActor {}
 
-const KNOWN_AGENTS_NAMES: &[&str] = &["orange"];
-
 /// Implementation of Rating Agent trait methods
 #[async_trait]
 impl RatingAgent for RatingAgentCoordinatorActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
-        // should call different rating agents here
-        let _agents = KNOWN_AGENTS_NAMES.to_vec();
         info!("Hello I'm your rating coordinator");
 
-        // let mut ratings = Vec::new();
-        // for agent in agents {
-        let rating_agent = RatingAgentSender::to_actor(&format!("agent/{}", "orange_vod"));
+        let rating_agent = RatingAgentSender::to_actor(&format!("agent/{}", _arg.agent_id));
         let rating = rating_agent.rate_usage(_ctx, _arg).await.expect("msg");
 
-        //    ratings.push(rating.clone());
-        // }
-
         RpcResult::Ok(rating)
-
-        // RpcResult::Ok(
-        //     RatingResponse {
-        //         authorization_status: AuthorizationStatus::default(),
-        //         billing_information: BillingInformation::default()
-        //     }
-        // )
-
-        // RpcResult::Err(RpcError::NotImplemented)
     }
 }

@@ -36,6 +36,8 @@ operation RateUsage {
 structure RatingRequest {
     @required
     customerId: String,
+    @required
+    agentId: String,
     language: String,
     offerId: String,
     // This will be a base64 encoded string containing a JSON payload. The interpretation of the payload
