@@ -23,54 +23,6 @@ use wasmbus_rpc::{
 pub const SMITHY_VERSION: &str = "1.0";
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
-pub struct CustomerDetails {}
-
-// Encode CustomerDetails as CBOR and append to output stream
-#[doc(hidden)]
-#[allow(unused_mut)]
-pub fn encode_customer_details<W: wasmbus_rpc::cbor::Write>(
-    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
-    _val: &CustomerDetails,
-) -> RpcResult<()>
-where
-    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
-{
-    e.map(0)?;
-    Ok(())
-}
-
-// Decode CustomerDetails from cbor input stream
-#[doc(hidden)]
-pub fn decode_customer_details(
-    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
-) -> Result<CustomerDetails, RpcError> {
-    let __result = {
-        let is_array = match d.datatype()? {
-            wasmbus_rpc::cbor::Type::Array => true,
-            wasmbus_rpc::cbor::Type::Map => false,
-            _ => {
-                return Err(RpcError::Deser(
-                    "decoding struct CustomerDetails, expected array or map".to_string(),
-                ))
-            }
-        };
-        if is_array {
-            let len = d.fixed_array()?;
-            for __i in 0..(len as usize) {
-                d.skip()?;
-            }
-        } else {
-            let len = d.fixed_map()?;
-            for __i in 0..(len as usize) {
-                d.str()?;
-                d.skip()?;
-            }
-        }
-        CustomerDetails {}
-    };
-    Ok(__result)
-}
-#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct DataItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub value: Option<String>,
@@ -150,19 +102,122 @@ pub fn decode_data_item(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<DataIt
     Ok(__result)
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
-pub struct OfferDetails {}
+pub struct ListOffersRequest {
+    #[serde(rename = "partyId")]
+    #[serde(default)]
+    pub party_id: String,
+    #[serde(default)]
+    pub vendor: String,
+}
+
+// Encode ListOffersRequest as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_list_offers_request<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &ListOffersRequest,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(2)?;
+    e.str("partyId")?;
+    e.str(&val.party_id)?;
+    e.str("vendor")?;
+    e.str(&val.vendor)?;
+    Ok(())
+}
+
+// Decode ListOffersRequest from cbor input stream
+#[doc(hidden)]
+pub fn decode_list_offers_request(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<ListOffersRequest, RpcError> {
+    let __result = {
+        let mut party_id: Option<String> = None;
+        let mut vendor: Option<String> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct ListOffersRequest, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => party_id = Some(d.str()?.to_string()),
+                    1 => vendor = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "partyId" => party_id = Some(d.str()?.to_string()),
+                    "vendor" => vendor = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        ListOffersRequest {
+            party_id: if let Some(__x) = party_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field ListOffersRequest.party_id (#0)".to_string(),
+                ));
+            },
+
+            vendor: if let Some(__x) = vendor {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field ListOffersRequest.vendor (#1)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct OfferDetails {
+    #[serde(rename = "agentId")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agent_id: Option<String>,
+    #[serde(rename = "offerId")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub offer_id: Option<String>,
+}
 
 // Encode OfferDetails as CBOR and append to output stream
 #[doc(hidden)]
 #[allow(unused_mut)]
 pub fn encode_offer_details<W: wasmbus_rpc::cbor::Write>(
     mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
-    _val: &OfferDetails,
+    val: &OfferDetails,
 ) -> RpcResult<()>
 where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
-    e.map(0)?;
+    e.map(2)?;
+    if let Some(val) = val.agent_id.as_ref() {
+        e.str("agentId")?;
+        e.str(val)?;
+    } else {
+        e.null()?;
+    }
+    if let Some(val) = val.offer_id.as_ref() {
+        e.str("offerId")?;
+        e.str(val)?;
+    } else {
+        e.null()?;
+    }
     Ok(())
 }
 
@@ -172,6 +227,9 @@ pub fn decode_offer_details(
     d: &mut wasmbus_rpc::cbor::Decoder<'_>,
 ) -> Result<OfferDetails, RpcError> {
     let __result = {
+        let mut agent_id: Option<Option<String>> = Some(None);
+        let mut offer_id: Option<Option<String>> = Some(None);
+
         let is_array = match d.datatype()? {
             wasmbus_rpc::cbor::Type::Array => true,
             wasmbus_rpc::cbor::Type::Map => false,
@@ -184,57 +242,129 @@ pub fn decode_offer_details(
         if is_array {
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
-                d.skip()?;
+                match __i {
+                    0 => {
+                        agent_id = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    1 => {
+                        offer_id = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+
+                    _ => d.skip()?,
+                }
             }
         } else {
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
-                d.str()?;
-                d.skip()?;
+                match d.str()? {
+                    "agentId" => {
+                        agent_id = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    "offerId" => {
+                        offer_id = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    _ => d.skip()?,
+                }
             }
         }
-        OfferDetails {}
+        OfferDetails {
+            agent_id: agent_id.unwrap(),
+            offer_id: offer_id.unwrap(),
+        }
     };
     Ok(__result)
 }
-/// Description of the rating mock service
+pub type OffersList = Vec<OfferDetails>;
+
+// Encode OffersList as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_offers_list<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &OffersList,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.array(val.len() as u64)?;
+    for item in val.iter() {
+        encode_offer_details(e, item)?;
+    }
+    Ok(())
+}
+
+// Decode OffersList from cbor input stream
+#[doc(hidden)]
+pub fn decode_offers_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<OffersList, RpcError> {
+    let __result = {
+        if let Some(n) = d.array()? {
+            let mut arr: Vec<OfferDetails> = Vec::with_capacity(n as usize);
+            for _ in 0..(n as usize) {
+                arr.push(decode_offer_details(d).map_err(|e| {
+                    format!("decoding 'co.uk.orange.rating.mock#OfferDetails': {}", e)
+                })?)
+            }
+            arr
+        } else {
+            // indefinite array
+            let mut arr: Vec<OfferDetails> = Vec::new();
+            loop {
+                match d.datatype() {
+                    Err(_) => break,
+                    Ok(wasmbus_rpc::cbor::Type::Break) => break,
+                    Ok(_) => arr.push(decode_offer_details(d).map_err(|e| {
+                        format!("decoding 'co.uk.orange.rating.mock#OfferDetails': {}", e)
+                    })?),
+                }
+            }
+            arr
+        }
+    };
+    Ok(__result)
+}
+/// Description of the customer inventory mock service
 /// wasmbus.actorReceive
 #[async_trait]
 pub trait CustomerInventoryAgent {
-    async fn get_customer_info<TS: ToString + ?Sized + std::marker::Sync>(
+    async fn get_customer_offers(
         &self,
         ctx: &Context,
-        arg: &TS,
-    ) -> RpcResult<CustomerDetails>;
-    async fn get_customer_offer_details<TS: ToString + ?Sized + std::marker::Sync>(
-        &self,
-        ctx: &Context,
-        arg: &TS,
-    ) -> RpcResult<OfferDetails>;
+        arg: &ListOffersRequest,
+    ) -> RpcResult<OffersList>;
 }
 
 /// CustomerInventoryAgentReceiver receives messages defined in the CustomerInventoryAgent service trait
-/// Description of the rating mock service
+/// Description of the customer inventory mock service
 #[doc(hidden)]
 #[async_trait]
 pub trait CustomerInventoryAgentReceiver: MessageDispatch + CustomerInventoryAgent {
     async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
         match message.method {
-            "GetCustomerInfo" => {
-                let value: String = wasmbus_rpc::common::deserialize(&message.arg)
-                    .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
+            "GetCustomerOffers" => {
+                let value: ListOffersRequest = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'ListOffersRequest': {}", e)))?;
 
-                let resp = CustomerInventoryAgent::get_customer_info(self, ctx, &value).await?;
-                let buf = wasmbus_rpc::common::serialize(&resp)?;
-
-                Ok(buf)
-            }
-            "GetCustomerOfferDetails" => {
-                let value: String = wasmbus_rpc::common::deserialize(&message.arg)
-                    .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
-
-                let resp =
-                    CustomerInventoryAgent::get_customer_offer_details(self, ctx, &value).await?;
+                let resp = CustomerInventoryAgent::get_customer_offers(self, ctx, &value).await?;
                 let buf = wasmbus_rpc::common::serialize(&resp)?;
 
                 Ok(buf)
@@ -248,7 +378,7 @@ pub trait CustomerInventoryAgentReceiver: MessageDispatch + CustomerInventoryAge
 }
 
 /// CustomerInventoryAgentSender sends messages to a CustomerInventoryAgent service
-/// Description of the rating mock service
+/// Description of the customer inventory mock service
 /// client for sending CustomerInventoryAgent messages
 #[derive(Debug)]
 pub struct CustomerInventoryAgentSender<T: Transport> {
@@ -291,51 +421,27 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> CustomerInventoryAgen
     for CustomerInventoryAgentSender<T>
 {
     #[allow(unused)]
-    async fn get_customer_info<TS: ToString + ?Sized + std::marker::Sync>(
+    async fn get_customer_offers(
         &self,
         ctx: &Context,
-        arg: &TS,
-    ) -> RpcResult<CustomerDetails> {
-        let buf = wasmbus_rpc::common::serialize(&arg.to_string())?;
+        arg: &ListOffersRequest,
+    ) -> RpcResult<OffersList> {
+        let buf = wasmbus_rpc::common::serialize(arg)?;
 
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
-                    method: "CustomerInventoryAgent.GetCustomerInfo",
+                    method: "CustomerInventoryAgent.GetCustomerOffers",
                     arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
             .await?;
 
-        let value: CustomerDetails = wasmbus_rpc::common::deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("'{}': CustomerDetails", e)))?;
-        Ok(value)
-    }
-    #[allow(unused)]
-    async fn get_customer_offer_details<TS: ToString + ?Sized + std::marker::Sync>(
-        &self,
-        ctx: &Context,
-        arg: &TS,
-    ) -> RpcResult<OfferDetails> {
-        let buf = wasmbus_rpc::common::serialize(&arg.to_string())?;
-
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "CustomerInventoryAgent.GetCustomerOfferDetails",
-                    arg: Cow::Borrowed(&buf),
-                },
-                None,
-            )
-            .await?;
-
-        let value: OfferDetails = wasmbus_rpc::common::deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("'{}': OfferDetails", e)))?;
+        let value: OffersList = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': OffersList", e)))?;
         Ok(value)
     }
 }
@@ -464,7 +570,7 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> MockAgent for MockAge
     }
 }
 
-/// Description of the rating mock service
+/// Description of the usage collector service
 /// wasmbus.actorReceive
 #[async_trait]
 pub trait UsageCollector {
@@ -476,7 +582,7 @@ pub trait UsageCollector {
 }
 
 /// UsageCollectorReceiver receives messages defined in the UsageCollector service trait
-/// Description of the rating mock service
+/// Description of the usage collector service
 #[doc(hidden)]
 #[async_trait]
 pub trait UsageCollectorReceiver: MessageDispatch + UsageCollector {
@@ -499,7 +605,7 @@ pub trait UsageCollectorReceiver: MessageDispatch + UsageCollector {
 }
 
 /// UsageCollectorSender sends messages to a UsageCollector service
-/// Description of the rating mock service
+/// Description of the usage collector service
 /// client for sending UsageCollector messages
 #[derive(Debug)]
 pub struct UsageCollectorSender<T: Transport> {

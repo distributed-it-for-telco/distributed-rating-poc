@@ -18,14 +18,14 @@ service MockAgent {
   operations: [ Seed, GetDataItem ]
 }
 
-/// Description of the rating mock service
+/// Description of the customer inventory mock service
 @wasmbus( actorReceive: true )
 service CustomerInventoryAgent {
   version: "0.1",
-  operations: [ GetCustomerInfo, GetCustomerOfferDetails ]
+  operations: [ GetCustomerOffers ]
 }
 
-/// Description of the rating mock service
+/// Description of the usage collector service
 @wasmbus( actorReceive: true )
 service UsageCollector {
   version: "0.1",
@@ -35,14 +35,9 @@ service UsageCollector {
 operation Seed {
 }
 
-operation GetCustomerInfo {
-  input: String,
-  output: CustomerDetails
-}
-
-operation GetCustomerOfferDetails {
-  input: String,
-  output: OfferDetails
+operation GetCustomerOffers {
+  input: ListOffersRequest,
+  output: OffersList
 }
 
 operation GetDataItem {
@@ -58,8 +53,18 @@ structure DataItem {
     value: String
 }
 
-structure CustomerDetails {
+structure ListOffersRequest {
+    @required
+    partyId: String,
+    @required
+    vendor: String
 }
 
 structure OfferDetails {
+  offerId: String,
+  agentId: String
+}
+
+list OffersList {
+    member: OfferDetails
 }
