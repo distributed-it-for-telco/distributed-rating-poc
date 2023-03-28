@@ -60,9 +60,9 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/*.wasm
+          files: ${{ env.working-directory }}/build/*.wasm
           token: ${{ env.WASMCLOUD_PAT }}
-          body_path: release.txt
+          body_path: ${{ env.working-directory }}/release.txt
           prerelease: false
           draft: false
 
