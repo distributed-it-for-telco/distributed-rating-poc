@@ -19,14 +19,10 @@ wasmbus-rpc = "0.11"
 wasmcloud-interface-keyvalue = "0.9.1"
 wasmcloud-interface-logging = "0.8.0"
 rating_interface = { path = "../../rating-interface/rust" }
-uuid = { version = "1.3.0", features = [
-    "v4",                # Lets you generate random UUIDs
-    "fast-rng",          # Use a faster (but still sufficiently random) RNG
-    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
-]}
-getrandom = { version = "0.2", features = ["js"] }
-chrono = "0.4.24"
-tinytemplate = "1.2.1"
+# chrono = "0.4.24"
+new_string_template = "1.4"
+wasmcloud-interface-numbergen = "0.8.1"
+# wasmcloud-interface-blobstore = "0.5.1"
 
 [profile.release]
 # Optimize for small code size

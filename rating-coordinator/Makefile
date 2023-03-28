@@ -15,7 +15,7 @@ ACTOR_NAME = "Rating Coordinator"
 # optional call alias for actor
 ACTOR_ALIAS=rating_coordinator
 
-include ../rating-agents/actor.mk
+include ../makefiles/actor.mk
 
 test::
 	cargo clippy --all-features --all-targets
