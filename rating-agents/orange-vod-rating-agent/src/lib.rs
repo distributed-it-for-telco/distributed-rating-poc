@@ -41,34 +41,46 @@ impl RatingAgent for OrangeVodRatingAgentActor {
         /*
          *  Contract or Offer is one Movie equal one EURO
          */
-        let rating = _arg.usage.parse::<i32>().unwrap() * 1;       
+        let rating = _arg.usage.parse::<i32>().unwrap() * 1;  
+
         // let rating_date = Utc::now().naive_local();
         let rating_date = "";
-       
-        // let usage_template_str = std::fs::read_to_string(&USAGE_TEMPLATE_PATH).unwrap();
-        let usage_template_str = "{\r\n            \"id\": \"{usage_id}\",\r\n            \"usageDate\": \"{usage_date}\",\r\n            \"description\":\"Video on Demand\",\r\n            \"usageType\":\"VoD\",\r\n            \"ratedProductUsage\":{\r\n               \"isBilled\":false,\r\n               \"ratingAmountType\":\"Total\",\r\n               \"ratingDate\":\"{rating_date}\",\r\n               \"bucketValueConvertedInAmount\":{\r\n                  \"unit\":\"EUR\",\r\n                  \"value\": \"{price}\"\r\n               },\r\n               \"productRef\":{\r\n                  \"id\":\"1234\",\r\n                  \"name\":\"Video on Demand\"\r\n               }\r\n            },\r\n            \"relatedParty\":{\r\n               \"id\":\"{party_id}\"\r\n            },\r\n            \"usageCharacteristic\":[\r\n               {\r\n                  \"id\":\"122\",\r\n                  \"name\":\"movie-count\",\r\n                  \"valueType\":\"integer\",\r\n                  \"value\":\"{rated_entity_count}\"\r\n               }\r\n            ]\r\n         }";
-        info!("Before using template engine");
 
-        // let usage_templ = Template::new("Hello {param}");
+        let usage_template_str =  json!({
+            "id": usage_id,
+            "usageDate": usage_date,
+            "description": "Video on Demand",
+            "usageType": "VoD",
+            "ratedProductUsage": {
+               "isBilled": false,
+               "ratingAmountType": "Total",
+               "ratingDate": rating_date,
+               "bucketValueConvertedInAmount": {
+                  "unit": "EUR",
+                  "value": rating
+               },
+               "productRef": {
+                  "id": "1234",
+                  "name": "Video on Demand"
+               }
+            },
+            "relatedParty": {
+               "id": _arg.customer_id
+            },
+            "usageCharacteristic": [
+               {
+                  "id": "122",
+                  "name": "movie-count",
+                  "valueType": "integer",
+                  "value": _arg.usage
+               }
+            ]
+         });
+                  
+        info!("Sending usage proof to usage collector for party with id: {}", _arg.customer_id.to_string());
 
-        let data = {
-            let mut map = serde_json::Map::new();
-            map.insert("usage_id".into(), usage_id.into());
-            map.insert("usage_date".into(), usage_date.into());
-            map.insert("rating_date".into(), rating_date.into());
-            map.insert("price".into(), rating.into());
-            map.insert("party_id".into(), _arg.customer_id.to_string().into());
-            map.insert("rated_entity_count".into(), _arg.usage.to_string().into());
-            map
-        };
-        
-        // let rendered_templ = usage_templ.render(&data).expect("Expected Result to be Ok");
-          
-        info!("Starting to send usage proof to usage actor for party with id: {}", _arg.customer_id.to_string());
-        // info!("Usage proof: {}", rendered_templ.to_string());
-        
         UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector"))
-            .store(_ctx, &serde_json::to_string(&data).map_err(|e| RpcError::Ser(format!("{}", e)))?)
+            .store(_ctx, &usage_template_str)
             .await?;
 
         /*
