@@ -1,13 +1,15 @@
 use wasmbus_rpc::actor::prelude::*;
 use rating_interface::{
-    MockAgent, MockAgentSender, MockAgentReceiver, OffersList, DataItem, CustomerInventoryAgent, ListOffersRequest
+    MockAgent, MockAgentReceiver, OffersList, DataItem, CustomerInventoryAgent, ListOffersRequest
 };
-use wasmcloud_interface_keyvalue::{SetRequest, KeyValue, KeyValueSender};
+use wasmcloud_interface_keyvalue::{SetRequest, KeyValue, KeyValueSender, ListRangeRequest};
 use serde_json::json;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, MockAgent)]
 struct OrangeCustomerProductInventoryActor {}
+
+const OFFERS_LIST_KEY_PREFIX: &str = "inventory:offers";
 
 /// Implementation of Customer Invetory Mock trait methods
 #[async_trait]
@@ -17,11 +19,29 @@ impl CustomerInventoryAgent for OrangeCustomerProductInventoryActor {
         ctx: &Context,
         arg: &ListOffersRequest,
     ) -> RpcResult<OffersList> {
-        todo!()
+        let kv = KeyValueSender::new();
+
+        kv.list_range(
+            ctx,
+            &ListRangeRequest {
+                list_name: format!("{}:{}:{}", OFFERS_LIST_KEY_PREFIX.to_string(), &arg.party_id, &arg.vendor),
+                start: 0,
+                stop: 9999,
+            },
+        )
+        .await
+        .map(|res| {
+            res.iter()
+                .filter_map(|s| match serde_json::from_str(s.as_str()) {
+                    Ok(v) => Some(v),
+                    Err(_) => None,
+                })
+                .collect::<OffersList>()
+        })
     }
 }
 
-/// Implementation of Rating Mock trait methods
+/// Implementation of Data Seeding Mock trait methods
 #[async_trait]
 impl MockAgent for OrangeCustomerProductInventoryActor {
     async fn seed(&self, ctx: &Context) -> RpcResult<()> {

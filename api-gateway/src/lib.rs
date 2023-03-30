@@ -1,10 +1,10 @@
-use rating_interface::{RatingAgent, RatingAgentSender, RatingRequest, MockAgentSender, MockAgent};
+use rating_interface::{RatingAgent, RatingAgentSender, RatingRequest, MockAgentSender, MockAgent, CustomerInventoryAgentSender, CustomerInventoryAgent, ListOffersRequest};
 use serde::Deserialize;
 use types::{
     AuthorizationStatus, BillingInformation, RequestApproval, ServiceUsageRatingRequest,
     ServiceUsageRatingResponse, ServiceUsageRequest, ServiceUsageResponse,
 };
-use wasmbus_rpc::actor::prelude::*;
+use wasmbus_rpc::{actor::prelude::*};
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
 use wasmcloud_interface_logging::{info};
 
@@ -27,9 +27,21 @@ impl HttpServer for ApiGatewayActor {
             ("POST", ["usage", "requests"]) => request_usage(ctx, deser(&req.body)?).await,
             ("POST", ["usage", "rating_events"]) => record_rated_usage(ctx, deser(&req.body)?).await,
             ("POST", ["seed", "orange", "customer", "inventory"]) => seed_data_for_orange_cust_inventory(ctx).await,
+            ("GET", ["party", party_id, "offers", vendor]) => get_party_offers(ctx, party_id, vendor).await,
             (_, _) => Ok(HttpResponse::not_found()),
         }
     }
+}
+
+async fn get_party_offers(_ctx: &Context, _party_id: &str, _vendor: &str) -> RpcResult<HttpResponse>{
+    let offers = CustomerInventoryAgentSender::to_actor(&format!("mock/{}", "orange_invetory"))
+        .get_customer_offers(_ctx, &ListOffersRequest {
+            party_id: _party_id.to_owned(),
+            vendor: _vendor.to_owned()
+        })
+        .await?;
+
+    HttpResponse::json(offers, 200)
 }
 
 async fn request_usage(_ctx: &Context, _request: ServiceUsageRequest) -> RpcResult<HttpResponse> {
