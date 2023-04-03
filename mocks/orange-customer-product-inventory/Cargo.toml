@@ -19,7 +19,6 @@ wasmbus-rpc = "0.11"
 wasmcloud-interface-keyvalue = "0.9.1"
 wasmcloud-interface-logging = "0.8.0"
 rating_interface = { path = "../../rating-interface/rust" }
-tokio = { version = "1.26.0", features = ["macros", "rt"] }
 
 [profile.release]
 # Optimize for small code size

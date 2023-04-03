@@ -22,7 +22,7 @@ service MockAgent {
 @wasmbus( actorReceive: true )
 service CustomerInventoryAgent {
   version: "0.1",
-  operations: [ GetCustomerOffers ]
+  operations: [ GetCustomer ]
 }
 
 /// Description of the usage collector service
@@ -35,9 +35,9 @@ service UsageCollector {
 operation Seed {
 }
 
-operation GetCustomerOffers {
-  input: ListOffersRequest,
-  output: OffersList
+operation GetCustomer {
+  input: String,
+  output: Customer
 }
 
 operation GetDataItem {
@@ -50,7 +50,13 @@ operation Store {
 }
 
 structure DataItem {
-    value: String
+  @required
+  value: String
+}
+
+structure Customer {
+  @required
+  value: String
 }
 
 structure ListOffersRequest {

@@ -1,43 +1,38 @@
 use wasmbus_rpc::actor::prelude::*;
 use rating_interface::{
-    MockAgent, MockAgentReceiver, OffersList, DataItem, CustomerInventoryAgent, ListOffersRequest
+    MockAgent, MockAgentReceiver, DataItem, CustomerInventoryAgent, CustomerInventoryAgentReceiver, Customer
 };
-use wasmcloud_interface_keyvalue::{SetRequest, KeyValue, KeyValueSender, ListRangeRequest};
+use wasmcloud_interface_keyvalue::{SetRequest, KeyValue, KeyValueSender};
 use serde_json::json;
+use wasmcloud_interface_logging::info;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
-#[services(Actor, MockAgent)]
+#[services(Actor, MockAgent, CustomerInventoryAgent)]
 struct OrangeCustomerProductInventoryActor {}
 
-const OFFERS_LIST_KEY_PREFIX: &str = "inventory:offers";
+const OFFERS_LIST_KEY_PREFIX: &str = "inventory";
 
 /// Implementation of Customer Invetory Mock trait methods
 #[async_trait]
 impl CustomerInventoryAgent for OrangeCustomerProductInventoryActor {
-    async fn get_customer_offers(
+    async fn get_customer<TS: ToString + ?Sized + std::marker::Sync>(
         &self,
         ctx: &Context,
-        arg: &ListOffersRequest,
-    ) -> RpcResult<OffersList> {
+        arg: &TS,
+    ) -> RpcResult<Customer> {
+        info!("Hello Hello");
+
+        info!("Getting cutomer details for customer: {}", arg.to_string());
+
         let kv = KeyValueSender::new();
 
-        kv.list_range(
-            ctx,
-            &ListRangeRequest {
-                list_name: format!("{}:{}:{}", OFFERS_LIST_KEY_PREFIX.to_string(), &arg.party_id, &arg.vendor),
-                start: 0,
-                stop: 9999,
-            },
+        let customer = kv.get(ctx, arg).await?.value;
+        
+        Ok(
+            Customer {
+                value: customer
+            }
         )
-        .await
-        .map(|res| {
-            res.iter()
-                .filter_map(|s| match serde_json::from_str(s.as_str()) {
-                    Ok(v) => Some(v),
-                    Err(_) => None,
-                })
-                .collect::<OffersList>()
-        })
     }
 }
 

@@ -5,4 +5,4 @@ version = "0.1.0"
 
 [actor]
 claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
-call_alias = "mock/orange_invetory"
+call_alias = "mock/orange_inventory"

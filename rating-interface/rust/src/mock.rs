@@ -23,9 +23,75 @@ use wasmbus_rpc::{
 pub const SMITHY_VERSION: &str = "1.0";
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct Customer {
+    #[serde(default)]
+    pub value: String,
+}
+
+// Encode Customer as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_customer<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &Customer,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(1)?;
+    e.str("value")?;
+    e.str(&val.value)?;
+    Ok(())
+}
+
+// Decode Customer from cbor input stream
+#[doc(hidden)]
+pub fn decode_customer(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Customer, RpcError> {
+    let __result = {
+        let mut value: Option<String> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct Customer, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => value = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "value" => value = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        Customer {
+            value: if let Some(__x) = value {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Customer.value (#0)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct DataItem {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub value: Option<String>,
+    #[serde(default)]
+    pub value: String,
 }
 
 // Encode DataItem as CBOR and append to output stream
@@ -39,12 +105,8 @@ where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
     e.map(1)?;
-    if let Some(val) = val.value.as_ref() {
-        e.str("value")?;
-        e.str(val)?;
-    } else {
-        e.null()?;
-    }
+    e.str("value")?;
+    e.str(&val.value)?;
     Ok(())
 }
 
@@ -52,7 +114,7 @@ where
 #[doc(hidden)]
 pub fn decode_data_item(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<DataItem, RpcError> {
     let __result = {
-        let mut value: Option<Option<String>> = Some(None);
+        let mut value: Option<String> = None;
 
         let is_array = match d.datatype()? {
             wasmbus_rpc::cbor::Type::Array => true,
@@ -67,15 +129,7 @@ pub fn decode_data_item(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<DataIt
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => {
-                        value = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
-                            d.skip()?;
-                            Some(None)
-                        } else {
-                            Some(Some(d.str()?.to_string()))
-                        }
-                    }
-
+                    0 => value = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
@@ -83,20 +137,19 @@ pub fn decode_data_item(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<DataIt
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
-                    "value" => {
-                        value = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
-                            d.skip()?;
-                            Some(None)
-                        } else {
-                            Some(Some(d.str()?.to_string()))
-                        }
-                    }
+                    "value" => value = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
         }
         DataItem {
-            value: value.unwrap(),
+            value: if let Some(__x) = value {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field DataItem.value (#0)".to_string(),
+                ));
+            },
         }
     };
     Ok(__result)
@@ -346,11 +399,11 @@ pub fn decode_offers_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Offe
 /// wasmbus.actorReceive
 #[async_trait]
 pub trait CustomerInventoryAgent {
-    async fn get_customer_offers(
+    async fn get_customer<TS: ToString + ?Sized + std::marker::Sync>(
         &self,
         ctx: &Context,
-        arg: &ListOffersRequest,
-    ) -> RpcResult<OffersList>;
+        arg: &TS,
+    ) -> RpcResult<Customer>;
 }
 
 /// CustomerInventoryAgentReceiver receives messages defined in the CustomerInventoryAgent service trait
@@ -360,11 +413,11 @@ pub trait CustomerInventoryAgent {
 pub trait CustomerInventoryAgentReceiver: MessageDispatch + CustomerInventoryAgent {
     async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
         match message.method {
-            "GetCustomerOffers" => {
-                let value: ListOffersRequest = wasmbus_rpc::common::deserialize(&message.arg)
-                    .map_err(|e| RpcError::Deser(format!("'ListOffersRequest': {}", e)))?;
+            "GetCustomer" => {
+                let value: String = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'String': {}", e)))?;
 
-                let resp = CustomerInventoryAgent::get_customer_offers(self, ctx, &value).await?;
+                let resp = CustomerInventoryAgent::get_customer(self, ctx, &value).await?;
                 let buf = wasmbus_rpc::common::serialize(&resp)?;
 
                 Ok(buf)
@@ -421,27 +474,27 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> CustomerInventoryAgen
     for CustomerInventoryAgentSender<T>
 {
     #[allow(unused)]
-    async fn get_customer_offers(
+    async fn get_customer<TS: ToString + ?Sized + std::marker::Sync>(
         &self,
         ctx: &Context,
-        arg: &ListOffersRequest,
-    ) -> RpcResult<OffersList> {
-        let buf = wasmbus_rpc::common::serialize(arg)?;
+        arg: &TS,
+    ) -> RpcResult<Customer> {
+        let buf = wasmbus_rpc::common::serialize(&arg.to_string())?;
 
         let resp = self
             .transport
             .send(
                 ctx,
                 Message {
-                    method: "CustomerInventoryAgent.GetCustomerOffers",
+                    method: "CustomerInventoryAgent.GetCustomer",
                     arg: Cow::Borrowed(&buf),
                 },
                 None,
             )
             .await?;
 
-        let value: OffersList = wasmbus_rpc::common::deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("'{}': OffersList", e)))?;
+        let value: Customer = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': Customer", e)))?;
         Ok(value)
     }
 }

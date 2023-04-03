@@ -1,5 +1,6 @@
-use rating_interface::{RatingAgent, RatingAgentSender, RatingRequest, MockAgentSender, MockAgent, CustomerInventoryAgentSender, CustomerInventoryAgent, ListOffersRequest};
-use serde::Deserialize;
+use rating_interface::{RatingAgent, RatingAgentSender, RatingRequest, MockAgentSender, MockAgent, CustomerInventoryAgentSender, CustomerInventoryAgent};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use types::{
     AuthorizationStatus, BillingInformation, RequestApproval, ServiceUsageRatingRequest,
     ServiceUsageRatingResponse, ServiceUsageRequest, ServiceUsageResponse,
@@ -10,6 +11,20 @@ use wasmcloud_interface_logging::{info};
 
 mod types;
 
+#[derive(Serialize, Deserialize, Debug)]
+struct Party {
+    #[serde(rename = "products")]
+    products: Vec<Product>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Product {
+    #[serde(rename = "partnerId")]
+    partner_id: String,
+    #[serde(rename = "id")]
+    id: u32
+}
+
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, HttpServer)]
 struct ApiGatewayActor {}
@@ -19,7 +34,6 @@ struct ApiGatewayActor {}
 impl HttpServer for ApiGatewayActor {
     async fn handle_request(&self, ctx: &Context, req: &HttpRequest) -> RpcResult<HttpResponse> {
         let trimmed_path: Vec<&str> = req.path.trim_matches('/').split('/').collect();
-        info!("This is an info level log!");
         info!("Trimmed Path: {:?}", trimmed_path);
 
         match (req.method.as_ref(), trimmed_path.as_slice()) {
@@ -33,13 +47,20 @@ impl HttpServer for ApiGatewayActor {
     }
 }
 
-async fn get_party_offers(_ctx: &Context, _party_id: &str, _vendor: &str) -> RpcResult<HttpResponse>{
-    let offers = CustomerInventoryAgentSender::to_actor(&format!("mock/{}", "orange_invetory"))
-        .get_customer_offers(_ctx, &ListOffersRequest {
-            party_id: _party_id.to_owned(),
-            vendor: _vendor.to_owned()
-        })
-        .await?;
+async fn get_party_offers(_ctx: &Context, _party_id: &str, _vendor: &str) -> RpcResult<HttpResponse> {
+    let customer = CustomerInventoryAgentSender::to_actor(&format!("mock/{}", "orange_inventory"))
+        .get_customer(_ctx, &_party_id).await?;
+
+    info!("retrieved cutomer details: {:?}", customer.value);
+
+    let customer_inventory_value: Value = serde_json::from_str(&customer.value)
+        .map_err(|err| RpcError::Ser(format!("{}", err)))?;
+
+    let offers = customer_inventory_value["products"]
+        .as_array().unwrap()
+        .iter()
+        .filter(|product| product["partnerId"] == _vendor)
+        .collect::<Vec<_>>();
 
     HttpResponse::json(offers, 200)
 }
