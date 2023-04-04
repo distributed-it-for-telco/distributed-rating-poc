@@ -34,8 +34,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         info!("Hello I'm your orange postpaid vod rating agent");
 
-        // let usage_date = Utc::now().naive_local();
-        let usage_date = "";
+        let usage_date = "04/04/2023";
         let usage_id: String = generate_guid().await?;
 
         /*
@@ -43,8 +42,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
          */
         let rating = _arg.usage.parse::<i32>().unwrap() * 1;  
 
-        // let rating_date = Utc::now().naive_local();
-        let rating_date = "";
+        let rating_date = "04/04/2023";
 
         let usage_template_str =  json!({
             "id": usage_id,
