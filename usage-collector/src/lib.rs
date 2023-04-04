@@ -1,5 +1,5 @@
-use wasmbus_rpc::actor::prelude::*;
 use rating_interface::*;
+use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_keyvalue::*;
 use wasmcloud_interface_logging::info;
 
@@ -27,8 +27,7 @@ impl UsageCollector for UsageCollectorActor {
                 },
             )
             .await?;
-    
+
         Ok(())
     }
 }
-
