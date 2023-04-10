@@ -1,6 +1,6 @@
-# Makefile for video-rating-agent
+# Makefile for orange-customer-product-inventory
 
-PROJECT  = rating_coordinator
+PROJECT  = orange_customer_product_inventory
 VERSION  = $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[] .version' | head -1)
 REVISION = 0
 # list of all contract claims for actor signing (space-separated)
@@ -11,11 +11,11 @@ REG_URL  = localhost:5000/v2/$(PROJECT):$(VERSION)
 PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
 
 # friendly name for the actor
-ACTOR_NAME = "Rating Coordinator"
+ACTOR_NAME = "orange-customer-product-inventory"
 # optional call alias for actor
-ACTOR_ALIAS=rating_coordinator
+# ACTOR_ALIAS=nickname
 
-include ../makefiles/actor.mk
+include ./actor.mk
 
 test::
 	cargo clippy --all-features --all-targets

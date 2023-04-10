@@ -11,7 +11,7 @@
 metadata package = [ 
   { 
     namespace: "co.uk.orange.rating.agent",
-    crate: "rating_coordinator"
+    crate: "rating_interface"
   }
 ]
 
@@ -29,13 +29,15 @@ service RatingAgent {
 }
 
 operation RateUsage {
-    input: RatingRequest
+    input: RatingRequest,
     output: RatingResponse
 }
 
 structure RatingRequest {
     @required
     customerId: String,
+    @required
+    agentId: String,
     language: String,
     offerId: String,
     // This will be a base64 encoded string containing a JSON payload. The interpretation of the payload

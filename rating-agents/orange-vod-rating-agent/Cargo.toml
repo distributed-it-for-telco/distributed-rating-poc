@@ -1,12 +1,12 @@
 [package]
-name = "orange_rating_agent"
+name = "orange_vod_rating_agent"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "orange_rating_agent"
+name = "orange_vod_rating_agent"
 
 [dependencies]
 async-trait = "0.1"
@@ -19,6 +19,10 @@ wasmbus-rpc = "0.11"
 wasmcloud-interface-keyvalue = "0.9.1"
 wasmcloud-interface-logging = "0.8.0"
 rating_interface = { path = "../../rating-interface/rust" }
+# chrono = "0.4.24"
+new_string_template = "1.4"
+wasmcloud-interface-numbergen = "0.8.1"
+# wasmcloud-interface-blobstore = "0.5.1"
 
 [profile.release]
 # Optimize for small code size

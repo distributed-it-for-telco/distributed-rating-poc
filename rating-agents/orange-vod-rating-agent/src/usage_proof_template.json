@@ -1,0 +1,30 @@
+{
+    "id": "{usage_id}",
+    "usageDate": "{usage_date}",
+    "description":"Video on Demand",
+    "usageType":"VoD",
+    "ratedProductUsage":{
+       "isBilled":false,
+       "ratingAmountType":"Total",
+       "ratingDate":"{rating_date}",
+       "bucketValueConvertedInAmount":{
+          "unit":"EUR",
+          "value": "{price}"
+       },
+       "productRef":{
+          "id":"1234",
+          "name":"Video on Demand"
+       }
+    },
+    "relatedParty":{
+       "id":"{party_id}"
+    },
+    "usageCharacteristic":[
+       {
+          "id":"122",
+          "name":"movie-count",
+          "valueType":"integer",
+          "value":"{rated_entity_count}"
+       }
+    ]
+ }

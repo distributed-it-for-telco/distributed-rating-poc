@@ -270,6 +270,9 @@ pub fn decode_message_list(
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct RatingRequest {
+    #[serde(rename = "agentId")]
+    #[serde(default)]
+    pub agent_id: String,
     #[serde(rename = "customerId")]
     #[serde(default)]
     pub customer_id: String,
@@ -292,7 +295,9 @@ pub fn encode_rating_request<W: wasmbus_rpc::cbor::Write>(
 where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
-    e.map(4)?;
+    e.map(5)?;
+    e.str("agentId")?;
+    e.str(&val.agent_id)?;
     e.str("customerId")?;
     e.str(&val.customer_id)?;
     if let Some(val) = val.language.as_ref() {
@@ -318,6 +323,7 @@ pub fn decode_rating_request(
     d: &mut wasmbus_rpc::cbor::Decoder<'_>,
 ) -> Result<RatingRequest, RpcError> {
     let __result = {
+        let mut agent_id: Option<String> = None;
         let mut customer_id: Option<String> = None;
         let mut language: Option<Option<String>> = Some(None);
         let mut offer_id: Option<Option<String>> = Some(None);
@@ -336,8 +342,9 @@ pub fn decode_rating_request(
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => customer_id = Some(d.str()?.to_string()),
-                    1 => {
+                    0 => agent_id = Some(d.str()?.to_string()),
+                    1 => customer_id = Some(d.str()?.to_string()),
+                    2 => {
                         language = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
                             d.skip()?;
                             Some(None)
@@ -345,7 +352,7 @@ pub fn decode_rating_request(
                             Some(Some(d.str()?.to_string()))
                         }
                     }
-                    2 => {
+                    3 => {
                         offer_id = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
                             d.skip()?;
                             Some(None)
@@ -353,7 +360,7 @@ pub fn decode_rating_request(
                             Some(Some(d.str()?.to_string()))
                         }
                     }
-                    3 => usage = Some(d.str()?.to_string()),
+                    4 => usage = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
@@ -361,6 +368,7 @@ pub fn decode_rating_request(
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
+                    "agentId" => agent_id = Some(d.str()?.to_string()),
                     "customerId" => customer_id = Some(d.str()?.to_string()),
                     "language" => {
                         language = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
@@ -384,11 +392,19 @@ pub fn decode_rating_request(
             }
         }
         RatingRequest {
+            agent_id: if let Some(__x) = agent_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingRequest.agent_id (#0)".to_string(),
+                ));
+            },
+
             customer_id: if let Some(__x) = customer_id {
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field RatingRequest.customer_id (#0)".to_string(),
+                    "missing field RatingRequest.customer_id (#1)".to_string(),
                 ));
             },
             language: language.unwrap(),
@@ -398,7 +414,7 @@ pub fn decode_rating_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field RatingRequest.usage (#3)".to_string(),
+                    "missing field RatingRequest.usage (#4)".to_string(),
                 ));
             },
         }

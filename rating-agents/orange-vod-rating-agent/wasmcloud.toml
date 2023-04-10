@@ -1,0 +1,8 @@
+name = "orange_vod_rating_agent"
+language = "rust"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging", "wasmcloud:builtin:numbergen"]
+call_alias = "agent/orange_vod"
