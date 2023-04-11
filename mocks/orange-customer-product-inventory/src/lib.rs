@@ -21,8 +21,6 @@ impl CustomerInventoryAgent for OrangeCustomerProductInventoryActor {
         ctx: &Context,
         arg: &TS,
     ) -> RpcResult<Customer> {
-        info!("Hello Hello");
-
         info!("Getting cutomer details for customer: {}", arg.to_string());
 
         let kv = KeyValueSender::new();
