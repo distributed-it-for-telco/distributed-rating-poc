@@ -6,7 +6,7 @@ use serde::{Serialize, Deserialize};
 use serde_json::{json};
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_keyvalue::{KeyValueSender, KeyValue, SetRequest};
-use wasmcloud_interface_logging::info;
+use wasmcloud_interface_logging::{info};
 use wasmcloud_interface_numbergen::generate_guid;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -17,7 +17,7 @@ struct Bucket {
     offer_id: String,
     #[serde(rename = "partyId")]
     party_id: String,
-    #[serde(rename = "partyCharacteristic")]
+    #[serde(rename = "bucketCharacteristic")]
     bucket_characteristic: BucketCharacteristic,
 }
 
@@ -51,17 +51,29 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
 
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
 
+        let mut billing_info = BillingInformation::default();
+        billing_info.unit = (&"EUR").to_string();
+        billing_info.messages = vec![String::from("Your bucket is is 3 movies with price 2 EUR")];
+
         if bucket.bucket_characteristic.count == 0 {
             let rating = 2;
+            info!("Handling rating empty buket");
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
 
             refill_bucket(_ctx, &bucket_key).await?;
             decrement_bucket(_ctx, &bucket_key).await?;
+
+            billing_info.price = rating.to_string();
         } else {
             let rating = 0;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
 
             decrement_bucket(_ctx, &bucket_key).await?;
+
+            billing_info.price = rating.to_string();
+            billing_info.messages.push(
+                String::from(format!("Current price is {}, because it's part of package", rating))
+            );
         }
 
         /*
@@ -69,7 +81,7 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
          */
         RpcResult::Ok(RatingResponse {
             authorization_status: AuthorizationStatus::default(),
-            billing_information: BillingInformation::default()
+            billing_information: billing_info
         })
     }
 }
@@ -80,11 +92,14 @@ async fn get_party_bucket(
 ) -> RpcResult<Bucket> {
     let kv = KeyValueSender::new();
 
+    info!("Retreiving party bucket with key: {:?}", bucket_key);
+
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
 
-    let bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let bucket: Bucket = serde_json::from_str(&bucket_json_str)
+        .map_err(|err| RpcError::Ser(format!("{}", err)))?;
 
-    info!("retrieved cutomer buckey: {:?}", bucket);
+    info!("retrieved party bucket: {:?}", bucket);
 
     Ok(bucket)
 }
@@ -104,7 +119,7 @@ async fn handle_rating(
     let usage_template_str = json!({
         "id": usage_id,
         "usageDate": usage_date,
-        "description": "Video on Demand",
+        "description": "Video on Demand with Bucket",
         "usageType": "VoD",
         "ratedProductUsage": {
             "isBilled": false,
@@ -116,7 +131,7 @@ async fn handle_rating(
             },
             "productRef": {
                 "id": "1234",
-                "name": "Video on Demand"
+                "name": "Video on Demand with Bucket"
             }
         },
         "relatedParty": {
@@ -149,16 +164,20 @@ async fn refill_bucket(
     _ctx: &Context,
     bucket_key: &str
 ) -> RpcResult<()> {
+    info!("Refill bucket");
+
     let kv = KeyValueSender::new();
 
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
 
-    let mut bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let mut bucket: Bucket = serde_json::from_str(&bucket_json_str)
+        .map_err(|err| RpcError::Ser(format!("{}", err)))?;
 
     bucket.bucket_characteristic.count = 3;
 
-
     let serialized_bucket = serde_json::to_string(&bucket).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    
+    info!("serialized bucket after refill {:?}", serialized_bucket);
 
     kv.set(
         _ctx,
@@ -186,6 +205,8 @@ async fn decrement_bucket(
     bucket.bucket_characteristic.count -= 1;
 
     let serialized_bucket = serde_json::to_string(&bucket).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+
+    info!("serialized bucket after decrement {:?}", serialized_bucket);
 
     kv.set(
         _ctx,
