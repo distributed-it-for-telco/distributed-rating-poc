@@ -1,0 +1,9 @@
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/wasm32-unknown-unknown/release/deps/tracing_futures-18ab67a82fef8fd3.rmeta: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/stdlib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/executor/mod.rs
+
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/wasm32-unknown-unknown/release/deps/libtracing_futures-18ab67a82fef8fd3.rlib: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/stdlib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/executor/mod.rs
+
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/wasm32-unknown-unknown/release/deps/tracing_futures-18ab67a82fef8fd3.d: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/stdlib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/executor/mod.rs
+
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/lib.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/stdlib.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-futures-0.2.5/src/executor/mod.rs:

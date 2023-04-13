@@ -1,0 +1,8 @@
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/wasm32-unknown-unknown/release/deps/wasmcloud_interface_keyvalue-55508fbef9804355.wasm: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmcloud-interface-keyvalue-0.9.1/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmcloud-interface-keyvalue-0.9.1/src/keyvalue.rs
+
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/wasm32-unknown-unknown/release/deps/libwasmcloud_interface_keyvalue-55508fbef9804355.rlib: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmcloud-interface-keyvalue-0.9.1/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmcloud-interface-keyvalue-0.9.1/src/keyvalue.rs
+
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/wasm32-unknown-unknown/release/deps/wasmcloud_interface_keyvalue-55508fbef9804355.d: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmcloud-interface-keyvalue-0.9.1/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmcloud-interface-keyvalue-0.9.1/src/keyvalue.rs
+
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmcloud-interface-keyvalue-0.9.1/src/lib.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmcloud-interface-keyvalue-0.9.1/src/keyvalue.rs:

@@ -1,0 +1,15 @@
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/release/deps/downloader-640b1cf768e1eb84.rmeta: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/backend.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/download.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/downloader.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/progress.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/verify.rs
+
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/release/deps/libdownloader-640b1cf768e1eb84.rlib: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/backend.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/download.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/downloader.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/progress.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/verify.rs
+
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/release/deps/downloader-640b1cf768e1eb84.d: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/backend.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/download.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/downloader.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/progress.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/verify.rs
+
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/lib.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/backend.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/download.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/downloader.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/progress.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/downloader-0.2.7/src/verify.rs:
+
+# env-dep:CARGO_PKG_NAME=downloader
+# env-dep:CARGO_PKG_VERSION=0.2.7

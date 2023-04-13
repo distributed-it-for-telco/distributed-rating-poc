@@ -1,0 +1,5 @@
+cargo:rerun-if-changed=/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-interface/codegen.toml
+cargo:rerun-if-changed=/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-interface/./interfaces/rating-agent.smithy
+cargo:rerun-if-changed=/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-interface/./interfaces/mock-agent.smithy
+cargo:rerun-if-changed=/Users/redaelsayed/Library/Caches/smithy/wasmcloud.github.io/wasmcloud-core.f2facc62766ec8c4.smithy
+cargo:rerun-if-changed=/Users/redaelsayed/Library/Caches/smithy/wasmcloud.github.io/wasmcloud-model.6e8584f5be28601b.smithy

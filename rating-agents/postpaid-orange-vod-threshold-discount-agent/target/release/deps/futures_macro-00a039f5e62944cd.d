@@ -1,0 +1,9 @@
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/release/deps/libfutures_macro-00a039f5e62944cd.dylib: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/executor.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/join.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/select.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/stream_select.rs
+
+/Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-threshold-discount-agent/target/release/deps/futures_macro-00a039f5e62944cd.d: /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/lib.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/executor.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/join.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/select.rs /Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/stream_select.rs
+
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/lib.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/executor.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/join.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/select.rs:
+/Users/redaelsayed/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-macro-0.3.28/src/stream_select.rs:

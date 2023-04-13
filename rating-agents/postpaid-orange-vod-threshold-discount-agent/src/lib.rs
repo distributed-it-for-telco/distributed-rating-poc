@@ -60,22 +60,37 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
 
         let bucket_key = format!("{}:{}:{}", BUCKET_KEY_PREFIX, &_arg.customer_id.as_str(), OFFER_ID);
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
-
-        if bucket.bucket_characteristic.count == THRESHOLD+1 {
-            let rating = MOVIE_COST*THRESHOLD_DISCOUNT;
+        let mut free_text: String = "".to_string();
+        info!("---------Your count = {}",bucket.bucket_characteristic.count);
+      
+        if bucket.bucket_characteristic.count == THRESHOLD {
+        
+            let rating = MOVIE_COST - MOVIE_COST*THRESHOLD_DISCOUNT;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
 
             clear_bucket(_ctx, &bucket_key).await?;
+
+            free_text = format!(" you got discount {}% ",THRESHOLD_DISCOUNT*100.0);
+            info!("free Text...{}",free_text);
             
         } else {
             let rating = MOVIE_COST;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
             increase_bucket(_ctx, &bucket_key).await?;
+            if bucket.bucket_characteristic.count+1 == THRESHOLD {
+                free_text=format!("You will get discount {}% Next movie",THRESHOLD_DISCOUNT*100.0);
+            } else {
+                free_text =format!("Still you can get discount {}% after watching {} movies",THRESHOLD_DISCOUNT*100.0,(THRESHOLD - (bucket.bucket_characteristic.count+1)))
+            } 
+            info!("free Text...{}",free_text);
         }
+
+         
 
         RpcResult::Ok(RatingResponse {
             authorization_status: AuthorizationStatus::default(),
             billing_information: BillingInformation::default(),
+            free_text
         })
 
     }
@@ -86,13 +101,10 @@ async fn get_party_bucket(
     _ctx: &Context,
     bucket_key: &str
 ) -> RpcResult<Bucket> {
+
     let kv = KeyValueSender::new();
-
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-
     let bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
-
-    info!("retrieved cutomer buckey: {:?}", bucket);
 
     Ok(bucket)
 }
