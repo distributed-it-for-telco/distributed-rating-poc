@@ -51,10 +51,7 @@ structure RatingResponse {
     authorizationStatus: AuthorizationStatus,
 
     @required
-    billingInformation: BillingInformation ,
-    
-    @required
-    freeText: String
+    billingInformation: BillingInformation 
 }
 
 structure BillingInformation {

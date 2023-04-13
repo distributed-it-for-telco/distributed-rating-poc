@@ -61,7 +61,9 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
         let bucket_key = format!("{}:{}:{}", BUCKET_KEY_PREFIX, &_arg.customer_id.as_str(), OFFER_ID);
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
         let mut free_text: String = "".to_string();
-        info!("---------Your count = {}",bucket.bucket_characteristic.count);
+        let mut billing_info = BillingInformation::default();
+        billing_info.unit = (&"EUR").to_string();
+       
       
         if bucket.bucket_characteristic.count == THRESHOLD {
         
@@ -69,28 +71,31 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
 
             clear_bucket(_ctx, &bucket_key).await?;
-
-            free_text = format!(" you got discount {}% ",THRESHOLD_DISCOUNT*100.0);
-            info!("free Text...{}",free_text);
+            billing_info.price = rating.to_string();
+            free_text = format!("You got discount {}% ",THRESHOLD_DISCOUNT*100.0);
+            
+            
             
         } else {
             let rating = MOVIE_COST;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
             increase_bucket(_ctx, &bucket_key).await?;
+            billing_info.price = rating.to_string();
             if bucket.bucket_characteristic.count+1 == THRESHOLD {
                 free_text=format!("You will get discount {}% Next movie",THRESHOLD_DISCOUNT*100.0);
             } else {
                 free_text =format!("Still you can get discount {}% after watching {} movies",THRESHOLD_DISCOUNT*100.0,(THRESHOLD - (bucket.bucket_characteristic.count+1)))
             } 
-            info!("free Text...{}",free_text);
+         
         }
 
          
-
+        billing_info.messages.push(
+            free_text.to_string()
+        );
         RpcResult::Ok(RatingResponse {
             authorization_status: AuthorizationStatus::default(),
-            billing_information: BillingInformation::default(),
-            free_text
+            billing_information: billing_info
         })
 
     }

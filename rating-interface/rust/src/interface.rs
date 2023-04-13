@@ -427,9 +427,6 @@ pub struct RatingResponse {
     pub authorization_status: AuthorizationStatus,
     #[serde(rename = "billingInformation")]
     pub billing_information: BillingInformation,
-    #[serde(rename = "freeText")]
-    #[serde(default)]
-    pub free_text: String,
 }
 
 // Encode RatingResponse as CBOR and append to output stream
@@ -442,13 +439,11 @@ pub fn encode_rating_response<W: wasmbus_rpc::cbor::Write>(
 where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
-    e.map(3)?;
+    e.map(2)?;
     e.str("authorizationStatus")?;
     encode_authorization_status(e, &val.authorization_status)?;
     e.str("billingInformation")?;
     encode_billing_information(e, &val.billing_information)?;
-    e.str("freeText")?;
-    e.str(&val.free_text)?;
     Ok(())
 }
 
@@ -461,7 +456,6 @@ pub fn decode_rating_response(
         {
             let mut authorization_status: Option<AuthorizationStatus> = None;
             let mut billing_information: Option<BillingInformation> = None;
-            let mut free_text: Option<String> = None;
 
             let is_array = match d.datatype()? {
                 wasmbus_rpc::cbor::Type::Array => true,
@@ -490,7 +484,6 @@ pub fn decode_rating_response(
                                     e
                                 )
                             })?),
-                        2 => free_text = Some(d.str()?.to_string()),
                         _ => d.skip()?,
                     }
                 }
@@ -512,7 +505,6 @@ pub fn decode_rating_response(
                                     e
                                 )
                             })?),
-                        "freeText" => free_text = Some(d.str()?.to_string()),
                         _ => d.skip()?,
                     }
                 }
@@ -531,14 +523,6 @@ pub fn decode_rating_response(
                 } else {
                     return Err(RpcError::Deser(
                         "missing field RatingResponse.billing_information (#1)".to_string(),
-                    ));
-                },
-
-                free_text: if let Some(__x) = free_text {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field RatingResponse.free_text (#2)".to_string(),
                     ));
                 },
             }
