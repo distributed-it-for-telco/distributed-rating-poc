@@ -53,13 +53,18 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
         let mut authorization_status = AuthorizationStatus::default();
 
         if balance.balance_characteristic.count <= 0.0 {
+            billing_info.messages.push(
+                format!("You have no sufficient balance")
+            );
             authorization_status.code = 401;
         }else{
           let usage:f64 = _arg.usage.parse().unwrap();
           let rating = UNIT_COST*usage;
         info!("Usage {} , Rating {} , & balance {}",usage,rating,balance.balance_characteristic.count);
           if balance.balance_characteristic.count < rating {
-
+            billing_info.messages.push(
+                format!("You have no sufficient balance")
+            );
             authorization_status.code = 401;
 
           }else{
