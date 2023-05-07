@@ -1,72 +1,96 @@
-swagger: "2.0"
+openapi: 3.0.1
 info:
-  version: "1.0.0"
-  title: "WasmCloud Rating"
-  termsOfService: "http://swagger.io/terms/"
-  contact:
-    email: "apiteam@swagger.io"
-  license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "weathered-mountain-8378.cosmonic.app"
+  title: WasmCloud Rating
+  version: 1.0.0
+servers:
+- url: https://weathered-mountain-8378.cosmonic.app/
 tags:
-- name: "Rating"
+- name: Rating
   externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-schemes:
-- "https"
-- "http"
+    description: Find out more
+    url: http://swagger.io
 paths:
   /usage/rating:
     post:
       tags:
-      - "Rating"
-      summary: "Rate user usage"
-      description: ""
-      operationId: "rateUsage"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Usage that needs to be rated"
+      - Rating
+      summary: Rate user usage
+      operationId: rateUsage
+      requestBody:
+        description: Usage that needs to be rated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RatingRequest'
         required: true
-        schema:
-          $ref: "#/definitions/RatingRequest"
       responses:
-        "405":
-          description: "Invalid input"
+        200:
+          description: successful operation
+          content: {}
+        400:
+          description: Invalid username supplied
+          content: {}
+        404:
+          description: User not found
+          content: {}
+        405:
+          description: Invalid input
+          content: {}
+      x-codegen-request-body-name: body
   
-definitions:
-  RatingRequest:
-    type: "object"
-    properties:
-      customerId:
-        type: "string"
-      usage:
-        type: "string"
-      agentId:
-        type: "string"
-    xml:
-      name: "RatingRequest"
-  
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
-        
-        
-        
-        
-        
+  /party/{partyId}/offers/{vendor}:
+    get:
+      tags:
+      - Inventory
+      summary: Rate user usage
+      operationId: getPartyOffers
+      parameters:
+        - in: path
+          name: partyId
+          schema:
+            type: string
+          required: true
+          description: Alphnumeric ID of the party to get offers for
+        - in: path
+          name: vendor
+          schema:
+            type: string
+          required: true
+          description: Alphnumeric ID of the vendor to get offers subscribed by party
+      responses:
+        200:
+          description: successful operation
+          content: {}
+        400:
+          description: Invalid partyId or vendor supplied
+          content: {}
+        405:
+          description: Invalid input
+          content: {}
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    RatingRequest:
+      type: object
+      properties:
+        customerId:
+          type: string
+        usage:
+          type: string
+        agentId:
+          type: string
+      xml:
+        name: RatingRequest
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
