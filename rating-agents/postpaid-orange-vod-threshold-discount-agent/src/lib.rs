@@ -19,7 +19,7 @@ struct Bucket {
     offer_id: String,
     #[serde(rename = "partyId")]
     party_id: String,
-    #[serde(rename = "partyCharacteristic")]
+    #[serde(rename = "bucketCharacteristic")]
     bucket_characteristic: BucketCharacteristic,
 }
 
@@ -106,11 +106,13 @@ async fn get_party_bucket(
     _ctx: &Context,
     bucket_key: &str
 ) -> RpcResult<Bucket> {
-
+    info!("Start get_party_bucket");
     let kv = KeyValueSender::new();
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-    let bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    info!("bucket {}", bucket_json_str);
 
+    let bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    info!("End get_party_bucket");
     Ok(bucket)
 }
 
