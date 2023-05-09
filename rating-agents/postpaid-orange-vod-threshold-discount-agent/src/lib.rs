@@ -19,7 +19,7 @@ struct Bucket {
     offer_id: String,
     #[serde(rename = "partyId")]
     party_id: String,
-    #[serde(rename = "partyCharacteristic")]
+    #[serde(rename = "bucketCharacteristic")]
     bucket_characteristic: BucketCharacteristic,
 }
 
