@@ -1,33 +1,12 @@
 use rating_interface::{
     AuthorizationStatus, BillingInformation, RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse, UsageCollector, UsageCollectorSender,
+    RatingResponse, UsageCollector, UsageCollectorSender, Bucket
 };
-use serde::{Serialize, Deserialize};
 use serde_json::{json};
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_keyvalue::{KeyValueSender, KeyValue, SetRequest};
 use wasmcloud_interface_logging::{info};
 use wasmcloud_interface_numbergen::generate_guid;
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Bucket {
-    #[serde(rename = "name")]
-    name: String,
-    #[serde(rename = "offerId")]
-    offer_id: String,
-    #[serde(rename = "partyId")]
-    party_id: String,
-    #[serde(rename = "bucketCharacteristic")]
-    bucket_characteristic: BucketCharacteristic,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct BucketCharacteristic {
-    #[serde(rename = "unit")]
-    unit: String,
-    #[serde(rename = "count")]
-    pub count: u32,
-}
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
