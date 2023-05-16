@@ -59,13 +59,16 @@ impl HttpServer for ApiGatewayActor {
     }
 }
 
-async fn get_options_response(
-    _ctx: &Context
-) -> RpcResult<HttpResponse> {
-        
+async fn get_options_response(_ctx: &Context) -> RpcResult<HttpResponse> {
     let mut headers: HashMap<String, Vec<String>> = HashMap::new();
-    headers.insert("Access-Control-Allow-Headers".to_owned(), vec!["Content-Type, api_key, Authorization".to_string()]);
-    headers.insert("Access-Control-Allow-Origin".to_owned(), vec!["https://editor.swagger.io".to_owned()]);
+    headers.insert(
+        "Access-Control-Allow-Headers".to_owned(),
+        vec!["Content-Type, api_key, Authorization".to_string()],
+    );
+    headers.insert(
+        "Access-Control-Allow-Origin".to_owned(),
+        vec!["https://editor.swagger.io".to_owned()],
+    );
     HttpResponse::json_with_headers("", 204, headers)
 }
 
@@ -91,8 +94,14 @@ async fn get_party_offers(
         .collect::<Vec<_>>();
 
     let mut headers: HashMap<String, Vec<String>> = HashMap::new();
-    headers.insert("Access-Control-Allow-Headers".to_owned(), vec!["Content-Type, api_key, Authorization".to_string()]);
-    headers.insert("Access-Control-Allow-Origin".to_owned(), vec!["https://editor.swagger.io".to_owned()]);
+    headers.insert(
+        "Access-Control-Allow-Headers".to_owned(),
+        vec!["Content-Type, api_key, Authorization".to_string()],
+    );
+    headers.insert(
+        "Access-Control-Allow-Origin".to_owned(),
+        vec!["https://editor.swagger.io".to_owned()],
+    );
 
     HttpResponse::json_with_headers(offers, 200, headers)
 }
@@ -113,8 +122,14 @@ async fn request_rate(_ctx: &Context, _request: RatingRequest) -> RpcResult<Http
         .await?;
 
     let mut headers: HashMap<String, Vec<String>> = HashMap::new();
-    headers.insert("Access-Control-Allow-Headers".to_owned(), vec!["Content-Type, api_key, Authorization".to_string()]);
-    headers.insert("Access-Control-Allow-Origin".to_owned(), vec!["https://editor.swagger.io".to_owned()]);
+    headers.insert(
+        "Access-Control-Allow-Headers".to_owned(),
+        vec!["Content-Type, api_key, Authorization".to_string()],
+    );
+    headers.insert(
+        "Access-Control-Allow-Origin".to_owned(),
+        vec!["https://editor.swagger.io".to_owned()],
+    );
 
     HttpResponse::json_with_headers(rating, 200, headers)
 }
