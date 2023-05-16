@@ -27,14 +27,13 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         */
 
         let bucket_key = format!("{}:{}:{}", BUCKET_KEY_PREFIX, &_arg.customer_id.as_str(), OFFER_ID);
-
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
 
         let mut billing_info = BillingInformation::default();
         billing_info.unit = (&"EUR").to_string();
         billing_info.messages = vec![String::from("Your bucket is is 3 movies with price 2 EUR")];
 
-        if bucket.bucket_characteristic.count == 0 {
+        if bucket.characteristic_count() == 0 {
             let rating = 2;
             info!("Handling rating empty buket");
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
@@ -70,13 +69,10 @@ async fn get_party_bucket(
     bucket_key: &str
 ) -> RpcResult<Bucket> {
     let kv = KeyValueSender::new();
-
     info!("Retreiving party bucket with key: {:?}", bucket_key);
 
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-
-    let bucket: Bucket = serde_json::from_str(&bucket_json_str)
-        .map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
 
     info!("retrieved party bucket: {:?}", bucket);
 
@@ -90,8 +86,7 @@ async fn handle_rating(
     _usage: &str
 ) -> RpcResult<()> {
     let usage_date = "04/04/2023";
-    let usage_id: String = generate_guid().await
-        .map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let usage_id: String = generate_guid().await?;
 
     let rating_date = "04/04/2023";
 
@@ -149,12 +144,9 @@ async fn refill_bucket(
 
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
 
-    let mut bucket: Bucket = serde_json::from_str(&bucket_json_str)
-        .map_err(|err| RpcError::Ser(format!("{}", err)))?;
-
-    bucket.bucket_characteristic.count = 3;
-
-    let serialized_bucket = serde_json::to_string(&bucket).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    bucket.set_characteristic_count(3);
+    let serialized_bucket = bucket.serialize()?;
     
     info!("serialized bucket after refill {:?}", serialized_bucket);
 
@@ -176,14 +168,11 @@ async fn decrement_bucket(
     bucket_key: &str
 ) -> RpcResult<()> {
     let kv = KeyValueSender::new();
-
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
 
-    let mut bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
-
-    bucket.bucket_characteristic.count -= 1;
-
-    let serialized_bucket = serde_json::to_string(&bucket).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    bucket.decrement_characteristic_count();
+    let serialized_bucket = bucket.serialize()?;
 
     info!("serialized bucket after decrement {:?}", serialized_bucket);
 

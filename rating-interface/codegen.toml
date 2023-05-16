@@ -13,12 +13,6 @@ url = "https://wasmcloud.github.io/interfaces/idl/org.wasmcloud"
 files = [ "wasmcloud-core.smithy", "wasmcloud-model.smithy" ]
 
 
-[html]
-output_dir = "html"
-
-[html.parameters]
-minified = true
-
 [rust]
 
 # top-level output directory for rust files.

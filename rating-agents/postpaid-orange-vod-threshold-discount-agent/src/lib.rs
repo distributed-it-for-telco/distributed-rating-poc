@@ -12,7 +12,6 @@ use wasmcloud_interface_numbergen::generate_guid;
 #[services(Actor, RatingAgent)]
 struct PostpaidOrangeVodThresholdDiscountAgentActor {}
 
-
 const BUCKET_KEY_PREFIX: &str = "bucket";
 
 const OFFER_ID: &str = "3";
@@ -42,30 +41,24 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
         billing_info.unit = (&"EUR").to_string();
        
       
-        if bucket.bucket_characteristic.count == THRESHOLD {
-        
+        if bucket.characteristic_count() == THRESHOLD {
             let rating = MOVIE_COST - MOVIE_COST*THRESHOLD_DISCOUNT;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
 
             clear_bucket(_ctx, &bucket_key).await?;
             billing_info.price = rating.to_string();
             free_text = format!("You got discount {}% ",THRESHOLD_DISCOUNT*100.0);
-            
-            
-            
         } else {
             let rating = MOVIE_COST;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
             increase_bucket(_ctx, &bucket_key).await?;
             billing_info.price = rating.to_string();
-            if bucket.bucket_characteristic.count+1 == THRESHOLD {
+            if bucket.characteristic_count()+1 == THRESHOLD {
                 free_text=format!("You will get discount {}% Next movie",THRESHOLD_DISCOUNT*100.0);
             } else {
                 free_text =format!("Still you can get discount {}% after watching {} movies",THRESHOLD_DISCOUNT*100.0,(THRESHOLD - (bucket.bucket_characteristic.count+1)))
             } 
-         
         }
-
          
         billing_info.messages.push(
             free_text.to_string()
@@ -88,25 +81,21 @@ async fn get_party_bucket(
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
     info!("bucket {}", bucket_json_str);
 
-    let bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
     info!("End get_party_bucket");
     Ok(bucket)
 }
-
 
 async fn increase_bucket(
     _ctx: &Context,
     bucket_key: &str
 ) -> RpcResult<()> {
     let kv = KeyValueSender::new();
-
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
 
-    let mut bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
-
-    bucket.bucket_characteristic.count += 1;
-
-    let serialized_bucket = serde_json::to_string(&bucket).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    bucket.increment_characteristic_count();
+    let serialized_bucket = bucket.serialize()?;
 
     kv.set(
         _ctx,
@@ -127,15 +116,11 @@ async fn clear_bucket(
     bucket_key: &str
 ) -> RpcResult<()> {
     let kv = KeyValueSender::new();
-
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
 
-    let mut bucket: Bucket = serde_json::from_str(&bucket_json_str).map_err(|err| RpcError::Ser(format!("{}", err)))?;
-
-    bucket.bucket_characteristic.count = 0;
-
-
-    let serialized_bucket = serde_json::to_string(&bucket).map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    bucket.clear_characteristic_count();
+    let serialized_bucket = bucket.serialize()?;
 
     kv.set(
         _ctx,
@@ -157,8 +142,7 @@ async fn handle_rating(
     _usage: &str
 ) -> RpcResult<()> {
     let usage_date = "04/04/2023";
-    let usage_id: String = generate_guid().await
-        .map_err(|err| RpcError::Ser(format!("{}", err)))?;
+    let usage_id: String = generate_guid().await?;
 
     let rating_date = "04/04/2023";
 
