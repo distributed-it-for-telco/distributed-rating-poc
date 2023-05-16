@@ -1,0 +1,96 @@
+openapi: 3.0.1
+info:
+  title: WasmCloud Rating
+  version: 1.0.0
+servers:
+- url: https://weathered-mountain-8378.cosmonic.app/
+tags:
+- name: Rating
+  externalDocs:
+    description: Find out more
+    url: http://swagger.io
+paths:
+  /usage/rating:
+    post:
+      tags:
+      - Rating
+      summary: Rate user usage
+      operationId: rateUsage
+      requestBody:
+        description: Usage that needs to be rated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RatingRequest'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content: {}
+        400:
+          description: Invalid username supplied
+          content: {}
+        404:
+          description: User not found
+          content: {}
+        405:
+          description: Invalid input
+          content: {}
+      x-codegen-request-body-name: body
+  
+  /party/{partyId}/offers/{vendor}:
+    get:
+      tags:
+      - Inventory
+      summary: Rate user usage
+      operationId: getPartyOffers
+      parameters:
+        - in: path
+          name: partyId
+          schema:
+            type: string
+          required: true
+          description: Alphnumeric ID of the party to get offers for
+        - in: path
+          name: vendor
+          schema:
+            type: string
+          required: true
+          description: Alphnumeric ID of the vendor to get offers subscribed by party
+      responses:
+        200:
+          description: successful operation
+          content: {}
+        400:
+          description: Invalid partyId or vendor supplied
+          content: {}
+        405:
+          description: Invalid input
+          content: {}
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    RatingRequest:
+      type: object
+      properties:
+        customerId:
+          type: string
+        usage:
+          type: string
+        agentId:
+          type: string
+      xml:
+        name: RatingRequest
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string

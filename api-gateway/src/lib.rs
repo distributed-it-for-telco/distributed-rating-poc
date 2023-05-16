@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use rating_interface::{
     CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender, RatingAgent,
     RatingAgentSender, RatingRequest,
@@ -40,6 +42,7 @@ impl HttpServer for ApiGatewayActor {
         info!("Trimmed Path: {:?}", trimmed_path);
 
         match (req.method.as_ref(), trimmed_path.as_slice()) {
+            ("OPTIONS", _) => get_options_response(ctx).await,
             ("POST", ["usage", "rating"]) => request_rate(ctx, deser(&req.body)?).await,
             ("POST", ["usage", "requests"]) => request_usage(ctx, deser(&req.body)?).await,
             ("POST", ["usage", "rating_events"]) => {
@@ -54,6 +57,19 @@ impl HttpServer for ApiGatewayActor {
             (_, _) => Ok(HttpResponse::not_found()),
         }
     }
+}
+
+async fn get_options_response(_ctx: &Context) -> RpcResult<HttpResponse> {
+    let mut headers: HashMap<String, Vec<String>> = HashMap::new();
+    headers.insert(
+        "Access-Control-Allow-Headers".to_owned(),
+        vec!["Content-Type, api_key, Authorization".to_string()],
+    );
+    headers.insert(
+        "Access-Control-Allow-Origin".to_owned(),
+        vec!["https://editor.swagger.io".to_owned()],
+    );
+    HttpResponse::json_with_headers("", 204, headers)
 }
 
 async fn get_party_offers(
@@ -77,7 +93,17 @@ async fn get_party_offers(
         .filter(|product| product["partnerId"] == _vendor)
         .collect::<Vec<_>>();
 
-    HttpResponse::json(offers, 200)
+    let mut headers: HashMap<String, Vec<String>> = HashMap::new();
+    headers.insert(
+        "Access-Control-Allow-Headers".to_owned(),
+        vec!["Content-Type, api_key, Authorization".to_string()],
+    );
+    headers.insert(
+        "Access-Control-Allow-Origin".to_owned(),
+        vec!["https://editor.swagger.io".to_owned()],
+    );
+
+    HttpResponse::json_with_headers(offers, 200, headers)
 }
 
 async fn request_usage(_ctx: &Context, _request: ServiceUsageRequest) -> RpcResult<HttpResponse> {
@@ -95,7 +121,17 @@ async fn request_rate(_ctx: &Context, _request: RatingRequest) -> RpcResult<Http
         .rate_usage(_ctx, &_request)
         .await?;
 
-    HttpResponse::json(rating, 200)
+    let mut headers: HashMap<String, Vec<String>> = HashMap::new();
+    headers.insert(
+        "Access-Control-Allow-Headers".to_owned(),
+        vec!["Content-Type, api_key, Authorization".to_string()],
+    );
+    headers.insert(
+        "Access-Control-Allow-Origin".to_owned(),
+        vec!["https://editor.swagger.io".to_owned()],
+    );
+
+    HttpResponse::json_with_headers(rating, 200, headers)
 }
 
 async fn seed_data_for_orange_cust_inventory(_ctx: &Context) -> RpcResult<HttpResponse> {
