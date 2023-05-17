@@ -452,81 +452,86 @@ where
 pub fn decode_rating_response(
     d: &mut wasmbus_rpc::cbor::Decoder<'_>,
 ) -> Result<RatingResponse, RpcError> {
-    let __result =
-        {
-            let mut authorization_status: Option<AuthorizationStatus> = None;
-            let mut billing_information: Option<BillingInformation> = None;
+    let __result = {
+        let mut authorization_status: Option<AuthorizationStatus> = None;
+        let mut billing_information: Option<BillingInformation> = None;
 
-            let is_array = match d.datatype()? {
-                wasmbus_rpc::cbor::Type::Array => true,
-                wasmbus_rpc::cbor::Type::Map => false,
-                _ => {
-                    return Err(RpcError::Deser(
-                        "decoding struct RatingResponse, expected array or map".to_string(),
-                    ))
-                }
-            };
-            if is_array {
-                let len = d.fixed_array()?;
-                for __i in 0..(len as usize) {
-                    match __i {
-                        0 => authorization_status =
-                            Some(decode_authorization_status(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
-                                    e
-                                )
-                            })?),
-                        1 => billing_information =
-                            Some(decode_billing_information(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
-                                    e
-                                )
-                            })?),
-                        _ => d.skip()?,
-                    }
-                }
-            } else {
-                let len = d.fixed_map()?;
-                for __i in 0..(len as usize) {
-                    match d.str()? {
-                        "authorizationStatus" => authorization_status =
-                            Some(decode_authorization_status(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
-                                    e
-                                )
-                            })?),
-                        "billingInformation" => billing_information =
-                            Some(decode_billing_information(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
-                                    e
-                                )
-                            })?),
-                        _ => d.skip()?,
-                    }
-                }
-            }
-            RatingResponse {
-                authorization_status: if let Some(__x) = authorization_status {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field RatingResponse.authorization_status (#0)".to_string(),
-                    ));
-                },
-
-                billing_information: if let Some(__x) = billing_information {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field RatingResponse.billing_information (#1)".to_string(),
-                    ));
-                },
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct RatingResponse, expected array or map".to_string(),
+                ))
             }
         };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        authorization_status =
+                            Some(decode_authorization_status(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
+                                    e
+                                )
+                            })?)
+                    }
+                    1 => {
+                        billing_information = Some(decode_billing_information(d).map_err(|e| {
+                            format!(
+                                "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
+                                e
+                            )
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "authorizationStatus" => {
+                        authorization_status =
+                            Some(decode_authorization_status(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
+                                    e
+                                )
+                            })?)
+                    }
+                    "billingInformation" => {
+                        billing_information = Some(decode_billing_information(d).map_err(|e| {
+                            format!(
+                                "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
+                                e
+                            )
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        }
+        RatingResponse {
+            authorization_status: if let Some(__x) = authorization_status {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingResponse.authorization_status (#0)".to_string(),
+                ));
+            },
+
+            billing_information: if let Some(__x) = billing_information {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingResponse.billing_information (#1)".to_string(),
+                ));
+            },
+        }
+    };
     Ok(__result)
 }
 /// Description of the rating agent service
