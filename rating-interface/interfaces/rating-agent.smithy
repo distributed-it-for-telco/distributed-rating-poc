@@ -76,3 +76,25 @@ structure AuthorizationStatus {
     // Key that proves authorization was successful. Will be missing if authorization was denied
     key: String,
 }
+
+structure Bucket {
+    @required
+    name: String,
+
+    @required
+    offerId: String,
+
+    @required
+    partyId: String,
+
+    @required
+    bucketCharacteristic: BucketCharacteristic,
+}
+
+structure BucketCharacteristic {
+    @required
+    unit: String,
+
+    @required
+    count: U16,
+}

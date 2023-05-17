@@ -222,6 +222,215 @@ pub fn decode_billing_information(
     };
     Ok(__result)
 }
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct Bucket {
+    #[serde(rename = "bucketCharacteristic")]
+    pub bucket_characteristic: BucketCharacteristic,
+    #[serde(default)]
+    pub name: String,
+    #[serde(rename = "offerId")]
+    #[serde(default)]
+    pub offer_id: String,
+    #[serde(rename = "partyId")]
+    #[serde(default)]
+    pub party_id: String,
+}
+
+// Encode Bucket as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_bucket<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &Bucket,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(4)?;
+    e.str("bucketCharacteristic")?;
+    encode_bucket_characteristic(e, &val.bucket_characteristic)?;
+    e.str("name")?;
+    e.str(&val.name)?;
+    e.str("offerId")?;
+    e.str(&val.offer_id)?;
+    e.str("partyId")?;
+    e.str(&val.party_id)?;
+    Ok(())
+}
+
+// Decode Bucket from cbor input stream
+#[doc(hidden)]
+pub fn decode_bucket(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Bucket, RpcError> {
+    let __result =
+        {
+            let mut bucket_characteristic: Option<BucketCharacteristic> = None;
+            let mut name: Option<String> = None;
+            let mut offer_id: Option<String> = None;
+            let mut party_id: Option<String> = None;
+
+            let is_array = match d.datatype()? {
+                wasmbus_rpc::cbor::Type::Array => true,
+                wasmbus_rpc::cbor::Type::Map => false,
+                _ => {
+                    return Err(RpcError::Deser(
+                        "decoding struct Bucket, expected array or map".to_string(),
+                    ))
+                }
+            };
+            if is_array {
+                let len = d.fixed_array()?;
+                for __i in 0..(len as usize) {
+                    match __i {
+                        0 => bucket_characteristic =
+                            Some(decode_bucket_characteristic(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
+                                    e
+                                )
+                            })?),
+                        1 => name = Some(d.str()?.to_string()),
+                        2 => offer_id = Some(d.str()?.to_string()),
+                        3 => party_id = Some(d.str()?.to_string()),
+                        _ => d.skip()?,
+                    }
+                }
+            } else {
+                let len = d.fixed_map()?;
+                for __i in 0..(len as usize) {
+                    match d.str()? {
+                        "bucketCharacteristic" => bucket_characteristic =
+                            Some(decode_bucket_characteristic(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
+                                    e
+                                )
+                            })?),
+                        "name" => name = Some(d.str()?.to_string()),
+                        "offerId" => offer_id = Some(d.str()?.to_string()),
+                        "partyId" => party_id = Some(d.str()?.to_string()),
+                        _ => d.skip()?,
+                    }
+                }
+            }
+            Bucket {
+                bucket_characteristic: if let Some(__x) = bucket_characteristic {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field Bucket.bucket_characteristic (#0)".to_string(),
+                    ));
+                },
+
+                name: if let Some(__x) = name {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field Bucket.name (#1)".to_string(),
+                    ));
+                },
+
+                offer_id: if let Some(__x) = offer_id {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field Bucket.offer_id (#2)".to_string(),
+                    ));
+                },
+
+                party_id: if let Some(__x) = party_id {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field Bucket.party_id (#3)".to_string(),
+                    ));
+                },
+            }
+        };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct BucketCharacteristic {
+    #[serde(default)]
+    pub count: u16,
+    #[serde(default)]
+    pub unit: String,
+}
+
+// Encode BucketCharacteristic as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_bucket_characteristic<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &BucketCharacteristic,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(2)?;
+    e.str("count")?;
+    e.u16(val.count)?;
+    e.str("unit")?;
+    e.str(&val.unit)?;
+    Ok(())
+}
+
+// Decode BucketCharacteristic from cbor input stream
+#[doc(hidden)]
+pub fn decode_bucket_characteristic(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<BucketCharacteristic, RpcError> {
+    let __result = {
+        let mut count: Option<u16> = None;
+        let mut unit: Option<String> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct BucketCharacteristic, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => count = Some(d.u16()?),
+                    1 => unit = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "count" => count = Some(d.u16()?),
+                    "unit" => unit = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        BucketCharacteristic {
+            count: if let Some(__x) = count {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field BucketCharacteristic.count (#0)".to_string(),
+                ));
+            },
+
+            unit: if let Some(__x) = unit {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field BucketCharacteristic.unit (#1)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
 pub type MessageList = Vec<String>;
 
 // Encode MessageList as CBOR and append to output stream
