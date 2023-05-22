@@ -3,7 +3,6 @@ use rating_interface::{
     RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler,
     UsageProofRequest,
 };
-use serde_json::json;
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_keyvalue::{KeyValue, KeyValueSender, SetRequest};
 use wasmcloud_interface_logging::info;
@@ -40,7 +39,7 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
             OFFER_ID
         );
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
-        let mut free_text: String = "".to_string();
+        let free_text: String;
         let mut billing_info = BillingInformation::default();
         billing_info.unit = (&"EUR").to_string();
 

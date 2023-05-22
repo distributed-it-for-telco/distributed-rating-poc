@@ -25,9 +25,9 @@ impl RatingAgent for OrangeVodRatingAgentActor {
         let rating = _arg.usage.parse::<i32>().unwrap() * 1;
 
         let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
-            party_id: _party_id.to_owned(),
-            rating: _rating.to_owned(),
-            usage: _usage.to_owned(),
+            party_id: _arg.customer_id.to_owned(),
+            rating: rating.to_string(),
+            usage: _arg.usage.to_owned(),
             usage_id: usage_id.as_str().to_owned(),
             usage_date: usage_date.to_owned(),
         });
