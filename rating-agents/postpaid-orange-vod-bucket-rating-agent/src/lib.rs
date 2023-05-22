@@ -1,8 +1,8 @@
 use rating_interface::{
     AuthorizationStatus, BillingInformation, RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse, UsageCollector, UsageCollectorSender, Bucket
+    RatingResponse, UsageCollector, UsageCollectorSender, Bucket, UsageProofRequest, UsageProofHandler
 };
-use serde_json::{json};
+
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_keyvalue::{KeyValueSender, KeyValue, SetRequest};
 use wasmcloud_interface_logging::{info};
@@ -85,41 +85,18 @@ async fn handle_rating(
     _party_id: &str,
     _usage: &str
 ) -> RpcResult<()> {
-    let usage_date = "04/04/2023";
+    let usage_date = "22/05/2023";
     let usage_id: String = generate_guid().await?;
-
-    let rating_date = "04/04/2023";
-
-    let usage_template_str = json!({
-        "id": usage_id,
-        "usageDate": usage_date,
-        "description": "Video on Demand with Bucket",
-        "usageType": "VoD",
-        "ratedProductUsage": {
-            "isBilled": false,
-            "ratingAmountType": "Total",
-            "ratingDate": rating_date,
-            "bucketValueConvertedInAmount": {
-                "unit": "EUR",
-                "value": _rating
-            },
-            "productRef": {
-                "id": "1234",
-                "name": "Video on Demand with Bucket"
-            }
-        },
-        "relatedParty": {
-            "id": _party_id
-        },
-        "usageCharacteristic": [
-            {
-                "id": "122",
-                "name": "movie-count",
-                "valueType": "integer",
-                "value": _usage
-            }
-        ]
-    });
+    
+    let usage_template_str = UsageProofHandler::generate_rating_proof(
+        &UsageProofRequest {
+            party_id: _party_id.to_owned(),
+            rating: _rating.to_owned(),
+            usage: _usage.to_owned(),
+            usage_id: usage_id.as_str().to_owned(),
+            usage_date: usage_date.to_owned()
+        }
+    );
 
     info!(
         "Sending usage proof to usage collector for party with id: {}",
