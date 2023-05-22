@@ -1,6 +1,6 @@
 use crate::{Bucket, UsageProofRequest};
 use serde_json::json;
-use wasmbus_rpc::{actor::prelude::{RpcError, RpcResult}};
+use wasmbus_rpc::actor::prelude::{RpcError, RpcResult};
 
 impl Bucket {
     /// Create a new bucket by deserializing a JSON string
@@ -42,9 +42,7 @@ impl Bucket {
 pub struct UsageProofHandler {}
 
 impl UsageProofHandler {
-    pub fn generate_rating_proof(
-        usage_proof_request: &UsageProofRequest
-    ) -> String {
+    pub fn generate_rating_proof(usage_proof_request: &UsageProofRequest) -> String {
         let rating_date = "04/04/2023";
 
         let usage_template_str = json!({
