@@ -261,91 +261,94 @@ where
 // Decode Bucket from cbor input stream
 #[doc(hidden)]
 pub fn decode_bucket(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Bucket, RpcError> {
-    let __result =
-        {
-            let mut bucket_characteristic: Option<BucketCharacteristic> = None;
-            let mut name: Option<String> = None;
-            let mut offer_id: Option<String> = None;
-            let mut party_id: Option<String> = None;
+    let __result = {
+        let mut bucket_characteristic: Option<BucketCharacteristic> = None;
+        let mut name: Option<String> = None;
+        let mut offer_id: Option<String> = None;
+        let mut party_id: Option<String> = None;
 
-            let is_array = match d.datatype()? {
-                wasmbus_rpc::cbor::Type::Array => true,
-                wasmbus_rpc::cbor::Type::Map => false,
-                _ => {
-                    return Err(RpcError::Deser(
-                        "decoding struct Bucket, expected array or map".to_string(),
-                    ))
-                }
-            };
-            if is_array {
-                let len = d.fixed_array()?;
-                for __i in 0..(len as usize) {
-                    match __i {
-                        0 => bucket_characteristic =
-                            Some(decode_bucket_characteristic(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
-                                    e
-                                )
-                            })?),
-                        1 => name = Some(d.str()?.to_string()),
-                        2 => offer_id = Some(d.str()?.to_string()),
-                        3 => party_id = Some(d.str()?.to_string()),
-                        _ => d.skip()?,
-                    }
-                }
-            } else {
-                let len = d.fixed_map()?;
-                for __i in 0..(len as usize) {
-                    match d.str()? {
-                        "bucketCharacteristic" => bucket_characteristic =
-                            Some(decode_bucket_characteristic(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
-                                    e
-                                )
-                            })?),
-                        "name" => name = Some(d.str()?.to_string()),
-                        "offerId" => offer_id = Some(d.str()?.to_string()),
-                        "partyId" => party_id = Some(d.str()?.to_string()),
-                        _ => d.skip()?,
-                    }
-                }
-            }
-            Bucket {
-                bucket_characteristic: if let Some(__x) = bucket_characteristic {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field Bucket.bucket_characteristic (#0)".to_string(),
-                    ));
-                },
-
-                name: if let Some(__x) = name {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field Bucket.name (#1)".to_string(),
-                    ));
-                },
-
-                offer_id: if let Some(__x) = offer_id {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field Bucket.offer_id (#2)".to_string(),
-                    ));
-                },
-
-                party_id: if let Some(__x) = party_id {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field Bucket.party_id (#3)".to_string(),
-                    ));
-                },
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct Bucket, expected array or map".to_string(),
+                ))
             }
         };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        bucket_characteristic =
+                            Some(decode_bucket_characteristic(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
+                                    e
+                                )
+                            })?)
+                    }
+                    1 => name = Some(d.str()?.to_string()),
+                    2 => offer_id = Some(d.str()?.to_string()),
+                    3 => party_id = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "bucketCharacteristic" => {
+                        bucket_characteristic =
+                            Some(decode_bucket_characteristic(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
+                                    e
+                                )
+                            })?)
+                    }
+                    "name" => name = Some(d.str()?.to_string()),
+                    "offerId" => offer_id = Some(d.str()?.to_string()),
+                    "partyId" => party_id = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        Bucket {
+            bucket_characteristic: if let Some(__x) = bucket_characteristic {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Bucket.bucket_characteristic (#0)".to_string(),
+                ));
+            },
+
+            name: if let Some(__x) = name {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Bucket.name (#1)".to_string(),
+                ));
+            },
+
+            offer_id: if let Some(__x) = offer_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Bucket.offer_id (#2)".to_string(),
+                ));
+            },
+
+            party_id: if let Some(__x) = party_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Bucket.party_id (#3)".to_string(),
+                ));
+            },
+        }
+    };
     Ok(__result)
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -661,81 +664,86 @@ where
 pub fn decode_rating_response(
     d: &mut wasmbus_rpc::cbor::Decoder<'_>,
 ) -> Result<RatingResponse, RpcError> {
-    let __result =
-        {
-            let mut authorization_status: Option<AuthorizationStatus> = None;
-            let mut billing_information: Option<BillingInformation> = None;
+    let __result = {
+        let mut authorization_status: Option<AuthorizationStatus> = None;
+        let mut billing_information: Option<BillingInformation> = None;
 
-            let is_array = match d.datatype()? {
-                wasmbus_rpc::cbor::Type::Array => true,
-                wasmbus_rpc::cbor::Type::Map => false,
-                _ => {
-                    return Err(RpcError::Deser(
-                        "decoding struct RatingResponse, expected array or map".to_string(),
-                    ))
-                }
-            };
-            if is_array {
-                let len = d.fixed_array()?;
-                for __i in 0..(len as usize) {
-                    match __i {
-                        0 => authorization_status =
-                            Some(decode_authorization_status(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
-                                    e
-                                )
-                            })?),
-                        1 => billing_information =
-                            Some(decode_billing_information(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
-                                    e
-                                )
-                            })?),
-                        _ => d.skip()?,
-                    }
-                }
-            } else {
-                let len = d.fixed_map()?;
-                for __i in 0..(len as usize) {
-                    match d.str()? {
-                        "authorizationStatus" => authorization_status =
-                            Some(decode_authorization_status(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
-                                    e
-                                )
-                            })?),
-                        "billingInformation" => billing_information =
-                            Some(decode_billing_information(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
-                                    e
-                                )
-                            })?),
-                        _ => d.skip()?,
-                    }
-                }
-            }
-            RatingResponse {
-                authorization_status: if let Some(__x) = authorization_status {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field RatingResponse.authorization_status (#0)".to_string(),
-                    ));
-                },
-
-                billing_information: if let Some(__x) = billing_information {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field RatingResponse.billing_information (#1)".to_string(),
-                    ));
-                },
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct RatingResponse, expected array or map".to_string(),
+                ))
             }
         };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        authorization_status =
+                            Some(decode_authorization_status(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
+                                    e
+                                )
+                            })?)
+                    }
+                    1 => {
+                        billing_information = Some(decode_billing_information(d).map_err(|e| {
+                            format!(
+                                "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
+                                e
+                            )
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "authorizationStatus" => {
+                        authorization_status =
+                            Some(decode_authorization_status(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
+                                    e
+                                )
+                            })?)
+                    }
+                    "billingInformation" => {
+                        billing_information = Some(decode_billing_information(d).map_err(|e| {
+                            format!(
+                                "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
+                                e
+                            )
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        }
+        RatingResponse {
+            authorization_status: if let Some(__x) = authorization_status {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingResponse.authorization_status (#0)".to_string(),
+                ));
+            },
+
+            billing_information: if let Some(__x) = billing_information {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingResponse.billing_information (#1)".to_string(),
+                ));
+            },
+        }
+    };
     Ok(__result)
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]

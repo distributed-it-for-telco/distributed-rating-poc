@@ -79,53 +79,26 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
 
 async fn get_party_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<Bucket> {
     info!("Start get_party_bucket");
-    let kv = KeyValueSender::new();
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-    info!("bucket {}", bucket_json_str);
-
-    let bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    let bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
     info!("End get_party_bucket");
     Ok(bucket)
 }
 
 async fn increase_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
-    let kv = KeyValueSender::new();
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
+    let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
 
-    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
     bucket.increment_characteristic_count();
-    let serialized_bucket = bucket.serialize()?;
 
-    kv.set(
-        _ctx,
-        &SetRequest {
-            key: bucket_key.to_string(),
-            value: serialized_bucket,
-            expires: 0,
-        },
-    )
-    .await?;
+    BucketAccessManager::save(_ctx, bucket_key, &bucket).await?;
 
     Ok(())
 }
 
 async fn clear_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
-    let kv = KeyValueSender::new();
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-
-    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
+    
     bucket.clear_characteristic_count();
-    let serialized_bucket = bucket.serialize()?;
-
-    kv.set(
-        _ctx,
-        &SetRequest {
-            key: bucket_key.to_string(),
-            value: serialized_bucket,
-            expires: 0,
-        },
-    )
-    .await?;
+    BucketAccessManager::save(_ctx, bucket_key, &bucket).await?;
 
     Ok(())
 }

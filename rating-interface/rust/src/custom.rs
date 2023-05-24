@@ -1,6 +1,10 @@
 use crate::{Bucket, UsageProofRequest};
 use serde_json::json;
-use wasmbus_rpc::actor::prelude::{RpcError, RpcResult};
+use wasmbus_rpc::{
+    actor::prelude::{RpcError, RpcResult},
+    common::Context,
+};
+use wasmcloud_interface_keyvalue::{KeyValue, KeyValueSender, SetRequest};
 
 impl Bucket {
     /// Create a new bucket by deserializing a JSON string
@@ -77,5 +81,34 @@ impl UsageProofHandler {
         });
 
         usage_template_str.to_string()
+    }
+}
+
+pub struct BucketAccessManager {}
+
+impl BucketAccessManager {
+    pub async fn get(_ctx: &Context, bucket_key: &str) -> RpcResult<Bucket> {
+        let kv = KeyValueSender::new();
+        let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
+        let bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+
+        Ok(bucket)
+    }
+
+    pub async fn save(_ctx: &Context, bucket_key: &str, bucket: &Bucket) -> RpcResult<()> {
+        let serialized_bucket = bucket.serialize()?;
+
+        let kv = KeyValueSender::new();
+        kv.set(
+            _ctx,
+            &SetRequest {
+                key: bucket_key.to_string(),
+                value: serialized_bucket,
+                expires: 0,
+            },
+        )
+        .await?;
+
+        Ok(())
     }
 }

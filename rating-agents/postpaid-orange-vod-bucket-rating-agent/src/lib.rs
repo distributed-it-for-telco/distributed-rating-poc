@@ -1,11 +1,10 @@
 use rating_interface::{
-    AuthorizationStatus, BillingInformation, Bucket, RatingAgent, RatingAgentReceiver,
-    RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest,
+    AuthorizationStatus, BillingInformation, Bucket, BucketAccessManager, RatingAgent,
+    RatingAgentReceiver, RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender,
+    UsageProofHandler, UsageProofRequest,
 };
 
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_keyvalue::{KeyValue, KeyValueSender, SetRequest};
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
@@ -72,11 +71,9 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
 }
 
 async fn get_party_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<Bucket> {
-    let kv = KeyValueSender::new();
     info!("Retreiving party bucket with key: {:?}", bucket_key);
 
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-    let bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    let bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
 
     info!("retrieved party bucket: {:?}", bucket);
 
@@ -89,7 +86,7 @@ async fn handle_rating(
     _party_id: &str,
     _usage: &str,
 ) -> RpcResult<()> {
-    let usage_date = "22/05/2023";
+    let usage_date = "23/05/2023";
     let usage_id: String = generate_guid().await?;
 
     let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
@@ -115,48 +112,19 @@ async fn handle_rating(
 async fn refill_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
     info!("Refill bucket");
 
-    let kv = KeyValueSender::new();
-
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-
-    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
     bucket.set_characteristic_count(3);
-    let serialized_bucket = bucket.serialize()?;
 
-    info!("serialized bucket after refill {:?}", serialized_bucket);
-
-    kv.set(
-        _ctx,
-        &SetRequest {
-            key: bucket_key.to_string(),
-            value: serialized_bucket,
-            expires: 0,
-        },
-    )
-    .await?;
+    BucketAccessManager::save(_ctx, bucket_key, &bucket).await?;
 
     Ok(())
 }
 
 async fn decrement_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
-    let kv = KeyValueSender::new();
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-
-    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
     bucket.decrement_characteristic_count();
-    let serialized_bucket = bucket.serialize()?;
 
-    info!("serialized bucket after decrement {:?}", serialized_bucket);
-
-    kv.set(
-        _ctx,
-        &SetRequest {
-            key: bucket_key.to_string(),
-            value: serialized_bucket,
-            expires: 0,
-        },
-    )
-    .await?;
+    BucketAccessManager::save(_ctx, bucket_key, &bucket).await?;
 
     Ok(())
 }
