@@ -661,16 +661,142 @@ where
 pub fn decode_rating_response(
     d: &mut wasmbus_rpc::cbor::Decoder<'_>,
 ) -> Result<RatingResponse, RpcError> {
+    let __result =
+        {
+            let mut authorization_status: Option<AuthorizationStatus> = None;
+            let mut billing_information: Option<BillingInformation> = None;
+
+            let is_array = match d.datatype()? {
+                wasmbus_rpc::cbor::Type::Array => true,
+                wasmbus_rpc::cbor::Type::Map => false,
+                _ => {
+                    return Err(RpcError::Deser(
+                        "decoding struct RatingResponse, expected array or map".to_string(),
+                    ))
+                }
+            };
+            if is_array {
+                let len = d.fixed_array()?;
+                for __i in 0..(len as usize) {
+                    match __i {
+                        0 => authorization_status =
+                            Some(decode_authorization_status(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
+                                    e
+                                )
+                            })?),
+                        1 => billing_information =
+                            Some(decode_billing_information(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
+                                    e
+                                )
+                            })?),
+                        _ => d.skip()?,
+                    }
+                }
+            } else {
+                let len = d.fixed_map()?;
+                for __i in 0..(len as usize) {
+                    match d.str()? {
+                        "authorizationStatus" => authorization_status =
+                            Some(decode_authorization_status(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
+                                    e
+                                )
+                            })?),
+                        "billingInformation" => billing_information =
+                            Some(decode_billing_information(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
+                                    e
+                                )
+                            })?),
+                        _ => d.skip()?,
+                    }
+                }
+            }
+            RatingResponse {
+                authorization_status: if let Some(__x) = authorization_status {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field RatingResponse.authorization_status (#0)".to_string(),
+                    ));
+                },
+
+                billing_information: if let Some(__x) = billing_information {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field RatingResponse.billing_information (#1)".to_string(),
+                    ));
+                },
+            }
+        };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct UsageProofRequest {
+    #[serde(rename = "partyId")]
+    #[serde(default)]
+    pub party_id: String,
+    #[serde(default)]
+    pub rating: String,
+    #[serde(default)]
+    pub usage: String,
+    #[serde(rename = "usageDate")]
+    #[serde(default)]
+    pub usage_date: String,
+    #[serde(rename = "usageId")]
+    #[serde(default)]
+    pub usage_id: String,
+}
+
+// Encode UsageProofRequest as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_usage_proof_request<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &UsageProofRequest,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(5)?;
+    e.str("partyId")?;
+    e.str(&val.party_id)?;
+    e.str("rating")?;
+    e.str(&val.rating)?;
+    e.str("usage")?;
+    e.str(&val.usage)?;
+    e.str("usageDate")?;
+    e.str(&val.usage_date)?;
+    e.str("usageId")?;
+    e.str(&val.usage_id)?;
+    Ok(())
+}
+
+// Decode UsageProofRequest from cbor input stream
+#[doc(hidden)]
+pub fn decode_usage_proof_request(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<UsageProofRequest, RpcError> {
     let __result = {
-        let mut authorization_status: Option<AuthorizationStatus> = None;
-        let mut billing_information: Option<BillingInformation> = None;
+        let mut party_id: Option<String> = None;
+        let mut rating: Option<String> = None;
+        let mut usage: Option<String> = None;
+        let mut usage_date: Option<String> = None;
+        let mut usage_id: Option<String> = None;
 
         let is_array = match d.datatype()? {
             wasmbus_rpc::cbor::Type::Array => true,
             wasmbus_rpc::cbor::Type::Map => false,
             _ => {
                 return Err(RpcError::Deser(
-                    "decoding struct RatingResponse, expected array or map".to_string(),
+                    "decoding struct UsageProofRequest, expected array or map".to_string(),
                 ))
             }
         };
@@ -678,23 +804,11 @@ pub fn decode_rating_response(
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => {
-                        authorization_status =
-                            Some(decode_authorization_status(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
-                                    e
-                                )
-                            })?)
-                    }
-                    1 => {
-                        billing_information = Some(decode_billing_information(d).map_err(|e| {
-                            format!(
-                                "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
-                                e
-                            )
-                        })?)
-                    }
+                    0 => party_id = Some(d.str()?.to_string()),
+                    1 => rating = Some(d.str()?.to_string()),
+                    2 => usage = Some(d.str()?.to_string()),
+                    3 => usage_date = Some(d.str()?.to_string()),
+                    4 => usage_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
@@ -702,41 +816,53 @@ pub fn decode_rating_response(
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
-                    "authorizationStatus" => {
-                        authorization_status =
-                            Some(decode_authorization_status(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#AuthorizationStatus': {}",
-                                    e
-                                )
-                            })?)
-                    }
-                    "billingInformation" => {
-                        billing_information = Some(decode_billing_information(d).map_err(|e| {
-                            format!(
-                                "decoding 'co.uk.orange.rating.agent#BillingInformation': {}",
-                                e
-                            )
-                        })?)
-                    }
+                    "partyId" => party_id = Some(d.str()?.to_string()),
+                    "rating" => rating = Some(d.str()?.to_string()),
+                    "usage" => usage = Some(d.str()?.to_string()),
+                    "usageDate" => usage_date = Some(d.str()?.to_string()),
+                    "usageId" => usage_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
         }
-        RatingResponse {
-            authorization_status: if let Some(__x) = authorization_status {
+        UsageProofRequest {
+            party_id: if let Some(__x) = party_id {
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field RatingResponse.authorization_status (#0)".to_string(),
+                    "missing field UsageProofRequest.party_id (#0)".to_string(),
                 ));
             },
 
-            billing_information: if let Some(__x) = billing_information {
+            rating: if let Some(__x) = rating {
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field RatingResponse.billing_information (#1)".to_string(),
+                    "missing field UsageProofRequest.rating (#1)".to_string(),
+                ));
+            },
+
+            usage: if let Some(__x) = usage {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field UsageProofRequest.usage (#2)".to_string(),
+                ));
+            },
+
+            usage_date: if let Some(__x) = usage_date {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field UsageProofRequest.usage_date (#3)".to_string(),
+                ));
+            },
+
+            usage_id: if let Some(__x) = usage_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field UsageProofRequest.usage_id (#4)".to_string(),
                 ));
             },
         }

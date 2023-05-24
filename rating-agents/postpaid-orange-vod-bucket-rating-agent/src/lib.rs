@@ -1,11 +1,12 @@
 use rating_interface::{
-    AuthorizationStatus, BillingInformation, RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse, UsageCollector, UsageCollectorSender, Bucket
+    AuthorizationStatus, BillingInformation, Bucket, RatingAgent, RatingAgentReceiver,
+    RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler,
+    UsageProofRequest,
 };
-use serde_json::{json};
+
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_keyvalue::{KeyValueSender, KeyValue, SetRequest};
-use wasmcloud_interface_logging::{info};
+use wasmcloud_interface_keyvalue::{KeyValue, KeyValueSender, SetRequest};
+use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
@@ -23,10 +24,15 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         info!("Hello I'm your orange postpaid vod bucket rating agent");
 
         /*
-        *  Contract or Offer is bucket with 3 Movies equal 2 EURO
-        */
+         *  Contract or Offer is bucket with 3 Movies equal 2 EURO
+         */
 
-        let bucket_key = format!("{}:{}:{}", BUCKET_KEY_PREFIX, &_arg.customer_id.as_str(), OFFER_ID);
+        let bucket_key = format!(
+            "{}:{}:{}",
+            BUCKET_KEY_PREFIX,
+            &_arg.customer_id.as_str(),
+            OFFER_ID
+        );
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
 
         let mut billing_info = BillingInformation::default();
@@ -49,9 +55,10 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             decrement_bucket(_ctx, &bucket_key).await?;
 
             billing_info.price = rating.to_string();
-            billing_info.messages.push(
-                String::from(format!("Current price is {}, because it's part of package", rating))
-            );
+            billing_info.messages.push(String::from(format!(
+                "Current price is {}, because it's part of package",
+                rating
+            )));
         }
 
         /*
@@ -59,15 +66,12 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
          */
         RpcResult::Ok(RatingResponse {
             authorization_status: AuthorizationStatus::default(),
-            billing_information: billing_info
+            billing_information: billing_info,
         })
     }
 }
 
-async fn get_party_bucket(
-    _ctx: &Context,
-    bucket_key: &str
-) -> RpcResult<Bucket> {
+async fn get_party_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<Bucket> {
     let kv = KeyValueSender::new();
     info!("Retreiving party bucket with key: {:?}", bucket_key);
 
@@ -83,42 +87,17 @@ async fn handle_rating(
     _ctx: &Context,
     _rating: &str,
     _party_id: &str,
-    _usage: &str
+    _usage: &str,
 ) -> RpcResult<()> {
-    let usage_date = "04/04/2023";
+    let usage_date = "22/05/2023";
     let usage_id: String = generate_guid().await?;
 
-    let rating_date = "04/04/2023";
-
-    let usage_template_str = json!({
-        "id": usage_id,
-        "usageDate": usage_date,
-        "description": "Video on Demand with Bucket",
-        "usageType": "VoD",
-        "ratedProductUsage": {
-            "isBilled": false,
-            "ratingAmountType": "Total",
-            "ratingDate": rating_date,
-            "bucketValueConvertedInAmount": {
-                "unit": "EUR",
-                "value": _rating
-            },
-            "productRef": {
-                "id": "1234",
-                "name": "Video on Demand with Bucket"
-            }
-        },
-        "relatedParty": {
-            "id": _party_id
-        },
-        "usageCharacteristic": [
-            {
-                "id": "122",
-                "name": "movie-count",
-                "valueType": "integer",
-                "value": _usage
-            }
-        ]
+    let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
+        party_id: _party_id.to_owned(),
+        rating: _rating.to_owned(),
+        usage: _usage.to_owned(),
+        usage_id: usage_id.as_str().to_owned(),
+        usage_date: usage_date.to_owned(),
     });
 
     info!(
@@ -131,13 +110,9 @@ async fn handle_rating(
         .await?;
 
     Ok(())
-
 }
 
-async fn refill_bucket(
-    _ctx: &Context,
-    bucket_key: &str
-) -> RpcResult<()> {
+async fn refill_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
     info!("Refill bucket");
 
     let kv = KeyValueSender::new();
@@ -147,7 +122,7 @@ async fn refill_bucket(
     let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
     bucket.set_characteristic_count(3);
     let serialized_bucket = bucket.serialize()?;
-    
+
     info!("serialized bucket after refill {:?}", serialized_bucket);
 
     kv.set(
@@ -163,10 +138,7 @@ async fn refill_bucket(
     Ok(())
 }
 
-async fn decrement_bucket(
-    _ctx: &Context,
-    bucket_key: &str
-) -> RpcResult<()> {
+async fn decrement_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
     let kv = KeyValueSender::new();
     let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
 

@@ -98,3 +98,16 @@ structure BucketCharacteristic {
     @required
     count: U16,
 }
+
+structure UsageProofRequest {
+    @required
+    partyId: String,
+    @required 
+    usageId: String,
+    @required
+    usage: String,
+    @required 
+    rating: String, 
+    @required
+    usageDate: String
+}
