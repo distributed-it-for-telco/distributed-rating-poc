@@ -1,10 +1,9 @@
 use rating_interface::{
-    AuthorizationStatus, BillingInformation, Bucket, RatingAgent, RatingAgentReceiver,
+    Bucket, RatingAgent, RatingAgentReceiver,
     RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest,
+    UsageProofRequest,RatingResponseBuilder,BucketAccessManager
 };
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_keyvalue::{KeyValue, KeyValueSender, SetRequest};
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
@@ -28,9 +27,12 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         info!("Hello I'm your orange postpaid vod Threshold discount rating agent");
 
+         let mut rating_response_builder = RatingResponseBuilder::new();
+
         /*
          *  Contract or Offer is normal movie cost = 2 EU , if you watched 10 movies the 11th will be with discount 10%
          */
+
 
         let bucket_key = format!(
             "{}:{}:{}",
@@ -40,21 +42,20 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
         );
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
         let free_text: String;
-        let mut billing_info = BillingInformation::default();
-        billing_info.unit = (&"EUR").to_string();
+        let unit =(&"EUR").to_string();
+        let  price :String;
 
         if bucket.characteristic_count() == THRESHOLD {
             let rating = MOVIE_COST - MOVIE_COST * THRESHOLD_DISCOUNT;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
-
             clear_bucket(_ctx, &bucket_key).await?;
-            billing_info.price = rating.to_string();
+            price = rating.to_string();
             free_text = format!("You got discount {}% ", THRESHOLD_DISCOUNT * 100.0);
         } else {
             let rating = MOVIE_COST;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
             increase_bucket(_ctx, &bucket_key).await?;
-            billing_info.price = rating.to_string();
+            price = rating.to_string();
             if bucket.characteristic_count() + 1 == THRESHOLD {
                 free_text = format!(
                     "You will get discount {}% Next movie",
@@ -69,11 +70,16 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
             }
         }
 
-        billing_info.messages.push(free_text.to_string());
-        RpcResult::Ok(RatingResponse {
-            authorization_status: AuthorizationStatus::default(),
-            billing_information: billing_info,
-        })
+        
+       
+        let rating_response = rating_response_builder
+         .unit(unit.to_string())
+         .price(price.to_string())
+         .message(&free_text.to_string())
+         .authorized()
+         .build();
+
+        RpcResult::Ok(rating_response)
     }
 }
 
