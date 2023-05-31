@@ -1,5 +1,4 @@
-use crate::{Bucket, UsageProofRequest,KeyValueStoreWrapper};
-use serde_json::json;
+use crate::{Bucket, KeyValueStoreWrapper};
 use wasmbus_rpc::{
     actor::prelude::{RpcError, RpcResult},
     common::Context,
@@ -42,52 +41,10 @@ impl Bucket {
     }
 }
 
-pub struct UsageProofHandler {}
-
-impl UsageProofHandler {
-    pub fn generate_rating_proof(usage_proof_request: &UsageProofRequest) -> String {
-        let rating_date = "04/04/2023";
-
-        let usage_template_str = json!({
-            "id": usage_proof_request.usage_id,
-            "usageDate": usage_proof_request.usage_date,
-            "description": "Video on Demand with Bucket",
-            "usageType": "VoD",
-            "ratedProductUsage": {
-                "isBilled": false,
-                "ratingAmountType": "Total",
-                "ratingDate": rating_date,
-                "bucketValueConvertedInAmount": {
-                    "unit": "EUR",
-                    "value": usage_proof_request.rating
-                },
-                "productRef": {
-                    "id": "1234",
-                    "name": "Video on Demand with Bucket"
-                }
-            },
-            "relatedParty": {
-                "id": usage_proof_request.party_id
-            },
-            "usageCharacteristic": [
-                {
-                    "id": "122",
-                    "name": "movie-count",
-                    "valueType": "integer",
-                    "value": usage_proof_request.usage
-                }
-            ]
-        });
-
-        usage_template_str.to_string()
-    }
-}
-
 pub struct BucketAccessManager {}
 
 impl BucketAccessManager {
     pub async fn get(_ctx: &Context, bucket_key: &str) -> RpcResult<Bucket> {
-
         let bucket_json_str = KeyValueStoreWrapper::get(_ctx, bucket_key).await?;
         let bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
         Ok(bucket)
@@ -95,7 +52,7 @@ impl BucketAccessManager {
 
     pub async fn save(_ctx: &Context, bucket_key: &str, bucket: &Bucket) -> RpcResult<()> {
         let serialized_bucket = bucket.serialize()?;
-        KeyValueStoreWrapper::put(_ctx,bucket_key,&serialized_bucket).await?;
+        KeyValueStoreWrapper::put(_ctx, bucket_key, &serialized_bucket).await?;
         Ok(())
     }
 }
