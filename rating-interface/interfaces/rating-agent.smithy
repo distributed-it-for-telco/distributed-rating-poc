@@ -19,6 +19,7 @@ namespace co.uk.orange.rating.agent
 
 use org.wasmcloud.model#U16
 use org.wasmcloud.model#wasmbus
+use org.wasmcloud.model#codegenRust
 
 
 /// Description of the rating agent service
@@ -75,6 +76,23 @@ structure AuthorizationStatus {
 
     // Key that proves authorization was successful. Will be missing if authorization was denied
     key: String,
+}
+@codegenRust(noDeriveEq: true )
+structure Balance {
+    @required
+     party_id: String,
+
+    @required
+    balanceCharacteristic: BalanceCharacteristic,
+} 
+
+@codegenRust(noDeriveEq: true )
+structure BalanceCharacteristic {
+     @required
+    unit: String,
+
+    @required
+    count: Float,
 }
 
 structure Bucket {

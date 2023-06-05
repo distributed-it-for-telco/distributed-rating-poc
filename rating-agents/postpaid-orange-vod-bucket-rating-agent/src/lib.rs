@@ -1,11 +1,10 @@
 use rating_interface::{
-    AuthorizationStatus, BillingInformation, Bucket, RatingAgent, RatingAgentReceiver,
-    RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest,
+    Bucket, BucketAccessManager, RatingAgent,
+    RatingAgentReceiver, RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender,
+    UsageProofHandler, UsageProofRequest,RatingResponseBuilder
 };
 
 use wasmbus_rpc::actor::prelude::*;
-use wasmcloud_interface_keyvalue::{KeyValue, KeyValueSender, SetRequest};
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
@@ -22,6 +21,7 @@ const OFFER_ID: &str = "2";
 impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         info!("Hello I'm your orange postpaid vod bucket rating agent");
+        let mut rating_response_builder = RatingResponseBuilder::new();
 
         /*
          *  Contract or Offer is bucket with 3 Movies equal 2 EURO
@@ -34,11 +34,11 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             OFFER_ID
         );
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
-
-        let mut billing_info = BillingInformation::default();
-        billing_info.unit = (&"EUR").to_string();
-        billing_info.messages = vec![String::from("Your bucket is is 3 movies with price 2 EUR")];
-
+        let price : String;
+        rating_response_builder
+        .unit( (&"EUR").to_string())
+        .message(&"Your bucket is is 3 movies with price 2 EUR");
+        
         if bucket.characteristic_count() == 0 {
             let rating = 2;
             info!("Handling rating empty buket");
@@ -47,36 +47,32 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             refill_bucket(_ctx, &bucket_key).await?;
             decrement_bucket(_ctx, &bucket_key).await?;
 
-            billing_info.price = rating.to_string();
+            price = rating.to_string();
         } else {
             let rating = 0;
             handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
 
             decrement_bucket(_ctx, &bucket_key).await?;
 
-            billing_info.price = rating.to_string();
-            billing_info.messages.push(String::from(format!(
+            price = rating.to_string();
+            rating_response_builder.message(&format!(
                 "Current price is {}, because it's part of package",
                 rating
-            )));
+            ));
         }
 
+       let rating_response =  rating_response_builder.price(price.to_string()).authorized().build();
         /*
          * Empty Response till we decide rating response how it should be
          */
-        RpcResult::Ok(RatingResponse {
-            authorization_status: AuthorizationStatus::default(),
-            billing_information: billing_info,
-        })
+        RpcResult::Ok(rating_response)
     }
 }
 
 async fn get_party_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<Bucket> {
-    let kv = KeyValueSender::new();
     info!("Retreiving party bucket with key: {:?}", bucket_key);
 
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-    let bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    let bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
 
     info!("retrieved party bucket: {:?}", bucket);
 
@@ -89,7 +85,7 @@ async fn handle_rating(
     _party_id: &str,
     _usage: &str,
 ) -> RpcResult<()> {
-    let usage_date = "22/05/2023";
+    let usage_date = "23/05/2023";
     let usage_id: String = generate_guid().await?;
 
     let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
@@ -115,48 +111,19 @@ async fn handle_rating(
 async fn refill_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
     info!("Refill bucket");
 
-    let kv = KeyValueSender::new();
-
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-
-    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
     bucket.set_characteristic_count(3);
-    let serialized_bucket = bucket.serialize()?;
 
-    info!("serialized bucket after refill {:?}", serialized_bucket);
-
-    kv.set(
-        _ctx,
-        &SetRequest {
-            key: bucket_key.to_string(),
-            value: serialized_bucket,
-            expires: 0,
-        },
-    )
-    .await?;
+    BucketAccessManager::save(_ctx, bucket_key, &bucket).await?;
 
     Ok(())
 }
 
 async fn decrement_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
-    let kv = KeyValueSender::new();
-    let bucket_json_str = kv.get(_ctx, bucket_key).await?.value;
-
-    let mut bucket: Bucket = Bucket::try_from_str(&bucket_json_str)?;
+    let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
     bucket.decrement_characteristic_count();
-    let serialized_bucket = bucket.serialize()?;
 
-    info!("serialized bucket after decrement {:?}", serialized_bucket);
-
-    kv.set(
-        _ctx,
-        &SetRequest {
-            key: bucket_key.to_string(),
-            value: serialized_bucket,
-            expires: 0,
-        },
-    )
-    .await?;
+    BucketAccessManager::save(_ctx, bucket_key, &bucket).await?;
 
     Ok(())
 }
