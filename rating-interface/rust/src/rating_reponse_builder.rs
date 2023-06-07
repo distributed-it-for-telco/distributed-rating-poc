@@ -65,6 +65,7 @@ impl RatingResponseBuilder {
         RatingResponse {
             authorization_status: authorization_status,
             billing_information: billing_info,
+            next_agent: Option::None
         }
     }
 }

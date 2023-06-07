@@ -23,6 +23,90 @@ use wasmbus_rpc::{
 pub const SMITHY_VERSION: &str = "1.0";
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct AgentIdentifiation {
+    #[serde(default)]
+    pub name: String,
+    #[serde(rename = "partnerId")]
+    #[serde(default)]
+    pub partner_id: String,
+}
+
+// Encode AgentIdentifiation as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_agent_identifiation<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &AgentIdentifiation,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(2)?;
+    e.str("name")?;
+    e.str(&val.name)?;
+    e.str("partnerId")?;
+    e.str(&val.partner_id)?;
+    Ok(())
+}
+
+// Decode AgentIdentifiation from cbor input stream
+#[doc(hidden)]
+pub fn decode_agent_identifiation(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<AgentIdentifiation, RpcError> {
+    let __result = {
+        let mut name: Option<String> = None;
+        let mut partner_id: Option<String> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct AgentIdentifiation, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => name = Some(d.str()?.to_string()),
+                    1 => partner_id = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "name" => name = Some(d.str()?.to_string()),
+                    "partnerId" => partner_id = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        AgentIdentifiation {
+            name: if let Some(__x) = name {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field AgentIdentifiation.name (#0)".to_string(),
+                ));
+            },
+
+            partner_id: if let Some(__x) = partner_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field AgentIdentifiation.partner_id (#1)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct AuthorizationStatus {
     #[serde(default)]
     pub code: u16,
@@ -163,15 +247,13 @@ pub fn decode_balance(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Balance,
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => {
-                        balance_characteristic =
-                            Some(decode_balance_characteristic(d).map_err(|e| {
-                                format!(
+                    0 => balance_characteristic =
+                        Some(decode_balance_characteristic(d).map_err(|e| {
+                            format!(
                                 "decoding 'co.uk.orange.rating.agent#BalanceCharacteristic': {}",
                                 e
                             )
-                            })?)
-                    }
+                        })?),
                     1 => party_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
@@ -180,15 +262,13 @@ pub fn decode_balance(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Balance,
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
-                    "balanceCharacteristic" => {
-                        balance_characteristic =
-                            Some(decode_balance_characteristic(d).map_err(|e| {
-                                format!(
+                    "balanceCharacteristic" => balance_characteristic =
+                        Some(decode_balance_characteristic(d).map_err(|e| {
+                            format!(
                                 "decoding 'co.uk.orange.rating.agent#BalanceCharacteristic': {}",
                                 e
                             )
-                            })?)
-                    }
+                        })?),
                     "party_id" => party_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
@@ -441,94 +521,91 @@ where
 // Decode Bucket from cbor input stream
 #[doc(hidden)]
 pub fn decode_bucket(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Bucket, RpcError> {
-    let __result = {
-        let mut bucket_characteristic: Option<BucketCharacteristic> = None;
-        let mut name: Option<String> = None;
-        let mut offer_id: Option<String> = None;
-        let mut party_id: Option<String> = None;
+    let __result =
+        {
+            let mut bucket_characteristic: Option<BucketCharacteristic> = None;
+            let mut name: Option<String> = None;
+            let mut offer_id: Option<String> = None;
+            let mut party_id: Option<String> = None;
 
-        let is_array = match d.datatype()? {
-            wasmbus_rpc::cbor::Type::Array => true,
-            wasmbus_rpc::cbor::Type::Map => false,
-            _ => {
-                return Err(RpcError::Deser(
-                    "decoding struct Bucket, expected array or map".to_string(),
-                ))
+            let is_array = match d.datatype()? {
+                wasmbus_rpc::cbor::Type::Array => true,
+                wasmbus_rpc::cbor::Type::Map => false,
+                _ => {
+                    return Err(RpcError::Deser(
+                        "decoding struct Bucket, expected array or map".to_string(),
+                    ))
+                }
+            };
+            if is_array {
+                let len = d.fixed_array()?;
+                for __i in 0..(len as usize) {
+                    match __i {
+                        0 => bucket_characteristic =
+                            Some(decode_bucket_characteristic(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
+                                    e
+                                )
+                            })?),
+                        1 => name = Some(d.str()?.to_string()),
+                        2 => offer_id = Some(d.str()?.to_string()),
+                        3 => party_id = Some(d.str()?.to_string()),
+                        _ => d.skip()?,
+                    }
+                }
+            } else {
+                let len = d.fixed_map()?;
+                for __i in 0..(len as usize) {
+                    match d.str()? {
+                        "bucketCharacteristic" => bucket_characteristic =
+                            Some(decode_bucket_characteristic(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
+                                    e
+                                )
+                            })?),
+                        "name" => name = Some(d.str()?.to_string()),
+                        "offerId" => offer_id = Some(d.str()?.to_string()),
+                        "partyId" => party_id = Some(d.str()?.to_string()),
+                        _ => d.skip()?,
+                    }
+                }
+            }
+            Bucket {
+                bucket_characteristic: if let Some(__x) = bucket_characteristic {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field Bucket.bucket_characteristic (#0)".to_string(),
+                    ));
+                },
+
+                name: if let Some(__x) = name {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field Bucket.name (#1)".to_string(),
+                    ));
+                },
+
+                offer_id: if let Some(__x) = offer_id {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field Bucket.offer_id (#2)".to_string(),
+                    ));
+                },
+
+                party_id: if let Some(__x) = party_id {
+                    __x
+                } else {
+                    return Err(RpcError::Deser(
+                        "missing field Bucket.party_id (#3)".to_string(),
+                    ));
+                },
             }
         };
-        if is_array {
-            let len = d.fixed_array()?;
-            for __i in 0..(len as usize) {
-                match __i {
-                    0 => {
-                        bucket_characteristic =
-                            Some(decode_bucket_characteristic(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
-                                    e
-                                )
-                            })?)
-                    }
-                    1 => name = Some(d.str()?.to_string()),
-                    2 => offer_id = Some(d.str()?.to_string()),
-                    3 => party_id = Some(d.str()?.to_string()),
-                    _ => d.skip()?,
-                }
-            }
-        } else {
-            let len = d.fixed_map()?;
-            for __i in 0..(len as usize) {
-                match d.str()? {
-                    "bucketCharacteristic" => {
-                        bucket_characteristic =
-                            Some(decode_bucket_characteristic(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
-                                    e
-                                )
-                            })?)
-                    }
-                    "name" => name = Some(d.str()?.to_string()),
-                    "offerId" => offer_id = Some(d.str()?.to_string()),
-                    "partyId" => party_id = Some(d.str()?.to_string()),
-                    _ => d.skip()?,
-                }
-            }
-        }
-        Bucket {
-            bucket_characteristic: if let Some(__x) = bucket_characteristic {
-                __x
-            } else {
-                return Err(RpcError::Deser(
-                    "missing field Bucket.bucket_characteristic (#0)".to_string(),
-                ));
-            },
-
-            name: if let Some(__x) = name {
-                __x
-            } else {
-                return Err(RpcError::Deser(
-                    "missing field Bucket.name (#1)".to_string(),
-                ));
-            },
-
-            offer_id: if let Some(__x) = offer_id {
-                __x
-            } else {
-                return Err(RpcError::Deser(
-                    "missing field Bucket.offer_id (#2)".to_string(),
-                ));
-            },
-
-            party_id: if let Some(__x) = party_id {
-                __x
-            } else {
-                return Err(RpcError::Deser(
-                    "missing field Bucket.party_id (#3)".to_string(),
-                ));
-            },
-        }
-    };
     Ok(__result)
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -819,6 +896,9 @@ pub struct RatingResponse {
     pub authorization_status: AuthorizationStatus,
     #[serde(rename = "billingInformation")]
     pub billing_information: BillingInformation,
+    #[serde(rename = "nextAgent")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_agent: Option<AgentIdentifiation>,
 }
 
 // Encode RatingResponse as CBOR and append to output stream
@@ -831,11 +911,17 @@ pub fn encode_rating_response<W: wasmbus_rpc::cbor::Write>(
 where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
-    e.map(2)?;
+    e.map(3)?;
     e.str("authorizationStatus")?;
     encode_authorization_status(e, &val.authorization_status)?;
     e.str("billingInformation")?;
     encode_billing_information(e, &val.billing_information)?;
+    if let Some(val) = val.next_agent.as_ref() {
+        e.str("nextAgent")?;
+        encode_agent_identifiation(e, val)?;
+    } else {
+        e.null()?;
+    }
     Ok(())
 }
 
@@ -847,6 +933,7 @@ pub fn decode_rating_response(
     let __result = {
         let mut authorization_status: Option<AuthorizationStatus> = None;
         let mut billing_information: Option<BillingInformation> = None;
+        let mut next_agent: Option<Option<AgentIdentifiation>> = Some(None);
 
         let is_array = match d.datatype()? {
             wasmbus_rpc::cbor::Type::Array => true,
@@ -878,6 +965,20 @@ pub fn decode_rating_response(
                             )
                         })?)
                     }
+                    2 => {
+                        next_agent = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_agent_identifiation(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AgentIdentifiation': {}",
+                                    e
+                                )
+                            })?))
+                        }
+                    }
+
                     _ => d.skip()?,
                 }
             }
@@ -902,6 +1003,19 @@ pub fn decode_rating_response(
                             )
                         })?)
                     }
+                    "nextAgent" => {
+                        next_agent = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_agent_identifiation(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AgentIdentifiation': {}",
+                                    e
+                                )
+                            })?))
+                        }
+                    }
                     _ => d.skip()?,
                 }
             }
@@ -922,6 +1036,7 @@ pub fn decode_rating_response(
                     "missing field RatingResponse.billing_information (#1)".to_string(),
                 ));
             },
+            next_agent: next_agent.unwrap(),
         }
     };
     Ok(__result)
@@ -1057,11 +1172,242 @@ pub fn decode_usage_proof_request(
     };
     Ok(__result)
 }
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct ValidationRequest {
+    #[serde(rename = "clientCountry")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub client_country: Option<String>,
+    #[serde(rename = "clientIp")]
+    #[serde(default)]
+    pub client_ip: String,
+    #[serde(rename = "ratingRequest")]
+    pub rating_request: RatingRequest,
+}
+
+// Encode ValidationRequest as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_validation_request<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &ValidationRequest,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(3)?;
+    if let Some(val) = val.client_country.as_ref() {
+        e.str("clientCountry")?;
+        e.str(val)?;
+    } else {
+        e.null()?;
+    }
+    e.str("clientIp")?;
+    e.str(&val.client_ip)?;
+    e.str("ratingRequest")?;
+    encode_rating_request(e, &val.rating_request)?;
+    Ok(())
+}
+
+// Decode ValidationRequest from cbor input stream
+#[doc(hidden)]
+pub fn decode_validation_request(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<ValidationRequest, RpcError> {
+    let __result = {
+        let mut client_country: Option<Option<String>> = Some(None);
+        let mut client_ip: Option<String> = None;
+        let mut rating_request: Option<RatingRequest> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct ValidationRequest, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        client_country = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    1 => client_ip = Some(d.str()?.to_string()),
+                    2 => {
+                        rating_request = Some(decode_rating_request(d).map_err(|e| {
+                            format!("decoding 'co.uk.orange.rating.agent#RatingRequest': {}", e)
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "clientCountry" => {
+                        client_country = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    "clientIp" => client_ip = Some(d.str()?.to_string()),
+                    "ratingRequest" => {
+                        rating_request = Some(decode_rating_request(d).map_err(|e| {
+                            format!("decoding 'co.uk.orange.rating.agent#RatingRequest': {}", e)
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        }
+        ValidationRequest {
+            client_country: client_country.unwrap(),
+
+            client_ip: if let Some(__x) = client_ip {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field ValidationRequest.client_ip (#1)".to_string(),
+                ));
+            },
+
+            rating_request: if let Some(__x) = rating_request {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field ValidationRequest.rating_request (#2)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct ValidationResponse {
+    #[serde(rename = "nextAgent")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_agent: Option<AgentIdentifiation>,
+    #[serde(default)]
+    pub valid: bool,
+}
+
+// Encode ValidationResponse as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_validation_response<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &ValidationResponse,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(2)?;
+    if let Some(val) = val.next_agent.as_ref() {
+        e.str("nextAgent")?;
+        encode_agent_identifiation(e, val)?;
+    } else {
+        e.null()?;
+    }
+    e.str("valid")?;
+    e.bool(val.valid)?;
+    Ok(())
+}
+
+// Decode ValidationResponse from cbor input stream
+#[doc(hidden)]
+pub fn decode_validation_response(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<ValidationResponse, RpcError> {
+    let __result = {
+        let mut next_agent: Option<Option<AgentIdentifiation>> = Some(None);
+        let mut valid: Option<bool> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct ValidationResponse, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        next_agent = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_agent_identifiation(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AgentIdentifiation': {}",
+                                    e
+                                )
+                            })?))
+                        }
+                    }
+                    1 => valid = Some(d.bool()?),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "nextAgent" => {
+                        next_agent = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_agent_identifiation(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#AgentIdentifiation': {}",
+                                    e
+                                )
+                            })?))
+                        }
+                    }
+                    "valid" => valid = Some(d.bool()?),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        ValidationResponse {
+            next_agent: next_agent.unwrap(),
+
+            valid: if let Some(__x) = valid {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field ValidationResponse.valid (#1)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
 /// Description of the rating agent service
 /// wasmbus.actorReceive
 #[async_trait]
 pub trait RatingAgent {
     async fn rate_usage(&self, ctx: &Context, arg: &RatingRequest) -> RpcResult<RatingResponse>;
+    async fn validate(
+        &self,
+        ctx: &Context,
+        arg: &ValidationRequest,
+    ) -> RpcResult<ValidationResponse>;
 }
 
 /// RatingAgentReceiver receives messages defined in the RatingAgent service trait
@@ -1076,6 +1422,15 @@ pub trait RatingAgentReceiver: MessageDispatch + RatingAgent {
                     .map_err(|e| RpcError::Deser(format!("'RatingRequest': {}", e)))?;
 
                 let resp = RatingAgent::rate_usage(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
+                Ok(buf)
+            }
+            "Validate" => {
+                let value: ValidationRequest = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'ValidationRequest': {}", e)))?;
+
+                let resp = RatingAgent::validate(self, ctx, &value).await?;
                 let buf = wasmbus_rpc::common::serialize(&resp)?;
 
                 Ok(buf)
@@ -1147,6 +1502,30 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> RatingAgent for Ratin
 
         let value: RatingResponse = wasmbus_rpc::common::deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("'{}': RatingResponse", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn validate(
+        &self,
+        ctx: &Context,
+        arg: &ValidationRequest,
+    ) -> RpcResult<ValidationResponse> {
+        let buf = wasmbus_rpc::common::serialize(arg)?;
+
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "RatingAgent.Validate",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: ValidationResponse = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': ValidationResponse", e)))?;
         Ok(value)
     }
 }

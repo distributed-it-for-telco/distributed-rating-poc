@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use rating_interface::{
     RatingAgent, RatingAgentReceiver, RatingAgentSender, RatingRequest, RatingResponse,
 };
@@ -5,13 +7,12 @@ use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
-#[services(Actor, RatingAgent)]
+#[services(Actor)]
 struct RatingAgentCoordinatorActor {}
 
-/// Implementation of Rating Agent trait methods
-#[async_trait]
-impl RatingAgent for RatingAgentCoordinatorActor {
-    async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
+/// Implementation of Rating Coodinator
+impl RatingAgentCoordinatorActor {
+    async fn handle_rating_process(&self, _ctx: &Context, _arg: &RatingRequest, headers: HashMap<String, String>) -> RpcResult<RatingResponse> {
         info!("Hello I'm your rating coordinator");
         info!("Current used agent is: {}", _arg.agent_id);
 

@@ -21,17 +21,33 @@ use org.wasmcloud.model#U16
 use org.wasmcloud.model#wasmbus
 use org.wasmcloud.model#codegenRust
 
+/// Description of the rating agent service
+@wasmbus( actorReceive: true )
+service RatingCoordinator {
+  version: "0.1",
+  operations: [ HandleRatingProcess ]
+}
 
 /// Description of the rating agent service
 @wasmbus( actorReceive: true )
 service RatingAgent {
   version: "0.1",
-  operations: [ RateUsage ]
+  operations: [ RateUsage, Validate ]
+}
+
+operation HandleRatingProcess {
+    input: RatingRequest, 
+    output: RatingResponse
 }
 
 operation RateUsage {
     input: RatingRequest,
     output: RatingResponse
+}
+
+operation Validate {
+    input: ValidationRequest,
+    output: ValidationResponse
 }
 
 structure RatingRequest {
@@ -52,7 +68,32 @@ structure RatingResponse {
     authorizationStatus: AuthorizationStatus,
 
     @required
-    billingInformation: BillingInformation 
+    billingInformation: BillingInformation,
+
+    nextAgent: AgentIdentifiation
+}
+
+structure ValidationRequest {
+    @required
+    ratingRequest: RatingRequest,
+    @required
+    clientIp: String,
+    clientCountry: String,
+}
+
+structure ValidationResponse {
+    @required
+    valid: Boolean,
+
+    nextAgent: AgentIdentifiation
+}
+
+structure AgentIdentifiation {
+    @required
+    name: String,
+
+    @required
+    partnerId: String
 }
 
 structure BillingInformation {
