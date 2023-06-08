@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use rating_interface::{
     CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender, RatingAgent,
-    RatingAgentSender, RatingRequest,
+    RatingAgentSender, RatingRequest, RatingProcessRequest,RatingCoordinatorSender, RatingCoordinator
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -136,9 +136,16 @@ async fn request_usage(_ctx: &Context, _request: ServiceUsageRequest) -> RpcResu
 }
 
 async fn request_rate(_ctx: &Context, _request: RatingRequest, request_headers: HashMap<String, String>) -> RpcResult<HttpResponse> {
-    let rating = RatingAgentSender::to_actor("ratingcoordinator")
-        .rate_usage(_ctx, &_request)
+
+    let mut rating_process_request = RatingProcessRequest::default();
+    rating_process_request.headers=Some(request_headers);
+    rating_process_request.rating_request=_request;
+
+    let rating = RatingCoordinatorSender::to_actor("ratingcoordinator")
+        .handle_rating_process(_ctx, &rating_process_request)
         .await?;
+
+
 
     let mut headers: HashMap<String, Vec<String>> = HashMap::new();
     headers.insert(

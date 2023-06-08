@@ -691,6 +691,44 @@ pub fn decode_bucket_characteristic(
     };
     Ok(__result)
 }
+pub type HeadersMap = std::collections::HashMap<String, String>;
+
+// Encode HeadersMap as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_headers_map<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &HeadersMap,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(val.len() as u64)?;
+    for (k, v) in val {
+        e.str(k)?;
+        e.str(v)?;
+    }
+    Ok(())
+}
+
+// Decode HeadersMap from cbor input stream
+#[doc(hidden)]
+pub fn decode_headers_map(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<HeadersMap, RpcError> {
+    let __result = {
+        {
+            let map_len = d.fixed_map()? as usize;
+            let mut m: std::collections::HashMap<String, String> =
+                std::collections::HashMap::with_capacity(map_len);
+            for _ in 0..map_len {
+                let k = d.str()?.to_string();
+                let v = d.str()?.to_string();
+                m.insert(k, v);
+            }
+            m
+        }
+    };
+    Ok(__result)
+}
 pub type MessageList = Vec<String>;
 
 // Encode MessageList as CBOR and append to output stream
@@ -733,6 +771,113 @@ pub fn decode_message_list(
                 }
             }
             arr
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct RatingProcessRequest {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub headers: Option<HeadersMap>,
+    #[serde(rename = "ratingRequest")]
+    pub rating_request: RatingRequest,
+}
+
+// Encode RatingProcessRequest as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_rating_process_request<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &RatingProcessRequest,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(2)?;
+    if let Some(val) = val.headers.as_ref() {
+        e.str("headers")?;
+        encode_headers_map(e, val)?;
+    } else {
+        e.null()?;
+    }
+    e.str("ratingRequest")?;
+    encode_rating_request(e, &val.rating_request)?;
+    Ok(())
+}
+
+// Decode RatingProcessRequest from cbor input stream
+#[doc(hidden)]
+pub fn decode_rating_process_request(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<RatingProcessRequest, RpcError> {
+    let __result = {
+        let mut headers: Option<Option<HeadersMap>> = Some(None);
+        let mut rating_request: Option<RatingRequest> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct RatingProcessRequest, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        headers = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_headers_map(d).map_err(|e| {
+                                format!("decoding 'co.uk.orange.rating.agent#HeadersMap': {}", e)
+                            })?))
+                        }
+                    }
+                    1 => {
+                        rating_request = Some(decode_rating_request(d).map_err(|e| {
+                            format!("decoding 'co.uk.orange.rating.agent#RatingRequest': {}", e)
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "headers" => {
+                        headers = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_headers_map(d).map_err(|e| {
+                                format!("decoding 'co.uk.orange.rating.agent#HeadersMap': {}", e)
+                            })?))
+                        }
+                    }
+                    "ratingRequest" => {
+                        rating_request = Some(decode_rating_request(d).map_err(|e| {
+                            format!("decoding 'co.uk.orange.rating.agent#RatingRequest': {}", e)
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        }
+        RatingProcessRequest {
+            headers: headers.unwrap(),
+
+            rating_request: if let Some(__x) = rating_request {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingProcessRequest.rating_request (#1)".to_string(),
+                ));
+            },
         }
     };
     Ok(__result)
@@ -1526,6 +1671,110 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> RatingAgent for Ratin
 
         let value: ValidationResponse = wasmbus_rpc::common::deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("'{}': ValidationResponse", e)))?;
+        Ok(value)
+    }
+}
+
+/// Description of the rating agent service
+/// wasmbus.actorReceive
+#[async_trait]
+pub trait RatingCoordinator {
+    async fn handle_rating_process(
+        &self,
+        ctx: &Context,
+        arg: &RatingProcessRequest,
+    ) -> RpcResult<RatingResponse>;
+}
+
+/// RatingCoordinatorReceiver receives messages defined in the RatingCoordinator service trait
+/// Description of the rating agent service
+#[doc(hidden)]
+#[async_trait]
+pub trait RatingCoordinatorReceiver: MessageDispatch + RatingCoordinator {
+    async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
+        match message.method {
+            "HandleRatingProcess" => {
+                let value: RatingProcessRequest = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'RatingProcessRequest': {}", e)))?;
+
+                let resp = RatingCoordinator::handle_rating_process(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
+                Ok(buf)
+            }
+            _ => Err(RpcError::MethodNotHandled(format!(
+                "RatingCoordinator::{}",
+                message.method
+            ))),
+        }
+    }
+}
+
+/// RatingCoordinatorSender sends messages to a RatingCoordinator service
+/// Description of the rating agent service
+/// client for sending RatingCoordinator messages
+#[derive(Debug)]
+pub struct RatingCoordinatorSender<T: Transport> {
+    transport: T,
+}
+
+impl<T: Transport> RatingCoordinatorSender<T> {
+    /// Constructs a RatingCoordinatorSender with the specified transport
+    pub fn via(transport: T) -> Self {
+        Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> RatingCoordinatorSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl RatingCoordinatorSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
+#[async_trait]
+impl<T: Transport + std::marker::Sync + std::marker::Send> RatingCoordinator
+    for RatingCoordinatorSender<T>
+{
+    #[allow(unused)]
+    async fn handle_rating_process(
+        &self,
+        ctx: &Context,
+        arg: &RatingProcessRequest,
+    ) -> RpcResult<RatingResponse> {
+        let buf = wasmbus_rpc::common::serialize(arg)?;
+
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "RatingCoordinator.HandleRatingProcess",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: RatingResponse = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': RatingResponse", e)))?;
         Ok(value)
     }
 }

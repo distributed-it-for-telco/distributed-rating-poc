@@ -36,7 +36,7 @@ service RatingAgent {
 }
 
 operation HandleRatingProcess {
-    input: RatingRequest, 
+    input: RatingProcessRequest,
     output: RatingResponse
 }
 
@@ -50,6 +50,21 @@ operation Validate {
     output: ValidationResponse
 }
 
+
+map HeadersMap {
+    key:String,
+    value:String
+}
+
+@input
+structure RatingProcessRequest{
+    @required
+    ratingRequest:RatingRequest,
+    
+    headers :HeadersMap,
+
+}
+
 structure RatingRequest {
     @required
     customerId: String,
@@ -60,7 +75,7 @@ structure RatingRequest {
     // This will be a base64 encoded string containing a JSON payload. The interpretation of the payload
     // is entirely up to the target agent
     @required
-    usage: String,
+    usage: String
 }
 
 structure RatingResponse {
