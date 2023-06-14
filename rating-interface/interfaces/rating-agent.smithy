@@ -133,6 +133,7 @@ structure AuthorizationStatus {
     // Key that proves authorization was successful. Will be missing if authorization was denied
     key: String,
 }
+
 @codegenRust(noDeriveEq: true )
 structure Balance {
     @required

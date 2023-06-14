@@ -1,6 +1,7 @@
 use rating_interface::{
     AuthorizationStatus, BillingInformation, RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler, UsageProofRequest,
+    RatingResponse, RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
+    UsageProofRequest, ValidationRequest, ValidationResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -41,12 +42,22 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             .store(_ctx, &usage_template_str)
             .await?;
 
-        /*
-         * Empty Response till we decide rating response how it should be
-         */
-        RpcResult::Ok(RatingResponse {
-            authorization_status: AuthorizationStatus::default(),
-            billing_information: BillingInformation::default(),
-        })
+        let mut rating_response_builder = RatingResponseBuilder::new();
+
+        let rating_response = rating_response_builder
+            .unit((&"EUR").to_string())
+            .price(rating.to_string())
+            .authorized()
+            .build();
+
+        RpcResult::Ok(rating_response)
+    }
+
+    async fn validate(
+        &self,
+        ctx: &Context,
+        arg: &ValidationRequest,
+    ) -> RpcResult<ValidationResponse> {
+        todo!()
     }
 }
