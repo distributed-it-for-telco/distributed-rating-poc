@@ -1,4 +1,4 @@
-use crate::{AuthorizationStatus, BillingInformation, RatingResponse};
+use crate::{AuthorizationStatus, BillingInformation, RatingResponse, AgentIdentifiation};
 
 #[derive(Debug, PartialEq, Default /*,Copy */, Clone)]
 pub struct RatingResponseBuilder {
@@ -8,6 +8,7 @@ pub struct RatingResponseBuilder {
     unit: String,
     price: String,
     messages: Vec<String>,
+    next_agent: AgentIdentifiation,
 }
 
 // impl Copy for RatingResponseBuilder{
@@ -45,6 +46,11 @@ impl RatingResponseBuilder {
         self
     }
 
+    pub fn next_agent(&mut self, next_agent: AgentIdentifiation) -> &mut Self {
+        self.next_agent = next_agent;
+        self
+    }
+
     pub fn build(&mut self) -> RatingResponse {
         let mut billing_info = BillingInformation::default();
         let mut authorization_status = AuthorizationStatus::default();
@@ -65,7 +71,7 @@ impl RatingResponseBuilder {
         RatingResponse {
             authorization_status: authorization_status,
             billing_information: billing_info,
-            next_agent: Option::None
+            next_agent: Some(self.next_agent.to_owned())
         }
     }
 }

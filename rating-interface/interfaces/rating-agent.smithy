@@ -184,5 +184,7 @@ structure UsageProofRequest {
     @required 
     rating: String, 
     @required
-    usageDate: String
+    usageDate: String,
+    @required
+    offerId: String
 }

@@ -23,6 +23,7 @@ rating_interface = { path = "../../rating-interface/rust" }
 new_string_template = "1.4"
 wasmcloud-interface-numbergen = "0.8.1"
 # wasmcloud-interface-blobstore = "0.5.1"
+lazy_static = "1.4.0"
 
 [profile.release]
 # Optimize for small code size

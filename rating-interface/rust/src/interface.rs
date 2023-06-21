@@ -1188,6 +1188,9 @@ pub fn decode_rating_response(
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct UsageProofRequest {
+    #[serde(rename = "offerId")]
+    #[serde(default)]
+    pub offer_id: String,
     #[serde(rename = "partyId")]
     #[serde(default)]
     pub party_id: String,
@@ -1213,7 +1216,9 @@ pub fn encode_usage_proof_request<W: wasmbus_rpc::cbor::Write>(
 where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
-    e.map(5)?;
+    e.map(6)?;
+    e.str("offerId")?;
+    e.str(&val.offer_id)?;
     e.str("partyId")?;
     e.str(&val.party_id)?;
     e.str("rating")?;
@@ -1233,6 +1238,7 @@ pub fn decode_usage_proof_request(
     d: &mut wasmbus_rpc::cbor::Decoder<'_>,
 ) -> Result<UsageProofRequest, RpcError> {
     let __result = {
+        let mut offer_id: Option<String> = None;
         let mut party_id: Option<String> = None;
         let mut rating: Option<String> = None;
         let mut usage: Option<String> = None;
@@ -1252,11 +1258,12 @@ pub fn decode_usage_proof_request(
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => party_id = Some(d.str()?.to_string()),
-                    1 => rating = Some(d.str()?.to_string()),
-                    2 => usage = Some(d.str()?.to_string()),
-                    3 => usage_date = Some(d.str()?.to_string()),
-                    4 => usage_id = Some(d.str()?.to_string()),
+                    0 => offer_id = Some(d.str()?.to_string()),
+                    1 => party_id = Some(d.str()?.to_string()),
+                    2 => rating = Some(d.str()?.to_string()),
+                    3 => usage = Some(d.str()?.to_string()),
+                    4 => usage_date = Some(d.str()?.to_string()),
+                    5 => usage_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
@@ -1264,6 +1271,7 @@ pub fn decode_usage_proof_request(
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
+                    "offerId" => offer_id = Some(d.str()?.to_string()),
                     "partyId" => party_id = Some(d.str()?.to_string()),
                     "rating" => rating = Some(d.str()?.to_string()),
                     "usage" => usage = Some(d.str()?.to_string()),
@@ -1274,11 +1282,19 @@ pub fn decode_usage_proof_request(
             }
         }
         UsageProofRequest {
+            offer_id: if let Some(__x) = offer_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field UsageProofRequest.offer_id (#0)".to_string(),
+                ));
+            },
+
             party_id: if let Some(__x) = party_id {
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.party_id (#0)".to_string(),
+                    "missing field UsageProofRequest.party_id (#1)".to_string(),
                 ));
             },
 
@@ -1286,7 +1302,7 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.rating (#1)".to_string(),
+                    "missing field UsageProofRequest.rating (#2)".to_string(),
                 ));
             },
 
@@ -1294,7 +1310,7 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.usage (#2)".to_string(),
+                    "missing field UsageProofRequest.usage (#3)".to_string(),
                 ));
             },
 
@@ -1302,7 +1318,7 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.usage_date (#3)".to_string(),
+                    "missing field UsageProofRequest.usage_date (#4)".to_string(),
                 ));
             },
 
@@ -1310,7 +1326,7 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.usage_id (#4)".to_string(),
+                    "missing field UsageProofRequest.usage_id (#5)".to_string(),
                 ));
             },
         }
