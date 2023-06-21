@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "./usage-collector-video-provider/Cargo.toml"
+    ]
+}

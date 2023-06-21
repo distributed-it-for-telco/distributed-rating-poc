@@ -1,3 +1,5 @@
+use std::ptr::null;
+
 use crate::{AuthorizationStatus, BillingInformation, RatingResponse, AgentIdentifiation};
 
 #[derive(Debug, PartialEq, Default /*,Copy */, Clone)]
@@ -67,7 +69,7 @@ impl RatingResponseBuilder {
             authorization_status.code = 401;
         }
         authorization_status.key = Some(self.authorization_message.to_string());
-
+        
         RatingResponse {
             authorization_status: authorization_status,
             billing_information: billing_info,
