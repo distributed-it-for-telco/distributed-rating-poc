@@ -12,9 +12,10 @@ use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "1";
+const ORANGE_PARTNER_PARTY_ID: &str = "orange_my_partner";
 
 lazy_static! {
-    static ref OFFER_PROVIDERS_AGENTS: HashMap<&'static str, &'static str> = {
+    static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
         let mut m = HashMap::new();
         m.insert("stream", "provider_streaming");
         m.insert("video", "provider_video");
@@ -60,11 +61,11 @@ impl RatingAgent for OrangeVodRatingAgentActor {
 
         let mut rating_response_builder = RatingResponseBuilder::new();
         
-        if _arg.offer_id.is_some() && OFFER_PROVIDERS_AGENTS.contains_key(_arg.offer_id.to_owned().unwrap().as_str()) {
+        if _arg.offer_id.is_some() && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.contains_key(_arg.offer_id.to_owned().unwrap().as_str()) {
             let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
 
-            next_agent.name = OFFER_PROVIDERS_AGENTS.get(_arg.offer_id.to_owned().unwrap().as_str()).unwrap().to_string();
-            next_agent.partner_id = _arg.offer_id.to_owned().unwrap();
+            next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.get(_arg.offer_id.to_owned().unwrap().as_str()).unwrap().to_string();
+            next_agent.partner_id = ORANGE_PARTNER_PARTY_ID.to_string();
 
             rating_response_builder.next_agent(next_agent);
         }
@@ -91,10 +92,10 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             validation_response.valid = false;
         }
 
-        if arg.rating_request.offer_id.is_some() && OFFER_PROVIDERS_AGENTS.contains_key(arg.rating_request.offer_id.to_owned().unwrap().as_str()) {
+        if arg.rating_request.offer_id.is_some() && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.contains_key(arg.rating_request.offer_id.to_owned().unwrap().as_str()) {
             let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
 
-            next_agent.name = OFFER_PROVIDERS_AGENTS.get(arg.rating_request.offer_id.to_owned().unwrap().as_str()).unwrap().to_string();
+            next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.get(arg.rating_request.offer_id.to_owned().unwrap().as_str()).unwrap().to_string();
             next_agent.partner_id = arg.rating_request.offer_id.to_owned().unwrap();
 
             validation_response.next_agent = Some(next_agent);
