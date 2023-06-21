@@ -102,6 +102,7 @@ async fn handle_rating(
         usage: _usage.to_owned(),
         usage_id: usage_id.as_str().to_owned(),
         usage_date: usage_date.to_owned(),
+        offer_id: OFFER_ID.to_owned()
     });
 
     info!(
