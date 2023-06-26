@@ -12,7 +12,7 @@ use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "1";
-const ORANGE_PARTNER_PARTY_ID: &str = "orange_my_partner";
+const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
 
 lazy_static! {
     static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
@@ -65,7 +65,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
 
             next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.get(_arg.offer_id.to_owned().unwrap().as_str()).unwrap().to_string();
-            next_agent.partner_id = ORANGE_PARTNER_PARTY_ID.to_string();
+            next_agent.partner_id = ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string();
 
             rating_response_builder.next_agent(next_agent);
         }
@@ -96,7 +96,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
 
             next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.get(arg.rating_request.offer_id.to_owned().unwrap().as_str()).unwrap().to_string();
-            next_agent.partner_id = arg.rating_request.offer_id.to_owned().unwrap();
+            next_agent.partner_id = ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string();
 
             validation_response.next_agent = Some(next_agent);
         }

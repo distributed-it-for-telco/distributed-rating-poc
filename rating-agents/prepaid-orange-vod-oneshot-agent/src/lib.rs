@@ -15,19 +15,6 @@ const OFFER_ID: &str ="4";
 
 #[async_trait]
 impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
-
-    async fn validate(&self, _ctx:&Context, _arg: &ValidationRequest)-> RpcResult<ValidationResponse> {
-        
-        info!("Hello I'm your orange prepaid vod One Shot agent---> Validation");
-    
-       Ok(ValidationResponse{
-        true,
-        Option::None
-       })
-
-      
-    }
-
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         info!("Hello I'm your orange prepaid vod One Shot agent");
         let usage: f32 = _arg.usage.parse().unwrap();
@@ -88,8 +75,13 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
         RpcResult::Ok(rating_response)
     }
 
-
-
+    async fn validate(
+        &self,
+        ctx: &Context,
+        arg: &ValidationRequest,
+    ) -> RpcResult<ValidationResponse> {
+        todo!()
+    }
 }
 fn has_sufficient_balance(balance :f32, charge:f32) -> bool {
     if balance< charge {

@@ -1,4 +1,4 @@
-# usage-collector Actor
+# usage-collector-video-provider Actor
 
 This project implements an actor that returns a greeting.
 

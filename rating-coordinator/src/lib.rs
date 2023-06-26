@@ -20,7 +20,6 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
     ) -> RpcResult<RatingResponse> {
         info!("Hello I'm your rating coordinator");
         info!("Current used agent is: {}", _arg.rating_request.agent_id);
-        info!("Headers {:?}", _arg.headers);
 
         let validation_response_as_rating = handle_validation_cycle(_ctx, _arg).await?;
 
@@ -56,6 +55,8 @@ async fn handle_validation_cycle(
         client_country = Some(client_headers.get("client_country").unwrap().to_string());
     }
 
+    info!("Validating against agent: {}", rating_process_request.rating_request.agent_id);
+
     let mut validation_response = validate_through_agent(
         _ctx,
         &rating_process_request.rating_request,
@@ -63,6 +64,10 @@ async fn handle_validation_cycle(
         client_country.to_owned(),
     )
     .await?;
+
+    info!("Vendor validation status: {}", validation_response.valid);
+    info!("Vendor validation have next agent and valid: {}",
+        validation_response.valid && validation_response.next_agent != None);
 
     while validation_response.valid && validation_response.next_agent != None {
         let next_agent_name = validation_response.next_agent.to_owned().unwrap().name;
@@ -75,6 +80,8 @@ async fn handle_validation_cycle(
         let mut updated_rating_request = rating_process_request.rating_request.clone();
         updated_rating_request.customer_id = next_partner_id;
         updated_rating_request.agent_id = next_agent_name;
+
+        info!("Validating against agent: {}", validation_response.next_agent.to_owned().unwrap().name);
 
         validation_response = validate_through_agent(
             _ctx,
@@ -122,11 +129,15 @@ async fn handle_rating_cycle(
     _ctx: &Context,
     rating_process_request: &RatingProcessRequest,
 ) -> RpcResult<RatingResponse> {
+    info!("Rating against agent: {}", rating_process_request.rating_request.agent_id);
+
     let mut rating_response =
         rate_through_agent(_ctx, &rating_process_request.rating_request).await?;
 
 
     while rating_response.authorization_status.code != 401 && rating_response.next_agent != None {
+        info!("Rating against agent: {}", rating_response.next_agent.to_owned().unwrap().name);
+
         let next_agent_name = rating_response.next_agent.to_owned().unwrap().name;
         let next_partner_id = rating_response.next_agent.to_owned().unwrap().partner_id;
 

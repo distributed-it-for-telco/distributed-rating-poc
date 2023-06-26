@@ -1,12 +1,12 @@
 [package]
-name = "usage-collector"
+name = "usage-collector-video-provider"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "usage_collector"
+name = "usage_collector_video_provider"
 
 [dependencies]
 futures = "0.3"
