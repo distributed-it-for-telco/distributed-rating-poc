@@ -10,7 +10,7 @@ pub struct RatingResponseBuilder {
     unit: String,
     price: String,
     messages: Vec<String>,
-    next_agent: AgentIdentifiation,
+    next_agent: Option<AgentIdentifiation>,
 }
 
 // impl Copy for RatingResponseBuilder{
@@ -49,7 +49,7 @@ impl RatingResponseBuilder {
     }
 
     pub fn next_agent(&mut self, next_agent: AgentIdentifiation) -> &mut Self {
-        self.next_agent = next_agent;
+        self.next_agent = Some(next_agent);
         self
     }
 
@@ -73,7 +73,7 @@ impl RatingResponseBuilder {
         RatingResponse {
             authorization_status: authorization_status,
             billing_information: billing_info,
-            next_agent: Some(self.next_agent.to_owned())
+            next_agent: self.next_agent.to_owned()
         }
     }
 }

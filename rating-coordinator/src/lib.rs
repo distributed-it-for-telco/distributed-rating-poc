@@ -134,9 +134,12 @@ async fn handle_rating_cycle(
     let mut rating_response =
         rate_through_agent(_ctx, &rating_process_request.rating_request).await?;
 
-
+    info!("Vendor Rating status: {}", rating_response.authorization_status.code);
+    info!("Vendor Rating have next agent and valid: {}",
+        rating_response.authorization_status.code != 401 && rating_response.next_agent != None);
+    
     while rating_response.authorization_status.code != 401 && rating_response.next_agent != None {
-        info!("Rating against agent: {}", rating_response.next_agent.to_owned().unwrap().name);
+        info!("Rating against provider agent: {}", rating_response.next_agent.to_owned().unwrap().name);
 
         let next_agent_name = rating_response.next_agent.to_owned().unwrap().name;
         let next_partner_id = rating_response.next_agent.to_owned().unwrap().partner_id;
@@ -146,7 +149,13 @@ async fn handle_rating_cycle(
         updated_rating_request.agent_id = next_agent_name;
 
         rating_response = rate_through_agent(_ctx, &updated_rating_request).await?;
+
+        info!("Provider Rating status: {}", rating_response.authorization_status.code);
+        info!("Provider Rating have next agent and valid: {}",
+            rating_response.authorization_status.code != 401 && rating_response.next_agent != None);
     }
+
+    info!("final Rating response: {}", rating_response.authorization_status.code);
 
     Ok(rating_response)
 }
