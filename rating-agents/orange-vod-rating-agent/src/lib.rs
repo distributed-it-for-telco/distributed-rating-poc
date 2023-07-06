@@ -60,15 +60,6 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             .await?;
 
         let mut rating_response_builder = RatingResponseBuilder::new();
-        
-        if _arg.offer_id.is_some() && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.contains_key(_arg.offer_id.to_owned().unwrap().as_str()) {
-            let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
-
-            next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.get(_arg.offer_id.to_owned().unwrap().as_str()).unwrap().to_string();
-            next_agent.partner_id = ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string();
-
-            rating_response_builder.next_agent(next_agent);
-        }
 
         let rating_response = rating_response_builder
             .unit((&"EUR").to_string())

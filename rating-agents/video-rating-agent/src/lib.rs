@@ -60,7 +60,7 @@ impl RatingAgent for VideoRatingAgentActor {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
         validation_response.next_agent = None;
 
-        if arg.client_country.is_some() && arg.client_country.to_owned().unwrap() == "EG" {
+        if arg.client_country.is_some() && arg.client_country.to_owned().unwrap() == "FR" {
             validation_response.valid = true;
         } else {
             validation_response.valid = false;

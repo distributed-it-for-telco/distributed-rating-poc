@@ -21,13 +21,18 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
         info!("Hello I'm your rating coordinator");
         info!("Current used agent is: {}", _arg.rating_request.agent_id);
 
-        let validation_response_as_rating = handle_validation_cycle(_ctx, _arg).await?;
+        let mut rating_agents_stack: Vec<(String, String)> = Vec::new();
+
+        let validation_response_as_rating = match handle_validation_cycle(_ctx, _arg, &mut rating_agents_stack).await {
+            Ok(validation) => validation,
+            Err(e) => return RpcResult::from(Err(e)),
+        };
 
         if validation_response_as_rating.authorization_status.code == 401 {
             return RpcResult::Ok(validation_response_as_rating);
         }
 
-        RpcResult::from(match handle_rating_cycle(_ctx, _arg).await {
+        RpcResult::from(match handle_rating_cycle(_ctx, _arg, &mut rating_agents_stack).await {
             Ok(rating) => Ok(rating),
             Err(e) => Err(e),
         })
@@ -37,6 +42,7 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
 async fn handle_validation_cycle(
     _ctx: &Context,
     rating_process_request: &RatingProcessRequest,
+    rating_agents_stack: &mut Vec<(String, String)>
 ) -> RpcResult<RatingResponse> {
     if rating_process_request.headers.is_none() {
         return RpcResult::from(Err(RpcError::Other(
@@ -65,6 +71,8 @@ async fn handle_validation_cycle(
     )
     .await?;
 
+    rating_agents_stack.push((rating_process_request.rating_request.agent_id.to_owned(), rating_process_request.rating_request.customer_id.to_owned()));
+
     info!("Vendor validation status: {}", validation_response.valid);
     info!("Vendor validation have next agent and valid: {}",
         validation_response.valid && validation_response.next_agent != None);
@@ -83,6 +91,8 @@ async fn handle_validation_cycle(
 
         info!("Validating against agent: {}", validation_response.next_agent.to_owned().unwrap().name);
 
+        rating_agents_stack.push((updated_rating_request.agent_id.to_owned(), updated_rating_request.customer_id.to_owned()));
+        
         validation_response = validate_through_agent(
             _ctx,
             &updated_rating_request,
@@ -114,6 +124,8 @@ async fn validate_through_agent(
     let rating_agent: RatingAgentSender<WasmHost> =
         RatingAgentSender::to_actor(&format!("agent/{}", rating_request.agent_id.to_string()));
 
+    info!("rating agent: {:?}", rating_agent);
+
     let validation_request = ValidationRequest {
         rating_request: rating_request.to_owned(),
         client_ip: client_ip,
@@ -128,23 +140,30 @@ async fn validate_through_agent(
 async fn handle_rating_cycle(
     _ctx: &Context,
     rating_process_request: &RatingProcessRequest,
+    rating_agents_stack: &mut Vec<(String, String)>
 ) -> RpcResult<RatingResponse> {
-    info!("Rating against agent: {}", rating_process_request.rating_request.agent_id);
+    let mut next_agent = rating_agents_stack.pop().unwrap();
+
+    let mut updated_rating_request = rating_process_request.rating_request.clone();
+    updated_rating_request.customer_id = next_agent.1;
+    updated_rating_request.agent_id = next_agent.0;
+
+    info!("Rating against agent: {}", updated_rating_request.agent_id);
 
     let mut rating_response =
-        rate_through_agent(_ctx, &rating_process_request.rating_request).await?;
+        rate_through_agent(_ctx, &updated_rating_request).await?;
 
     info!("Vendor Rating status: {}", rating_response.authorization_status.code);
     info!("Vendor Rating have next agent and valid: {}",
-        rating_response.authorization_status.code != 401 && rating_response.next_agent != None);
+        rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty());
     
-    while rating_response.authorization_status.code != 401 && rating_response.next_agent != None {
-        info!("Rating against provider agent: {}", rating_response.next_agent.to_owned().unwrap().name);
+    while rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty() {
+        next_agent = rating_agents_stack.pop().unwrap();
+        info!("Rating against provider agent: {}", next_agent.0);
 
-        let next_agent_name = rating_response.next_agent.to_owned().unwrap().name;
-        let next_partner_id = rating_response.next_agent.to_owned().unwrap().partner_id;
+        let next_agent_name = next_agent.0;
+        let next_partner_id = next_agent.1;
 
-        let mut updated_rating_request = rating_process_request.rating_request.clone();
         updated_rating_request.customer_id = next_partner_id;
         updated_rating_request.agent_id = next_agent_name;
 
@@ -152,7 +171,7 @@ async fn handle_rating_cycle(
 
         info!("Provider Rating status: {}", rating_response.authorization_status.code);
         info!("Provider Rating have next agent and valid: {}",
-            rating_response.authorization_status.code != 401 && rating_response.next_agent != None);
+            rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty());
     }
 
     info!("final Rating response: {}", rating_response.authorization_status.code);
