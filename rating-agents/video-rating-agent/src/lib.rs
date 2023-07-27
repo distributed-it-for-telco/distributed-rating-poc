@@ -1,3 +1,4 @@
+
 use rating_interface::*;
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -60,7 +61,7 @@ impl RatingAgent for VideoRatingAgentActor {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
         validation_response.next_agent = None;
 
-        if arg.client_country.is_some() && arg.client_country.to_owned().unwrap() == "FR" {
+        if arg.client_country.is_some() && arg.client_country.to_owned().unwrap() == "EG" {
             validation_response.valid = true;
         } else {
             validation_response.valid = false;
@@ -69,3 +70,6 @@ impl RatingAgent for VideoRatingAgentActor {
         Ok(validation_response)
     }
 }
+
+
+

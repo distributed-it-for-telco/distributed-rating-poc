@@ -65,6 +65,7 @@ structure RatingProcessRequest{
 
 }
 
+
 structure RatingRequest {
     @required
     customerId: String,
@@ -75,7 +76,23 @@ structure RatingRequest {
     // This will be a base64 encoded string containing a JSON payload. The interpretation of the payload
     // is entirely up to the target agent
     @required
-    usage: String
+    usage: String,
+    ratingHistory:RatingHistory
+}
+
+
+structure RatingRecord {
+    @required
+    producer: String,
+    @required
+    unit: String,
+    @required
+    price: String
+}
+
+
+list RatingHistory {
+    member: RatingRecord
 }
 
 structure RatingResponse {

@@ -775,6 +775,56 @@ pub fn decode_message_list(
     };
     Ok(__result)
 }
+pub type RatingHistory = Vec<RatingRecord>;
+
+// Encode RatingHistory as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_rating_history<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &RatingHistory,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.array(val.len() as u64)?;
+    for item in val.iter() {
+        encode_rating_record(e, item)?;
+    }
+    Ok(())
+}
+
+// Decode RatingHistory from cbor input stream
+#[doc(hidden)]
+pub fn decode_rating_history(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<RatingHistory, RpcError> {
+    let __result = {
+        if let Some(n) = d.array()? {
+            let mut arr: Vec<RatingRecord> = Vec::with_capacity(n as usize);
+            for _ in 0..(n as usize) {
+                arr.push(decode_rating_record(d).map_err(|e| {
+                    format!("decoding 'co.uk.orange.rating.agent#RatingRecord': {}", e)
+                })?)
+            }
+            arr
+        } else {
+            // indefinite array
+            let mut arr: Vec<RatingRecord> = Vec::new();
+            loop {
+                match d.datatype() {
+                    Err(_) => break,
+                    Ok(wasmbus_rpc::cbor::Type::Break) => break,
+                    Ok(_) => arr.push(decode_rating_record(d).map_err(|e| {
+                        format!("decoding 'co.uk.orange.rating.agent#RatingRecord': {}", e)
+                    })?),
+                }
+            }
+            arr
+        }
+    };
+    Ok(__result)
+}
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct RatingProcessRequest {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -883,6 +933,104 @@ pub fn decode_rating_process_request(
     Ok(__result)
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct RatingRecord {
+    #[serde(default)]
+    pub price: String,
+    #[serde(default)]
+    pub producer: String,
+    #[serde(default)]
+    pub unit: String,
+}
+
+// Encode RatingRecord as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_rating_record<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &RatingRecord,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(3)?;
+    e.str("price")?;
+    e.str(&val.price)?;
+    e.str("producer")?;
+    e.str(&val.producer)?;
+    e.str("unit")?;
+    e.str(&val.unit)?;
+    Ok(())
+}
+
+// Decode RatingRecord from cbor input stream
+#[doc(hidden)]
+pub fn decode_rating_record(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<RatingRecord, RpcError> {
+    let __result = {
+        let mut price: Option<String> = None;
+        let mut producer: Option<String> = None;
+        let mut unit: Option<String> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct RatingRecord, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => price = Some(d.str()?.to_string()),
+                    1 => producer = Some(d.str()?.to_string()),
+                    2 => unit = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "price" => price = Some(d.str()?.to_string()),
+                    "producer" => producer = Some(d.str()?.to_string()),
+                    "unit" => unit = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        RatingRecord {
+            price: if let Some(__x) = price {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingRecord.price (#0)".to_string(),
+                ));
+            },
+
+            producer: if let Some(__x) = producer {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingRecord.producer (#1)".to_string(),
+                ));
+            },
+
+            unit: if let Some(__x) = unit {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field RatingRecord.unit (#2)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct RatingRequest {
     #[serde(rename = "agentId")]
     #[serde(default)]
@@ -895,6 +1043,9 @@ pub struct RatingRequest {
     #[serde(rename = "offerId")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub offer_id: Option<String>,
+    #[serde(rename = "ratingHistory")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rating_history: Option<RatingHistory>,
     #[serde(default)]
     pub usage: String,
 }
@@ -909,7 +1060,7 @@ pub fn encode_rating_request<W: wasmbus_rpc::cbor::Write>(
 where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
-    e.map(5)?;
+    e.map(6)?;
     e.str("agentId")?;
     e.str(&val.agent_id)?;
     e.str("customerId")?;
@@ -923,6 +1074,12 @@ where
     if let Some(val) = val.offer_id.as_ref() {
         e.str("offerId")?;
         e.str(val)?;
+    } else {
+        e.null()?;
+    }
+    if let Some(val) = val.rating_history.as_ref() {
+        e.str("ratingHistory")?;
+        encode_rating_history(e, val)?;
     } else {
         e.null()?;
     }
@@ -941,6 +1098,7 @@ pub fn decode_rating_request(
         let mut customer_id: Option<String> = None;
         let mut language: Option<Option<String>> = Some(None);
         let mut offer_id: Option<Option<String>> = Some(None);
+        let mut rating_history: Option<Option<RatingHistory>> = Some(None);
         let mut usage: Option<String> = None;
 
         let is_array = match d.datatype()? {
@@ -974,7 +1132,17 @@ pub fn decode_rating_request(
                             Some(Some(d.str()?.to_string()))
                         }
                     }
-                    4 => usage = Some(d.str()?.to_string()),
+                    4 => {
+                        rating_history = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_rating_history(d).map_err(|e| {
+                                format!("decoding 'co.uk.orange.rating.agent#RatingHistory': {}", e)
+                            })?))
+                        }
+                    }
+                    5 => usage = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
@@ -1000,6 +1168,16 @@ pub fn decode_rating_request(
                             Some(Some(d.str()?.to_string()))
                         }
                     }
+                    "ratingHistory" => {
+                        rating_history = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_rating_history(d).map_err(|e| {
+                                format!("decoding 'co.uk.orange.rating.agent#RatingHistory': {}", e)
+                            })?))
+                        }
+                    }
                     "usage" => usage = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
@@ -1023,12 +1201,13 @@ pub fn decode_rating_request(
             },
             language: language.unwrap(),
             offer_id: offer_id.unwrap(),
+            rating_history: rating_history.unwrap(),
 
             usage: if let Some(__x) = usage {
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field RatingRequest.usage (#4)".to_string(),
+                    "missing field RatingRequest.usage (#5)".to_string(),
                 ));
             },
         }

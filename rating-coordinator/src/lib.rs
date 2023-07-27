@@ -1,7 +1,7 @@
 use rating_interface::{
     RatingAgent, RatingAgentSender, RatingCoordinator,
     RatingCoordinatorReceiver, RatingProcessRequest, RatingRequest, RatingResponse,
-    RatingResponseBuilder, ValidationRequest, ValidationResponse,
+    RatingResponseBuilder, ValidationRequest, ValidationResponse, RatingRecord,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -158,6 +158,19 @@ async fn handle_rating_cycle(
         rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty());
     
     while rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty() {
+        
+        info!("Prepare rating history .....");
+        let mut rating_record : RatingRecord = RatingRecord::default();
+        rating_record.producer  = updated_rating_request.agent_id;
+        rating_record.unit= rating_response.billing_information.unit;
+        rating_record.price = rating_response.billing_information.price;
+        let mut rating_history : Vec<RatingRecord> = Vec::new();
+        let rec = rating_record.clone();
+        rating_history.push(rating_record);
+        
+        info!("Rating History {:?},{:?},{:?}",rec.producer,rec.unit,rec.price);
+
+
         next_agent = rating_agents_stack.pop().unwrap();
         info!("Rating against provider agent: {}", next_agent.0);
 
@@ -166,6 +179,7 @@ async fn handle_rating_cycle(
 
         updated_rating_request.customer_id = next_partner_id;
         updated_rating_request.agent_id = next_agent_name;
+        updated_rating_request.rating_history= Some(rating_history);
 
         rating_response = rate_through_agent(_ctx, &updated_rating_request).await?;
 

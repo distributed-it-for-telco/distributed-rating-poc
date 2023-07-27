@@ -13,6 +13,7 @@ use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "1";
 const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
+const RATE_FEE: f64= 0.5;
 
 lazy_static! {
     static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
@@ -37,9 +38,13 @@ impl RatingAgent for OrangeVodRatingAgentActor {
         let usage_id: String = generate_guid().await?;
 
         /*
-         *  Contract or Offer is one Movie equal one EURO
+         *  Contract or Offer is 50% added to provider price
          */
-        let rating = _arg.usage.parse::<i32>().unwrap() * 1;
+
+        
+        let previouse_rating_price_str  = _arg.rating_history.clone().unwrap().pop().unwrap().price;
+        let previouse_rating_price = previouse_rating_price_str.parse::<f64>().unwrap();
+        let rating = previouse_rating_price + (previouse_rating_price * RATE_FEE);
 
         let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
             party_id: _arg.customer_id.to_owned(),
