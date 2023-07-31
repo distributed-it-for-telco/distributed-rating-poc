@@ -1,10 +1,10 @@
-use std::collections::HashMap;
 use lazy_static::lazy_static;
+use std::collections::HashMap;
 
 use rating_interface::{
-    RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse, RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse, AgentIdentifiation,
+    AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
+    RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
+    UsageProofRequest, ValidationRequest, ValidationResponse,
 };
 
 use wasmbus_rpc::actor::prelude::*;
@@ -13,7 +13,7 @@ use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "1";
 const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
-const RATE_FEE: f64= 0.5;
+const RATE_FEE: f64 = 0.5;
 
 lazy_static! {
     static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
@@ -41,8 +41,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
          *  Contract or Offer is 50% added to provider price
          */
 
-        
-        let previouse_rating_price_str  = _arg.rating_history.clone().unwrap().pop().unwrap().price;
+        let previouse_rating_price_str = _arg.rating_history.clone().unwrap().pop().unwrap().price;
         let previouse_rating_price = previouse_rating_price_str.parse::<f64>().unwrap();
         let rating = previouse_rating_price + (previouse_rating_price * RATE_FEE);
 
@@ -52,7 +51,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             usage: _arg.usage.to_owned(),
             usage_id: usage_id.as_str().to_owned(),
             usage_date: usage_date.to_owned(),
-            offer_id: OFFER_ID.to_owned()
+            offer_id: OFFER_ID.to_owned(),
         });
 
         info!(
@@ -88,10 +87,16 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             validation_response.valid = false;
         }
 
-        if arg.rating_request.offer_id.is_some() && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.contains_key(arg.rating_request.offer_id.to_owned().unwrap().as_str()) {
+        if arg.rating_request.offer_id.is_some()
+            && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
+                .contains_key(arg.rating_request.offer_id.to_owned().unwrap().as_str())
+        {
             let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
 
-            next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS.get(arg.rating_request.offer_id.to_owned().unwrap().as_str()).unwrap().to_string();
+            next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
+                .get(arg.rating_request.offer_id.to_owned().unwrap().as_str())
+                .unwrap()
+                .to_string();
             next_agent.partner_id = ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string();
 
             validation_response.next_agent = Some(next_agent);

@@ -1,7 +1,7 @@
 use rating_interface::{
-    RatingAgent, RatingAgentSender, RatingCoordinator,
-    RatingCoordinatorReceiver, RatingProcessRequest, RatingRequest, RatingResponse,
-    RatingResponseBuilder, ValidationRequest, ValidationResponse, RatingRecord,
+    RatingAgent, RatingAgentSender, RatingCoordinator, RatingCoordinatorReceiver,
+    RatingProcessRequest, RatingRecord, RatingRequest, RatingResponse, RatingResponseBuilder,
+    ValidationRequest, ValidationResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -23,26 +23,29 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
 
         let mut rating_agents_stack: Vec<(String, String)> = Vec::new();
 
-        let validation_response_as_rating = match handle_validation_cycle(_ctx, _arg, &mut rating_agents_stack).await {
-            Ok(validation) => validation,
-            Err(e) => return RpcResult::from(Err(e)),
-        };
+        let validation_response_as_rating =
+            match handle_validation_cycle(_ctx, _arg, &mut rating_agents_stack).await {
+                Ok(validation) => validation,
+                Err(e) => return RpcResult::from(Err(e)),
+            };
 
         if validation_response_as_rating.authorization_status.code == 401 {
             return RpcResult::Ok(validation_response_as_rating);
         }
 
-        RpcResult::from(match handle_rating_cycle(_ctx, _arg, &mut rating_agents_stack).await {
-            Ok(rating) => Ok(rating),
-            Err(e) => Err(e),
-        })
+        RpcResult::from(
+            match handle_rating_cycle(_ctx, _arg, &mut rating_agents_stack).await {
+                Ok(rating) => Ok(rating),
+                Err(e) => Err(e),
+            },
+        )
     }
 }
 
 async fn handle_validation_cycle(
     _ctx: &Context,
     rating_process_request: &RatingProcessRequest,
-    rating_agents_stack: &mut Vec<(String, String)>
+    rating_agents_stack: &mut Vec<(String, String)>,
 ) -> RpcResult<RatingResponse> {
     if rating_process_request.headers.is_none() {
         return RpcResult::from(Err(RpcError::Other(
@@ -61,7 +64,10 @@ async fn handle_validation_cycle(
         client_country = Some(client_headers.get("client_country").unwrap().to_string());
     }
 
-    info!("Validating against agent: {}", rating_process_request.rating_request.agent_id);
+    info!(
+        "Validating against agent: {}",
+        rating_process_request.rating_request.agent_id
+    );
 
     let mut validation_response = validate_through_agent(
         _ctx,
@@ -71,11 +77,16 @@ async fn handle_validation_cycle(
     )
     .await?;
 
-    rating_agents_stack.push((rating_process_request.rating_request.agent_id.to_owned(), rating_process_request.rating_request.customer_id.to_owned()));
+    rating_agents_stack.push((
+        rating_process_request.rating_request.agent_id.to_owned(),
+        rating_process_request.rating_request.customer_id.to_owned(),
+    ));
 
     info!("Vendor validation status: {}", validation_response.valid);
-    info!("Vendor validation have next agent and valid: {}",
-        validation_response.valid && validation_response.next_agent != None);
+    info!(
+        "Vendor validation have next agent and valid: {}",
+        validation_response.valid && validation_response.next_agent != None
+    );
 
     while validation_response.valid && validation_response.next_agent != None {
         let next_agent_name = validation_response.next_agent.to_owned().unwrap().name;
@@ -89,10 +100,16 @@ async fn handle_validation_cycle(
         updated_rating_request.customer_id = next_partner_id;
         updated_rating_request.agent_id = next_agent_name;
 
-        info!("Validating against agent: {}", validation_response.next_agent.to_owned().unwrap().name);
+        info!(
+            "Validating against agent: {}",
+            validation_response.next_agent.to_owned().unwrap().name
+        );
 
-        rating_agents_stack.push((updated_rating_request.agent_id.to_owned(), updated_rating_request.customer_id.to_owned()));
-        
+        rating_agents_stack.push((
+            updated_rating_request.agent_id.to_owned(),
+            updated_rating_request.customer_id.to_owned(),
+        ));
+
         validation_response = validate_through_agent(
             _ctx,
             &updated_rating_request,
@@ -140,7 +157,7 @@ async fn validate_through_agent(
 async fn handle_rating_cycle(
     _ctx: &Context,
     rating_process_request: &RatingProcessRequest,
-    rating_agents_stack: &mut Vec<(String, String)>
+    rating_agents_stack: &mut Vec<(String, String)>,
 ) -> RpcResult<RatingResponse> {
     let mut next_agent = rating_agents_stack.pop().unwrap();
 
@@ -150,26 +167,31 @@ async fn handle_rating_cycle(
 
     info!("Rating against agent: {}", updated_rating_request.agent_id);
 
-    let mut rating_response =
-        rate_through_agent(_ctx, &updated_rating_request).await?;
+    let mut rating_response = rate_through_agent(_ctx, &updated_rating_request).await?;
 
-    info!("Vendor Rating status: {}", rating_response.authorization_status.code);
-    info!("Vendor Rating have next agent and valid: {}",
-        rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty());
-    
+    info!(
+        "Vendor Rating status: {}",
+        rating_response.authorization_status.code
+    );
+    info!(
+        "Vendor Rating have next agent and valid: {}",
+        rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty()
+    );
+
     while rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty() {
-        
         info!("Prepare rating history .....");
-        let mut rating_record : RatingRecord = RatingRecord::default();
-        rating_record.producer  = updated_rating_request.agent_id;
-        rating_record.unit= rating_response.billing_information.unit;
+        let mut rating_record: RatingRecord = RatingRecord::default();
+        rating_record.producer = updated_rating_request.agent_id;
+        rating_record.unit = rating_response.billing_information.unit;
         rating_record.price = rating_response.billing_information.price;
-        let mut rating_history : Vec<RatingRecord> = Vec::new();
+        let mut rating_history: Vec<RatingRecord> = Vec::new();
         let rec = rating_record.clone();
         rating_history.push(rating_record);
-        
-        info!("Rating History {:?},{:?},{:?}",rec.producer,rec.unit,rec.price);
 
+        info!(
+            "Rating History {:?},{:?},{:?}",
+            rec.producer, rec.unit, rec.price
+        );
 
         next_agent = rating_agents_stack.pop().unwrap();
         info!("Rating against provider agent: {}", next_agent.0);
@@ -179,16 +201,24 @@ async fn handle_rating_cycle(
 
         updated_rating_request.customer_id = next_partner_id;
         updated_rating_request.agent_id = next_agent_name;
-        updated_rating_request.rating_history= Some(rating_history);
+        updated_rating_request.rating_history = Some(rating_history);
 
         rating_response = rate_through_agent(_ctx, &updated_rating_request).await?;
 
-        info!("Provider Rating status: {}", rating_response.authorization_status.code);
-        info!("Provider Rating have next agent and valid: {}",
-            rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty());
+        info!(
+            "Provider Rating status: {}",
+            rating_response.authorization_status.code
+        );
+        info!(
+            "Provider Rating have next agent and valid: {}",
+            rating_response.authorization_status.code != 401 && !rating_agents_stack.is_empty()
+        );
     }
 
-    info!("final Rating response: {}", rating_response.authorization_status.code);
+    info!(
+        "final Rating response: {}",
+        rating_response.authorization_status.code
+    );
 
     Ok(rating_response)
 }

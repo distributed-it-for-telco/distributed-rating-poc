@@ -1,4 +1,3 @@
-
 use rating_interface::*;
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -30,7 +29,7 @@ impl RatingAgent for VideoRatingAgentActor {
             usage: _arg.usage.to_owned(),
             usage_id: usage_id.as_str().to_owned(),
             usage_date: usage_date.to_owned(),
-            offer_id: OFFER_ID.to_owned()
+            offer_id: OFFER_ID.to_owned(),
         });
 
         info!(
@@ -70,6 +69,3 @@ impl RatingAgent for VideoRatingAgentActor {
         Ok(validation_response)
     }
 }
-
-
-
