@@ -81,6 +81,14 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
 
         RpcResult::Ok(rating_response)
     }
+
+    async fn validate(
+        &self,
+        ctx: &Context,
+        arg: &ValidationRequest,
+    ) -> RpcResult<ValidationResponse> {
+        todo!()
+    }
 }
 
 async fn get_party_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<Bucket> {
@@ -124,6 +132,7 @@ async fn handle_rating(
         usage: _usage.to_owned(),
         usage_id: usage_id.as_str().to_owned(),
         usage_date: usage_date.to_owned(),
+        offer_id: OFFER_ID.to_owned()
     });
 
     info!(

@@ -21,7 +21,7 @@ impl UsageProofHandler {
                     "value": usage_proof_request.rating
                 },
                 "productRef": {
-                    "id": "1234",
+                    "id": usage_proof_request.offer_id,
                     "name": "Video on Demand with Bucket"
                 }
             },

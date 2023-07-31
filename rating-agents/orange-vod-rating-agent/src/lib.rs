@@ -1,10 +1,28 @@
+use lazy_static::lazy_static;
+use std::collections::HashMap;
+
 use rating_interface::{
-    AuthorizationStatus, BillingInformation, RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler, UsageProofRequest,
+    AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
+    RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
+    UsageProofRequest, ValidationRequest, ValidationResponse,
 };
+
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
+
+const OFFER_ID: &str = "1";
+const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
+const RATE_FEE: f64 = 0.5;
+
+lazy_static! {
+    static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
+        let mut m = HashMap::new();
+        m.insert("stream", "provider_streaming");
+        m.insert("video", "provider_video");
+        m
+    };
+}
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
@@ -20,9 +38,12 @@ impl RatingAgent for OrangeVodRatingAgentActor {
         let usage_id: String = generate_guid().await?;
 
         /*
-         *  Contract or Offer is one Movie equal one EURO
+         *  Contract or Offer is 50% added to provider price
          */
-        let rating = _arg.usage.parse::<i32>().unwrap() * 1;
+
+        let previouse_rating_price_str = _arg.rating_history.clone().unwrap().pop().unwrap().price;
+        let previouse_rating_price = previouse_rating_price_str.parse::<f64>().unwrap();
+        let rating = previouse_rating_price + (previouse_rating_price * RATE_FEE);
 
         let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
             party_id: _arg.customer_id.to_owned(),
@@ -30,6 +51,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             usage: _arg.usage.to_owned(),
             usage_id: usage_id.as_str().to_owned(),
             usage_date: usage_date.to_owned(),
+            offer_id: OFFER_ID.to_owned(),
         });
 
         info!(
@@ -41,12 +63,45 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             .store(_ctx, &usage_template_str)
             .await?;
 
-        /*
-         * Empty Response till we decide rating response how it should be
-         */
-        RpcResult::Ok(RatingResponse {
-            authorization_status: AuthorizationStatus::default(),
-            billing_information: BillingInformation::default(),
-        })
+        let mut rating_response_builder = RatingResponseBuilder::new();
+
+        let rating_response = rating_response_builder
+            .unit((&"EUR").to_string())
+            .price(rating.to_string())
+            .authorized()
+            .build();
+
+        RpcResult::Ok(rating_response)
+    }
+
+    async fn validate(
+        &self,
+        ctx: &Context,
+        arg: &ValidationRequest,
+    ) -> RpcResult<ValidationResponse> {
+        let mut validation_response: ValidationResponse = ValidationResponse::default();
+
+        if arg.client_country.is_some() && arg.client_country.to_owned().unwrap() == "EG" {
+            validation_response.valid = true;
+        } else {
+            validation_response.valid = false;
+        }
+
+        if arg.rating_request.offer_id.is_some()
+            && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
+                .contains_key(arg.rating_request.offer_id.to_owned().unwrap().as_str())
+        {
+            let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
+
+            next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
+                .get(arg.rating_request.offer_id.to_owned().unwrap().as_str())
+                .unwrap()
+                .to_string();
+            next_agent.partner_id = ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string();
+
+            validation_response.next_agent = Some(next_agent);
+        }
+
+        Ok(validation_response)
     }
 }

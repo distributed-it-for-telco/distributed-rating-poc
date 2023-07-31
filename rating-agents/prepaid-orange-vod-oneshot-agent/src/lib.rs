@@ -1,5 +1,5 @@
 use rating_interface::{Balance, BalanceAccessManager,RatingResponseBuilder, RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse
+    RatingResponse,ValidationResponse,ValidationRequest
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -15,7 +15,6 @@ const OFFER_ID: &str ="4";
 
 #[async_trait]
 impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
-
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         info!("Hello I'm your orange prepaid vod One Shot agent");
         let usage: f32 = _arg.usage.parse().unwrap();
@@ -76,8 +75,13 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
         RpcResult::Ok(rating_response)
     }
 
-
-
+    async fn validate(
+        &self,
+        ctx: &Context,
+        arg: &ValidationRequest,
+    ) -> RpcResult<ValidationResponse> {
+        todo!()
+    }
 }
 fn has_sufficient_balance(balance :f32, charge:f32) -> bool {
     if balance< charge {

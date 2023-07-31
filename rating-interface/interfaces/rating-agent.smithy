@@ -21,18 +21,50 @@ use org.wasmcloud.model#U16
 use org.wasmcloud.model#wasmbus
 use org.wasmcloud.model#codegenRust
 
+/// Description of the rating agent service
+@wasmbus( actorReceive: true )
+service RatingCoordinator {
+  version: "0.1",
+  operations: [ HandleRatingProcess ]
+}
 
 /// Description of the rating agent service
 @wasmbus( actorReceive: true )
 service RatingAgent {
   version: "0.1",
-  operations: [ RateUsage ]
+  operations: [ RateUsage, Validate ]
+}
+
+operation HandleRatingProcess {
+    input: RatingProcessRequest,
+    output: RatingResponse
 }
 
 operation RateUsage {
     input: RatingRequest,
     output: RatingResponse
 }
+
+operation Validate {
+    input: ValidationRequest,
+    output: ValidationResponse
+}
+
+
+map HeadersMap {
+    key:String,
+    value:String
+}
+
+@input
+structure RatingProcessRequest{
+    @required
+    ratingRequest:RatingRequest,
+    
+    headers :HeadersMap,
+
+}
+
 
 structure RatingRequest {
     @required
@@ -45,6 +77,22 @@ structure RatingRequest {
     // is entirely up to the target agent
     @required
     usage: String,
+    ratingHistory:RatingHistory
+}
+
+
+structure RatingRecord {
+    @required
+    producer: String,
+    @required
+    unit: String,
+    @required
+    price: String
+}
+
+
+list RatingHistory {
+    member: RatingRecord
 }
 
 structure RatingResponse {
@@ -52,7 +100,32 @@ structure RatingResponse {
     authorizationStatus: AuthorizationStatus,
 
     @required
-    billingInformation: BillingInformation 
+    billingInformation: BillingInformation,
+
+    nextAgent: AgentIdentifiation
+}
+
+structure ValidationRequest {
+    @required
+    ratingRequest: RatingRequest,
+    @required
+    clientIp: String,
+    clientCountry: String,
+}
+
+structure ValidationResponse {
+    @required
+    valid: Boolean,
+
+    nextAgent: AgentIdentifiation
+}
+
+structure AgentIdentifiation {
+    @required
+    name: String,
+
+    @required
+    partnerId: String
 }
 
 structure BillingInformation {
@@ -77,6 +150,7 @@ structure AuthorizationStatus {
     // Key that proves authorization was successful. Will be missing if authorization was denied
     key: String,
 }
+
 @codegenRust(noDeriveEq: true )
 structure Balance {
     @required
@@ -127,5 +201,7 @@ structure UsageProofRequest {
     @required 
     rating: String, 
     @required
-    usageDate: String
+    usageDate: String,
+    @required
+    offerId: String
 }

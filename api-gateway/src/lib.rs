@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use rating_interface::{
     CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender, RatingAgent,
-    RatingAgentSender, RatingRequest,
+    RatingAgentSender, RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest,
+    RatingRequest,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -41,9 +42,13 @@ impl HttpServer for ApiGatewayActor {
         let trimmed_path: Vec<&str> = req.path.trim_matches('/').split('/').collect();
         info!("Trimmed Path: {:?}", trimmed_path);
 
+        info!("Headers: {:?}", req.header);
+
         match (req.method.as_ref(), trimmed_path.as_slice()) {
             ("OPTIONS", _) => get_options_response(ctx).await,
-            ("POST", ["usage", "rating"]) => request_rate(ctx, deser(&req.body)?).await,
+            ("POST", ["usage", "rating"]) => {
+                request_rate(ctx, deser(&req.body)?, extract_headers(ctx, req).await?).await
+            }
             ("POST", ["usage", "requests"]) => request_usage(ctx, deser(&req.body)?).await,
             ("POST", ["usage", "rating_events"]) => {
                 record_rated_usage(ctx, deser(&req.body)?).await
@@ -57,6 +62,37 @@ impl HttpServer for ApiGatewayActor {
             (_, _) => Ok(HttpResponse::not_found()),
         }
     }
+}
+//
+async fn extract_headers(_ctx: &Context, req: &HttpRequest) -> RpcResult<HashMap<String, String>> {
+    let mut headers: HashMap<String, String> = HashMap::new();
+    if req.header.contains_key("cf-ipcountry") {
+        headers.insert(
+            "client_country".to_owned(),
+            req.header
+                .get("cf-ipcountry")
+                .unwrap()
+                .get(0)
+                .unwrap()
+                .to_owned(),
+        );
+    }
+
+    if req.header.contains_key("cf-connecting-ip") {
+        headers.insert(
+            "client_ip".to_owned(),
+            req.header
+                .get("cf-connecting-ip")
+                .unwrap()
+                .get(0)
+                .unwrap()
+                .to_owned(),
+        );
+    }
+
+    info!("Extracted headers {:?}", headers);
+
+    Ok(headers)
 }
 
 async fn get_options_response(_ctx: &Context) -> RpcResult<HttpResponse> {
@@ -116,9 +152,17 @@ async fn request_usage(_ctx: &Context, _request: ServiceUsageRequest) -> RpcResu
     HttpResponse::json(resp, 200)
 }
 
-async fn request_rate(_ctx: &Context, _request: RatingRequest) -> RpcResult<HttpResponse> {
-    let rating = RatingAgentSender::to_actor("ratingcoordinator")
-        .rate_usage(_ctx, &_request)
+async fn request_rate(
+    _ctx: &Context,
+    _request: RatingRequest,
+    request_headers: HashMap<String, String>,
+) -> RpcResult<HttpResponse> {
+    let mut rating_process_request = RatingProcessRequest::default();
+    rating_process_request.headers = Some(request_headers);
+    rating_process_request.rating_request = _request;
+
+    let rating = RatingCoordinatorSender::to_actor("ratingcoordinator")
+        .handle_rating_process(_ctx, &rating_process_request)
         .await?;
 
     let mut headers: HashMap<String, Vec<String>> = HashMap::new();
