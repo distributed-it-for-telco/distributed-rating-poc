@@ -140,7 +140,7 @@ async fn handle_rating(
         _party_id.to_string()
     );
 
-    UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector"))
+    UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector_orange"))
         .store(_ctx, &usage_template_str)
         .await?;
 
