@@ -39,7 +39,7 @@ pub async fn handle_validation_cycle(
     rating_agents_stack.push((
         rating_process_request.rating_request.agent_id.to_owned(),
         rating_process_request.rating_request.customer_id.to_owned(),
-        None,
+        Some(rating_process_request.rating_request.usage.to_owned()),
     ));
 
     let mut validation_response: ValidationResponse = validate_through_agent(
@@ -80,13 +80,13 @@ pub async fn handle_validation_cycle(
         rating_agents_stack.push((
             updated_rating_request.agent_id.to_owned(),
             updated_rating_request.customer_id.to_owned(),
-            None,
+            validation_response.translated_usage.to_owned(),
         ));
 
         // updating usage in the request with the usage of current agent 
         // for the next to understand as next agent don't understand nothing other than the above level
-        if let Some(prev_translated_usage) = validation_response.translated_usage.to_owned() {
-            updated_rating_request.usage = prev_translated_usage.to_owned();
+        if let Some(translated_usage) = validation_response.translated_usage.to_owned() {
+            updated_rating_request.usage = translated_usage.to_owned();
         }
 
         validation_response = validate_through_agent(
@@ -96,12 +96,6 @@ pub async fn handle_validation_cycle(
             client_country.to_owned().cloned(),
         )
         .await?;
-
-        // push current agent tranlsated usage in the stack
-        // to be sent in the rating request to its child agent in the rating tree
-        if let Some(top) = rating_agents_stack.last_mut() {
-            top.2 = validation_response.translated_usage.to_owned();
-        }    
     }
 
     let mut rating_response_builder = RatingResponseBuilder::new();
