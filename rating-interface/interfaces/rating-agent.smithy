@@ -197,7 +197,7 @@ structure UsageProofRequest {
     @required 
     usageId: String,
     @required
-    usage: String,
+    usageCharacteristicList: UsageCharacteristicList,
     @required 
     rating: String, 
     @required
