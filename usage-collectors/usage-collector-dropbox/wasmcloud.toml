@@ -1,0 +1,8 @@
+name = "usage-collector-dropbox"
+language = "rust"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
+call_alias = "mock/usage_collector_dropbox"
