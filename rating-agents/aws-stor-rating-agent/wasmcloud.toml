@@ -1,0 +1,8 @@
+name = "aws-stor-rating-agent"
+language = "rust"
+type = "actor"
+version = "0.1.0"
+
+[actor]
+claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
+call_alias = "agent/aws_stor"
