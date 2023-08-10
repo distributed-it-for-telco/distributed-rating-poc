@@ -17,7 +17,13 @@ const OFFER_ID: &str ="4";
 impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         info!("Hello I'm your orange prepaid vod One Shot agent");
-        let usage: f32 = _arg.usage.parse().unwrap();
+
+        let mut usage:f32=0.0;
+        if let Some(first) = _arg.usage.usage_characteristic_list.first() {
+            usage= first.value.parse::<f32>().unwrap();
+        }
+
+       // let usage: f32 = _arg.usage.parse().unwrap();
         let customer_id = &_arg.customer_id;
 
 
@@ -80,7 +86,13 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
         ctx: &Context,
         arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
-        todo!()
+        let mut validation_response: ValidationResponse = ValidationResponse::default();
+        validation_response.next_agent = None;
+
+        
+            validation_response.valid = true;
+
+        Ok(validation_response)
     }
 }
 fn has_sufficient_balance(balance :f32, charge:f32) -> bool {
