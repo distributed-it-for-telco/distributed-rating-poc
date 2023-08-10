@@ -1,7 +1,7 @@
 use rating_interface::{
     Bucket, RatingAgent, RatingAgentReceiver,
     RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest,RatingResponseBuilder,BucketAccessManager
+    UsageProofRequest,RatingResponseBuilder,BucketAccessManager,Usage,ValidationResponse,ValidationRequest
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -87,7 +87,13 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
         ctx: &Context,
         arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
-        todo!()
+        let mut validation_response: ValidationResponse = ValidationResponse::default();
+        validation_response.next_agent = None;
+
+        
+            validation_response.valid = true;
+
+        Ok(validation_response)
     }
 }
 
@@ -121,7 +127,7 @@ async fn handle_rating(
     _ctx: &Context,
     _rating: &str,
     _party_id: &str,
-    _usage: &str,
+    _usage: &Usage,
 ) -> RpcResult<()> {
     let usage_date = "22/05/2023";
     let usage_id: String = generate_guid().await?;
@@ -129,7 +135,7 @@ async fn handle_rating(
     let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
         party_id: _party_id.to_owned(),
         rating: _rating.to_owned(),
-        usage: _usage.to_owned(),
+        usage_characteristic_list: _usage.usage_characteristic_list.to_owned(),
         usage_id: usage_id.as_str().to_owned(),
         usage_date: usage_date.to_owned(),
         offer_id: OFFER_ID.to_owned()
