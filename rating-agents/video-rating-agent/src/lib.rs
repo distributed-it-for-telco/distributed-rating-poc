@@ -21,12 +21,16 @@ impl RatingAgent for VideoRatingAgentActor {
         /*
          *  Contract or Offer is one Movie equal one EURO
          */
-        let rating = _arg.usage.parse::<i32>().unwrap() * 1;
+        info!("_arg.usage.usage_characteristic_list {}",_arg.usage.usage_characteristic_list.len());
+        let mut rating=0;
+         if let Some(first) = _arg.usage.usage_characteristic_list.first() {
+            rating = first.value.parse::<i32>().unwrap()*1;
+        }
 
         let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
             party_id: _arg.customer_id.to_owned(),
             rating: rating.to_string(),
-            usage: _arg.usage.to_owned(),
+            usage_characteristic_list: _arg.usage.usage_characteristic_list.to_owned(),
             usage_id: usage_id.as_str().to_owned(),
             usage_date: usage_date.to_owned(),
             offer_id: OFFER_ID.to_owned(),
