@@ -9,18 +9,13 @@ use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "10000";
 const PROVIDER_AGENT_NAME: &str = "orange_connectivity";
-const RATE_FEE: f64 = 1;
+const RATE_FEE: f32 = 1.0;
 
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
 struct OrangeConnectivityRatingAgentActor {}
 
-
-
-
-
-/// Implementation of the HttpServer capability contract
 #[async_trait]
 impl RatingAgent for OrangeConnectivityRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
@@ -39,9 +34,9 @@ impl RatingAgent for OrangeConnectivityRatingAgentActor {
          *  Contract or Offer is 1 GB = 1 EUR
          */
 
-        let mut connectivity_usage: f32 = 1;
-        for characteristic in _arg.usage.usage_characteristic_list.iter_mut() {
-            connectivity_usage *= characteristic.value.parse::<i32>().unwrap();
+        let mut connectivity_usage: f32 = 1.0;
+        for  characteristic in _arg.usage.usage_characteristic_list.to_owned().iter_mut() {
+            connectivity_usage *= characteristic.value.parse::<f32>().unwrap();
         }
 
         let rating = RATE_FEE * connectivity_usage;

@@ -11,8 +11,7 @@ const OFFER_ID: &str = "1000";
 const AWS_PARTY_ID_AT_PARTNER_SIDE: &str = "aws_my_partner";
 const PROVIDER_AGENT_NAME: &str = "aws_stor";
 const REPLICATION_FACTOR: u32 = 2;
-const RATE_FEE: f64 = 1;
-
+const RATE_FEE: f32 = 1.0;
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
 struct AwsStorRatingAgentActor {}
@@ -35,9 +34,9 @@ impl RatingAgent for AwsStorRatingAgentActor {
          *  Contract or Offer is 1 GB = 1 EUR
          */
 
-        let mut storage_usage: f32 = 1;
-        for characteristic in _arg.usage.usage_characteristic_list.iter_mut() {
-            storage_usage *= characteristic.value.parse::<i32>().unwrap();
+        let mut storage_usage: f32 = 1.0;
+        for characteristic in _arg.usage.usage_characteristic_list.clone().iter_mut() {
+            storage_usage *= characteristic.value.parse::<f32>().unwrap();
         }
 
         let rating = RATE_FEE * storage_usage;
@@ -91,13 +90,13 @@ impl RatingAgent for AwsStorRatingAgentActor {
         let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
 
         next_agent.name = PROVIDER_AGENT_NAME.to_string();
-        next_agent.partner_id = DROPBOX_PARTY_ID_AT_PARTNER_SIDE.to_string();
+        next_agent.partner_id = AWS_PARTY_ID_AT_PARTNER_SIDE.to_string();
 
         validation_response.next_agent = Some(next_agent);
 
-        let mut connectivity: f32 = 1;
-        for characteristic in arg.usage.usage_characteristic_list.iter_mut() {
-            connectivity *= characteristic.value.parse::<i32>().unwrap();
+        let mut connectivity: f32 = 1.0;
+        for  characteristic in arg.rating_request.usage.usage_characteristic_list.to_owned().iter_mut() {
+            connectivity *= characteristic.value.parse::<f32>().unwrap();
         }
 
         let mut translated_usage = arg.rating_request.usage.to_owned();
