@@ -1,0 +1,24 @@
+[package]
+name = "orange-connectivity-rating-agent"
+version = "0.1.0"
+authors = [ "" ]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "orange_connectivity_rating_agent"
+
+[dependencies]
+futures = "0.3"
+wasmbus-rpc = "0.14"
+wasmcloud-interface-httpserver = "0.11"
+wasmcloud-interface-logging = "0.8.0"
+wasmcloud-interface-numbergen = "0.8.1"
+
+rating_interface = { path = "../../rating-interface/rust" }
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
+strip = true
