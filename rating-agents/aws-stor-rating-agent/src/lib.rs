@@ -7,8 +7,8 @@ use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
-const OFFER_ID: &str = "100";
-const DROPBOX_PARTY_ID_AT_PARTNER_SIDE: &str = "dropbox_my_partner";
+const OFFER_ID: &str = "1000";
+const AWS_PARTY_ID_AT_PARTNER_SIDE: &str = "aws_my_partner";
 const PROVIDER_AGENT_NAME: &str = "aws_stor";
 const REPLICATION_FACTOR: u32 = 2;
 const RATE_FEE: f64 = 1;
