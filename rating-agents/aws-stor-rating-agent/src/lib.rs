@@ -56,7 +56,7 @@ impl RatingAgent for AwsStorRatingAgentActor {
             _arg.customer_id.to_string()
         );
 
-        UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector_dropbox"))
+        UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector_aws"))
             .store(_ctx, &usage_template_str)
             .await?;
 
