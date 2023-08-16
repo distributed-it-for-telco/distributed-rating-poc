@@ -1,16 +1,14 @@
 use rating_interface::{
-    AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
+    RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
     RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse, UsageCharacteristic,
+    UsageProofRequest, ValidationRequest, ValidationResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "10000";
-const PROVIDER_AGENT_NAME: &str = "orange_connectivity";
 const RATE_FEE: f32 = 1.0;
-
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
@@ -70,18 +68,13 @@ impl RatingAgent for OrangeConnectivityRatingAgentActor {
         RpcResult::Ok(rating_response)
     }
 
-
-
-
-
-
     /// Validate
     /// 1- apply business validation.
     /// 2- translate usage.
     /// 3- return validation status and tranlated usage.
     async fn validate(
         &self,
-        ctx: &Context,
+        _ctx: &Context,
         arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
@@ -94,7 +87,5 @@ impl RatingAgent for OrangeConnectivityRatingAgentActor {
 
         Ok(validation_response)
     }
-
-
 }
 
