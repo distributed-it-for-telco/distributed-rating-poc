@@ -49,10 +49,6 @@ pub async fn handle_validation_cycle(
         client_country.to_owned().cloned(),
     )
     .await?;
-
-    if let Some(top) = rating_agents_stack.last_mut() {
-        top.2 = validation_response.translated_usage.to_owned();
-    }
     
     info!("Vendor validation status: {}", validation_response.valid);
     info!(
