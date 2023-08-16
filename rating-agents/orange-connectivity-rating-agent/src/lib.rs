@@ -1,49 +1,43 @@
-use lazy_static::lazy_static;
-use std::collections::HashMap;
-
 use rating_interface::{
-    AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
+    RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
     RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
     UsageProofRequest, ValidationRequest, ValidationResponse,
 };
-
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
-const OFFER_ID: &str = "1";
-const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
-const RATE_FEE: f64 = 0.5;
-
-lazy_static! {
-    static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
-        let mut m = HashMap::new();
-        m.insert("stream", "provider_streaming");
-        m.insert("video", "provider_video");
-        m
-    };
-}
+const OFFER_ID: &str = "10000";
+const RATE_FEE: f32 = 1.0;
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
-struct OrangeVodRatingAgentActor {}
+struct OrangeConnectivityRatingAgentActor {}
 
-/// Implementation of Rating Agent trait methods
 #[async_trait]
-impl RatingAgent for OrangeVodRatingAgentActor {
+impl RatingAgent for OrangeConnectivityRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
-        info!("Hello I'm your orange postpaid vod rating agent");
+        if _arg.usage.usage_characteristic_list.is_empty() {
+            return RpcResult::from(Err(RpcError::Other(
+                "Can't rate usage, no characteristic sent!".to_owned(),
+            )));
+        }
 
-        let usage_date = "04/04/2023";
+        info!("Hello I'm your Orange Connectivity postpaid rating agent");
+
+        let usage_date = "07/08/2023";
         let usage_id: String = generate_guid().await?;
 
         /*
-         *  Contract or Offer is 50% added to provider price
+         *  Contract or Offer is 1 GB = 1 EUR
          */
 
-        let previouse_rating_price_str = _arg.rating_history.clone().unwrap().pop().unwrap().price;
-        let previouse_rating_price = previouse_rating_price_str.parse::<f64>().unwrap();
-        let rating = previouse_rating_price + (previouse_rating_price * RATE_FEE);
+        let mut connectivity_usage: f32 = 1.0;
+        for  characteristic in _arg.usage.usage_characteristic_list.to_owned().iter_mut() {
+            connectivity_usage *= characteristic.value.parse::<f32>().unwrap();
+        }
+
+        let rating = RATE_FEE * connectivity_usage;
 
         let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
             party_id: _arg.customer_id.to_owned(),
@@ -59,7 +53,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             _arg.customer_id.to_string()
         );
 
-        UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector_orange"))
+        UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector_orange_connectivity"))
             .store(_ctx, &usage_template_str)
             .await?;
 
@@ -74,9 +68,13 @@ impl RatingAgent for OrangeVodRatingAgentActor {
         RpcResult::Ok(rating_response)
     }
 
+    /// Validate
+    /// 1- apply business validation.
+    /// 2- translate usage.
+    /// 3- return validation status and tranlated usage.
     async fn validate(
         &self,
-        ctx: &Context,
+        _ctx: &Context,
         arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
@@ -87,21 +85,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             validation_response.valid = false;
         }
 
-        if arg.rating_request.offer_id.is_some()
-            && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
-                .contains_key(arg.rating_request.offer_id.to_owned().unwrap().as_str())
-        {
-            let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
-
-            next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
-                .get(arg.rating_request.offer_id.to_owned().unwrap().as_str())
-                .unwrap()
-                .to_string();
-            next_agent.partner_id = ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string();
-
-            validation_response.next_agent = Some(next_agent);
-        }
-
         Ok(validation_response)
     }
 }
+

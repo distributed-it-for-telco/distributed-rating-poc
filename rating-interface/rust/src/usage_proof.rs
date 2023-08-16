@@ -1,4 +1,4 @@
-use crate::{UsageProofRequest};
+use crate::UsageProofRequest;
 use serde_json::json;
 
 pub struct UsageProofHandler {}
@@ -28,14 +28,7 @@ impl UsageProofHandler {
             "relatedParty": {
                 "id": usage_proof_request.party_id
             },
-            "usageCharacteristic": [
-                {
-                    "id": "122",
-                    "name": "movie-count",
-                    "valueType": "integer",
-                    "value": usage_proof_request.usage
-                }
-            ]
+            "usageCharacteristic": usage_proof_request.usage_characteristic_list
         });
 
         usage_template_str.to_string()

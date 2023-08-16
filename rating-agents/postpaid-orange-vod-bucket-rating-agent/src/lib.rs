@@ -1,7 +1,7 @@
 use rating_interface::{
     Bucket, BucketAccessManager, RatingAgent,
     RatingAgentReceiver, RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender,
-    UsageProofHandler, UsageProofRequest,RatingResponseBuilder
+    UsageProofHandler, UsageProofRequest,RatingResponseBuilder,Usage,ValidationResponse,ValidationRequest
 };
 
 use wasmbus_rpc::actor::prelude::*;
@@ -42,7 +42,7 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         if bucket.characteristic_count() == 0 {
             let rating = 2;
             info!("Handling rating empty buket");
-            handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
+            handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, _arg.usage.clone()).await?;
 
             refill_bucket(_ctx, &bucket_key).await?;
             decrement_bucket(_ctx, &bucket_key).await?;
@@ -50,7 +50,7 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             price = rating.to_string();
         } else {
             let rating = 0;
-            handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, &_arg.usage).await?;
+            handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, _arg.usage.clone()).await?;
 
             decrement_bucket(_ctx, &bucket_key).await?;
 
@@ -73,7 +73,13 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         ctx: &Context,
         arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
-        todo!()
+        let mut validation_response: ValidationResponse = ValidationResponse::default();
+        validation_response.next_agent = None;
+
+        
+            validation_response.valid = true;
+
+        Ok(validation_response)
     }
 }
 
@@ -91,7 +97,7 @@ async fn handle_rating(
     _ctx: &Context,
     _rating: &str,
     _party_id: &str,
-    _usage: &str,
+    _usage: Usage,
 ) -> RpcResult<()> {
     let usage_date = "23/05/2023";
     let usage_id: String = generate_guid().await?;
@@ -99,7 +105,7 @@ async fn handle_rating(
     let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
         party_id: _party_id.to_owned(),
         rating: _rating.to_owned(),
-        usage: _usage.to_owned(),
+        usage_characteristic_list: _usage.usage_characteristic_list.to_owned(),
         usage_id: usage_id.as_str().to_owned(),
         usage_date: usage_date.to_owned(),
         offer_id: OFFER_ID.to_owned()
@@ -110,7 +116,7 @@ async fn handle_rating(
         _party_id.to_string()
     );
 
-    UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector"))
+    UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector_orange"))
         .store(_ctx, &usage_template_str)
         .await?;
 

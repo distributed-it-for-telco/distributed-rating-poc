@@ -1,5 +1,3 @@
-use std::ptr::null;
-
 use crate::{AuthorizationStatus, BillingInformation, RatingResponse, AgentIdentifiation};
 
 #[derive(Debug, PartialEq, Default /*,Copy */, Clone)]

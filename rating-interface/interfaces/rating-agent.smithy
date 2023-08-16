@@ -73,11 +73,9 @@ structure RatingRequest {
     agentId: String,
     language: String,
     offerId: String,
-    // This will be a base64 encoded string containing a JSON payload. The interpretation of the payload
-    // is entirely up to the target agent
     @required
-    usage: String,
-    ratingHistory:RatingHistory
+    usage: Usage,
+    ratingHistory: RatingHistory
 }
 
 
@@ -117,7 +115,9 @@ structure ValidationResponse {
     @required
     valid: Boolean,
 
-    nextAgent: AgentIdentifiation
+    nextAgent: AgentIdentifiation,
+
+    translatedUsage: Usage,
 }
 
 structure AgentIdentifiation {
@@ -197,11 +197,31 @@ structure UsageProofRequest {
     @required 
     usageId: String,
     @required
-    usage: String,
+    usageCharacteristicList: UsageCharacteristicList,
     @required 
     rating: String, 
     @required
     usageDate: String,
     @required
     offerId: String
+}
+
+structure Usage {
+    @required
+    usageCharacteristicList: UsageCharacteristicList
+}
+
+structure UsageCharacteristic {
+    @required
+    name: String,
+
+    @required
+    value: String,
+
+    @required
+    valueType: String,
+}
+
+list UsageCharacteristicList {
+    member: UsageCharacteristic
 }
