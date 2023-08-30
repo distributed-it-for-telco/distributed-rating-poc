@@ -1,15 +1,19 @@
+use std::collections::{HashMap, VecDeque};
+
 use rating_interface::{
     RatingAgent, RatingAgentSender,
     RatingProcessRequest, RatingResponse, RatingResponseBuilder,
-    ValidationRequest, ValidationResponse, Usage, RatingRequest,
+    ValidationRequest, ValidationResponse, Usage, RatingRequest, Agent, AgentIdentifiation,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 
+use crate::agent_graph::AgentGraph;
+
 pub async fn handle_validation_cycle(
     _ctx: &Context,
     rating_process_request: &RatingProcessRequest,
-    rating_agents_stack: &mut Vec<(String, String, Option<Usage>)>,
+    agents_graph: &AgentGraph
 ) -> RpcResult<RatingResponse> {
     if rating_process_request.headers.is_none() {
         return RpcResult::from(Err(RpcError::Other(
@@ -33,79 +37,58 @@ pub async fn handle_validation_cycle(
         rating_process_request.rating_request.agent_id
     );
 
-    // Push main agent in the stack
-    // validate throug main agent
-    // push translated usage in usage stack
-    rating_agents_stack.push((
-        rating_process_request.rating_request.agent_id.to_owned(),
-        rating_process_request.rating_request.customer_id.to_owned(),
-        Some(rating_process_request.rating_request.usage.to_owned()),
-    ));
+  
+    let mut validation_response =ValidationResponse::default();
+    let mut rating_response_builder = RatingResponseBuilder::new();
 
-    let mut validation_response: ValidationResponse = validate_through_agent(
-        _ctx,
-        &rating_process_request.rating_request,
-        client_ip.to_string(),
-        client_country.to_owned().cloned(),
-    )
-    .await?;
-    
-    info!("Vendor validation status: {}", validation_response.valid);
-    info!(
-        "Vendor validation have next agent and valid: {}",
-        validation_response.valid && validation_response.next_agent != None
-    );
+    let mut visited: HashMap<String, bool> = HashMap::new();
+    for vertex in agents_graph.adjacency_list.keys() {
+        visited.insert(vertex.clone(), false);
+    }
+    let mut queue: VecDeque<Agent> = VecDeque::new();
+    let start = agents_graph.get_start_vertex().to_owned().unwrap();
+    queue.push_back(start.clone());
+    visited.insert(start.clone().identifiation.clone().name.clone(), true);
 
-    while validation_response.valid && validation_response.next_agent != None {
-        let next_agent_name = validation_response.next_agent.to_owned().unwrap().name;
-        let next_partner_id = validation_response
-            .next_agent
-            .to_owned()
-            .unwrap()
-            .partner_id;
+    while !queue.is_empty() {
+        let current = queue.pop_front().unwrap();
+        println!("Visited vertex: {:?}", current);
 
         let mut updated_rating_request = rating_process_request.rating_request.clone();
-        updated_rating_request.customer_id = next_partner_id;
-        updated_rating_request.agent_id = next_agent_name;
+        updated_rating_request.customer_id = current.identifiation.partner_id.clone();
+        updated_rating_request.agent_id = current.identifiation.name.clone();
+        updated_rating_request.usage = current.clone().usage.unwrap().clone();
 
-        info!(
-            "Validating against agent: {}",
-            validation_response.next_agent.to_owned().unwrap().name
-        );
-
-        rating_agents_stack.push((
-            updated_rating_request.agent_id.to_owned(),
-            updated_rating_request.customer_id.to_owned(),
-            validation_response.translated_usage.to_owned(),
-        ));
-
-        // updating usage in the request with the usage of current agent 
-        // for the next to understand as next agent don't understand nothing other than the above level
-        if let Some(translated_usage) = validation_response.translated_usage.to_owned() {
-            updated_rating_request.usage = translated_usage.to_owned();
-        }
-
-        validation_response = validate_through_agent(
+         validation_response = validate_through_agent(
             _ctx,
             &updated_rating_request,
             client_ip.to_string(),
             client_country.to_owned().cloned(),
         )
         .await?;
+
+        if !validation_response.valid {
+            rating_response_builder
+                .message(&"Validation failed")
+                .not_authorized();
+            return Ok(rating_response_builder.build());
+        } 
+
+        if let Some(neighbors) = agents_graph.adjacency_list.get(&current.identifiation.name) {
+            for neighbor in neighbors {
+                if !visited[&neighbor.clone().identifiation.name] {
+                    visited.insert(neighbor.clone().identifiation.clone().name.clone(), true);
+                    queue.push_back(neighbor.clone());
+                }
+            }
+        }
     }
 
-    let mut rating_response_builder = RatingResponseBuilder::new();
-
-    if !validation_response.valid {
-        rating_response_builder
-            .message(&"Validation failed")
-            .not_authorized();
-    } else {
-        rating_response_builder.message(&"Valid usage").authorized();
-    }
-
+    rating_response_builder.message(&"Valid usage").authorized();
     Ok(rating_response_builder.build())
+
 }
+
 
 pub async fn validate_through_agent(
     ctx: &Context,

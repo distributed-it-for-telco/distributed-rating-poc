@@ -1,5 +1,5 @@
-use rating_interface::{Balance, BalanceAccessManager,RatingResponseBuilder, RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse,ValidationResponse,ValidationRequest
+use rating_interface::{Balance, BalanceAccessManager,RatingResponseBuilder, RatingAgent, RatingAgentReceiver, RatingRequest,GetChildrenRequest,
+    RatingResponse,ValidationResponse,ValidationRequest,AgentList
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -87,12 +87,17 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
         arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
-        validation_response.next_agent = None;
+
 
         
             validation_response.valid = true;
 
         Ok(validation_response)
+    }
+
+
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+        Ok(AgentList::new())
     }
 }
 fn has_sufficient_balance(balance :f32, charge:f32) -> bool {

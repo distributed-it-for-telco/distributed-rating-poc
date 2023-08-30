@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use rating_interface::{
     AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
     RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse,
+    UsageProofRequest, ValidationRequest, ValidationResponse, GetChildrenRequest, AgentList, Agent,
 };
 
 use wasmbus_rpc::actor::prelude::*;
@@ -98,21 +98,33 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             validation_response.valid = false;
         }
 
-        if arg.rating_request.offer_id.is_some()
+        Ok(validation_response)
+    }
+
+
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+
+        let mut child=Agent::default();
+
+        if arg.atomic_offer_id.is_some()
             && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
-                .contains_key(arg.rating_request.offer_id.to_owned().unwrap().as_str())
+                .contains_key(arg.atomic_offer_id.to_owned().unwrap().as_str())
         {
-            let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
-
-            next_agent.name = OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
-                .get(arg.rating_request.offer_id.to_owned().unwrap().as_str())
-                .unwrap()
-                .to_string();
-            next_agent.partner_id = ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string();
-
-            validation_response.next_agent = Some(next_agent);
+             child = Agent {
+                identifiation: AgentIdentifiation {
+                    name: OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
+                    .get(arg.atomic_offer_id.to_owned().unwrap().as_str())
+                    .unwrap()
+                    .to_string(),
+                    partner_id:  ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string(),
+                },
+                usage: Some(arg.usage.clone()),
+            };
         }
 
-        Ok(validation_response)
+        let mut children_list = AgentList::new();
+        children_list.push(child);
+
+        Ok(children_list)
     }
 }

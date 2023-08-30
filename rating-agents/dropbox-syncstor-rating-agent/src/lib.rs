@@ -1,7 +1,7 @@
 use rating_interface::{
     AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
     RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse, UsageCharacteristic,
+    UsageProofRequest, ValidationRequest, ValidationResponse, UsageCharacteristic, AgentList, Usage, Agent, GetChildrenRequest,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -78,10 +78,6 @@ impl RatingAgent for DropboxSyncstorRatingAgentActor {
         RpcResult::Ok(rating_response)
     }
 
-    /// Validate 
-    /// 1- apply business validation.
-    /// 2- translate usage.
-    /// 3- return validation status and tranlated usage.
     async fn validate(
         &self,
         ctx: &Context,
@@ -95,23 +91,31 @@ impl RatingAgent for DropboxSyncstorRatingAgentActor {
             validation_response.valid = false;
         }
 
+        Ok(validation_response)
+    }
 
-        let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
-
-        next_agent.name = PROVIDER_AGENT_NAME.to_string();
-        next_agent.partner_id = DROPBOX_PARTY_ID_AT_PARTNER_SIDE.to_string();
-
-        validation_response.next_agent = Some(next_agent);
-
-        let mut translated_usage = arg.rating_request.usage.to_owned();
-        let replica_count_usage = UsageCharacteristic {
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+     
+       let replica_count_usage = UsageCharacteristic {
             name: "replica-count".to_string(),
             value: REPLICATION_FACTOR.to_string(),
             value_type: "integer".to_string()
         };
+
+        let mut translated_usage = arg.usage.to_owned();
         translated_usage.usage_characteristic_list.push(replica_count_usage);
 
-        validation_response.translated_usage = Some(translated_usage);
-        Ok(validation_response)
+        let child = Agent {
+            identifiation: AgentIdentifiation {
+                name: PROVIDER_AGENT_NAME.to_string(),
+                partner_id: DROPBOX_PARTY_ID_AT_PARTNER_SIDE.to_string(),
+            },
+            usage: Some(translated_usage),
+        };
+
+        let mut children_list = AgentList::new();
+        children_list.push(child);
+
+        Ok(children_list)
     }
 }

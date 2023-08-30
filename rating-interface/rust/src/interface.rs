@@ -23,6 +23,116 @@ use wasmbus_rpc::{
 pub const SMITHY_VERSION: &str = "1.0";
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct Agent {
+    pub identifiation: AgentIdentifiation,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub usage: Option<Usage>,
+}
+
+// Encode Agent as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_agent<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &Agent,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(2)?;
+    e.str("identifiation")?;
+    encode_agent_identifiation(e, &val.identifiation)?;
+    if let Some(val) = val.usage.as_ref() {
+        e.str("usage")?;
+        encode_usage(e, val)?;
+    } else {
+        e.null()?;
+    }
+    Ok(())
+}
+
+// Decode Agent from cbor input stream
+#[doc(hidden)]
+pub fn decode_agent(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Agent, RpcError> {
+    let __result = {
+        let mut identifiation: Option<AgentIdentifiation> = None;
+        let mut usage: Option<Option<Usage>> = Some(None);
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct Agent, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        identifiation = Some(decode_agent_identifiation(d).map_err(|e| {
+                            format!(
+                                "decoding 'co.uk.orange.rating.agent#AgentIdentifiation': {}",
+                                e
+                            )
+                        })?)
+                    }
+                    1 => {
+                        usage = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_usage(d).map_err(|e| {
+                                format!("decoding 'co.uk.orange.rating.agent#Usage': {}", e)
+                            })?))
+                        }
+                    }
+
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "identifiation" => {
+                        identifiation = Some(decode_agent_identifiation(d).map_err(|e| {
+                            format!(
+                                "decoding 'co.uk.orange.rating.agent#AgentIdentifiation': {}",
+                                e
+                            )
+                        })?)
+                    }
+                    "usage" => {
+                        usage = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(decode_usage(d).map_err(|e| {
+                                format!("decoding 'co.uk.orange.rating.agent#Usage': {}", e)
+                            })?))
+                        }
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        }
+        Agent {
+            identifiation: if let Some(__x) = identifiation {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Agent.identifiation (#0)".to_string(),
+                ));
+            },
+            usage: usage.unwrap(),
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct AgentIdentifiation {
     #[serde(default)]
     pub name: String,
@@ -104,6 +214,55 @@ pub fn decode_agent_identifiation(
             },
         }
     };
+    Ok(__result)
+}
+pub type AgentList = Vec<Agent>;
+
+// Encode AgentList as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_agent_list<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &AgentList,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.array(val.len() as u64)?;
+    for item in val.iter() {
+        encode_agent(e, item)?;
+    }
+    Ok(())
+}
+
+// Decode AgentList from cbor input stream
+#[doc(hidden)]
+pub fn decode_agent_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<AgentList, RpcError> {
+    let __result =
+        {
+            if let Some(n) = d.array()? {
+                let mut arr: Vec<Agent> = Vec::with_capacity(n as usize);
+                for _ in 0..(n as usize) {
+                    arr.push(decode_agent(d).map_err(|e| {
+                        format!("decoding 'co.uk.orange.rating.agent#Agent': {}", e)
+                    })?)
+                }
+                arr
+            } else {
+                // indefinite array
+                let mut arr: Vec<Agent> = Vec::new();
+                loop {
+                    match d.datatype() {
+                        Err(_) => break,
+                        Ok(wasmbus_rpc::cbor::Type::Break) => break,
+                        Ok(_) => arr.push(decode_agent(d).map_err(|e| {
+                            format!("decoding 'co.uk.orange.rating.agent#Agent': {}", e)
+                        })?),
+                    }
+                }
+                arr
+            }
+        };
     Ok(__result)
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -685,6 +844,109 @@ pub fn decode_bucket_characteristic(
             } else {
                 return Err(RpcError::Deser(
                     "missing field BucketCharacteristic.unit (#1)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct GetChildrenRequest {
+    #[serde(rename = "atomicOfferId")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub atomic_offer_id: Option<String>,
+    pub usage: Usage,
+}
+
+// Encode GetChildrenRequest as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_get_children_request<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &GetChildrenRequest,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(2)?;
+    if let Some(val) = val.atomic_offer_id.as_ref() {
+        e.str("atomicOfferId")?;
+        e.str(val)?;
+    } else {
+        e.null()?;
+    }
+    e.str("usage")?;
+    encode_usage(e, &val.usage)?;
+    Ok(())
+}
+
+// Decode GetChildrenRequest from cbor input stream
+#[doc(hidden)]
+pub fn decode_get_children_request(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<GetChildrenRequest, RpcError> {
+    let __result = {
+        let mut atomic_offer_id: Option<Option<String>> = Some(None);
+        let mut usage: Option<Usage> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct GetChildrenRequest, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        atomic_offer_id = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    1 => {
+                        usage = Some(decode_usage(d).map_err(|e| {
+                            format!("decoding 'co.uk.orange.rating.agent#Usage': {}", e)
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "atomicOfferId" => {
+                        atomic_offer_id = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
+                            d.skip()?;
+                            Some(None)
+                        } else {
+                            Some(Some(d.str()?.to_string()))
+                        }
+                    }
+                    "usage" => {
+                        usage = Some(decode_usage(d).map_err(|e| {
+                            format!("decoding 'co.uk.orange.rating.agent#Usage': {}", e)
+                        })?)
+                    }
+                    _ => d.skip()?,
+                }
+            }
+        }
+        GetChildrenRequest {
+            atomic_offer_id: atomic_offer_id.unwrap(),
+
+            usage: if let Some(__x) = usage {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field GetChildrenRequest.usage (#1)".to_string(),
                 ));
             },
         }
@@ -1933,12 +2195,6 @@ pub fn decode_validation_request(
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ValidationResponse {
-    #[serde(rename = "nextAgent")]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_agent: Option<AgentIdentifiation>,
-    #[serde(rename = "translatedUsage")]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub translated_usage: Option<Usage>,
     #[serde(default)]
     pub valid: bool,
 }
@@ -1953,19 +2209,7 @@ pub fn encode_validation_response<W: wasmbus_rpc::cbor::Write>(
 where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
-    e.map(3)?;
-    if let Some(val) = val.next_agent.as_ref() {
-        e.str("nextAgent")?;
-        encode_agent_identifiation(e, val)?;
-    } else {
-        e.null()?;
-    }
-    if let Some(val) = val.translated_usage.as_ref() {
-        e.str("translatedUsage")?;
-        encode_usage(e, val)?;
-    } else {
-        e.null()?;
-    }
+    e.map(1)?;
     e.str("valid")?;
     e.bool(val.valid)?;
     Ok(())
@@ -1977,8 +2221,6 @@ pub fn decode_validation_response(
     d: &mut wasmbus_rpc::cbor::Decoder<'_>,
 ) -> Result<ValidationResponse, RpcError> {
     let __result = {
-        let mut next_agent: Option<Option<AgentIdentifiation>> = Some(None);
-        let mut translated_usage: Option<Option<Usage>> = Some(None);
         let mut valid: Option<bool> = None;
 
         let is_array = match d.datatype()? {
@@ -1994,30 +2236,7 @@ pub fn decode_validation_response(
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => {
-                        next_agent = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
-                            d.skip()?;
-                            Some(None)
-                        } else {
-                            Some(Some(decode_agent_identifiation(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#AgentIdentifiation': {}",
-                                    e
-                                )
-                            })?))
-                        }
-                    }
-                    1 => {
-                        translated_usage = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
-                            d.skip()?;
-                            Some(None)
-                        } else {
-                            Some(Some(decode_usage(d).map_err(|e| {
-                                format!("decoding 'co.uk.orange.rating.agent#Usage': {}", e)
-                            })?))
-                        }
-                    }
-                    2 => valid = Some(d.bool()?),
+                    0 => valid = Some(d.bool()?),
                     _ => d.skip()?,
                 }
             }
@@ -2025,43 +2244,17 @@ pub fn decode_validation_response(
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
-                    "nextAgent" => {
-                        next_agent = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
-                            d.skip()?;
-                            Some(None)
-                        } else {
-                            Some(Some(decode_agent_identifiation(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#AgentIdentifiation': {}",
-                                    e
-                                )
-                            })?))
-                        }
-                    }
-                    "translatedUsage" => {
-                        translated_usage = if wasmbus_rpc::cbor::Type::Null == d.datatype()? {
-                            d.skip()?;
-                            Some(None)
-                        } else {
-                            Some(Some(decode_usage(d).map_err(|e| {
-                                format!("decoding 'co.uk.orange.rating.agent#Usage': {}", e)
-                            })?))
-                        }
-                    }
                     "valid" => valid = Some(d.bool()?),
                     _ => d.skip()?,
                 }
             }
         }
         ValidationResponse {
-            next_agent: next_agent.unwrap(),
-            translated_usage: translated_usage.unwrap(),
-
             valid: if let Some(__x) = valid {
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field ValidationResponse.valid (#2)".to_string(),
+                    "missing field ValidationResponse.valid (#0)".to_string(),
                 ));
             },
         }
@@ -2078,6 +2271,7 @@ pub trait RatingAgent {
         ctx: &Context,
         arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse>;
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList>;
 }
 
 /// RatingAgentReceiver receives messages defined in the RatingAgent service trait
@@ -2101,6 +2295,15 @@ pub trait RatingAgentReceiver: MessageDispatch + RatingAgent {
                     .map_err(|e| RpcError::Deser(format!("'ValidationRequest': {}", e)))?;
 
                 let resp = RatingAgent::validate(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
+                Ok(buf)
+            }
+            "GetChildren" => {
+                let value: GetChildrenRequest = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'GetChildrenRequest': {}", e)))?;
+
+                let resp = RatingAgent::get_children(self, ctx, &value).await?;
                 let buf = wasmbus_rpc::common::serialize(&resp)?;
 
                 Ok(buf)
@@ -2196,6 +2399,26 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> RatingAgent for Ratin
 
         let value: ValidationResponse = wasmbus_rpc::common::deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("'{}': ValidationResponse", e)))?;
+        Ok(value)
+    }
+    #[allow(unused)]
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+        let buf = wasmbus_rpc::common::serialize(arg)?;
+
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "RatingAgent.GetChildren",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: AgentList = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': AgentList", e)))?;
         Ok(value)
     }
 }

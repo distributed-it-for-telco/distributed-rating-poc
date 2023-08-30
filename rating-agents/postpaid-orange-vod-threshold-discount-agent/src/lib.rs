@@ -1,7 +1,7 @@
 use rating_interface::{
     Bucket, BucketAccessManager, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
     RatingResponseBuilder, Usage, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse,
+    UsageProofRequest, ValidationRequest, ValidationResponse,GetChildrenRequest,AgentList
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -89,6 +89,10 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
         validation_response.valid = true;
 
         Ok(validation_response)
+    }
+
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+        Ok(AgentList::new())
     }
 }
 

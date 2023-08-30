@@ -1,7 +1,8 @@
 use rating_interface::{
-    AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
-    RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse, UsageCharacteristic,
+    Agent, AgentIdentifiation, AgentList, RatingAgent, RatingAgentReceiver, RatingRequest,
+    RatingResponse, RatingResponseBuilder, Usage, UsageCharacteristic, UsageCollector,
+    UsageCollectorSender, UsageProofHandler, UsageProofRequest, ValidationRequest,
+    ValidationResponse,GetChildrenRequest,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -93,31 +94,36 @@ impl RatingAgent for AwsStorRatingAgentActor {
         } else {
             validation_response.valid = false;
         }
+        Ok(validation_response)
+    }
 
-        let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
-
-        next_agent.name = PROVIDER_AGENT_NAME.to_string();
-        next_agent.partner_id = AWS_PARTY_ID_AT_PARTNER_SIDE.to_string();
-
-        validation_response.next_agent = Some(next_agent);
-
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
         let mut connectivity: f32 = 1.0;
-        for  characteristic in arg.rating_request.usage.usage_characteristic_list.to_owned().iter_mut() {
+        for characteristic in arg.usage.usage_characteristic_list.to_owned().iter_mut() {
             connectivity *= characteristic.value.parse::<f32>().unwrap();
         }
 
-        let mut translated_usage = arg.rating_request.usage.to_owned();
         let connectivity_usage = UsageCharacteristic {
             name: "connectivity".to_string(),
             value: connectivity.to_string(),
             value_type: "float".to_string(),
         };
-        let mut characteristicsVector = vec![connectivity_usage];
 
-        translated_usage.usage_characteristic_list = characteristicsVector;
+        let mut translated_usage = arg.usage.to_owned();
+        let characteristics_vector = vec![connectivity_usage];
+        translated_usage.usage_characteristic_list = characteristics_vector;
 
-        validation_response.translated_usage = Some(translated_usage);
-        Ok(validation_response)
+        let child = Agent {
+            identifiation: AgentIdentifiation {
+                name: PROVIDER_AGENT_NAME.to_string(),
+                partner_id: AWS_PARTY_ID_AT_PARTNER_SIDE.to_string(),
+            },
+            usage: Some(translated_usage),
+        };
+
+        let mut children_list = AgentList::new();
+        children_list.push(child);
+
+        Ok(children_list)
     }
-
 }

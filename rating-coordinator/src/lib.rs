@@ -1,7 +1,11 @@
 mod rating;
 mod validation;
+mod build_agents_hierarchy;
+mod agent_graph;
 use validation::*;
 use rating::*;
+use build_agents_hierarchy::*;
+use agent_graph::*;
 
 use rating_interface::{
     RatingCoordinator, RatingCoordinatorReceiver,
@@ -25,10 +29,13 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
         info!("Hello I'm your rating coordinator");
         info!("Current used agent is: {}", _arg.rating_request.agent_id);
 
-        let mut rating_agents_stack: Vec<(String, String, Option<Usage>)> = Vec::new();
+
+        let  agent_graph = build_agent_hierarchy(&_ctx, &_arg.rating_request).await?;
+
+    
 
         let validation_response_as_rating =
-            match handle_validation_cycle(_ctx, _arg, &mut rating_agents_stack).await {
+            match handle_validation_cycle(_ctx, _arg,&agent_graph).await {
                 Ok(validation) => validation,
                 Err(e) => return RpcResult::from(Err(e)),
             };
@@ -38,7 +45,7 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
         }
 
         RpcResult::from(
-            match handle_rating_cycle(_ctx, _arg, &mut rating_agents_stack).await {
+            match handle_rating_cycle(_ctx, _arg, &agent_graph).await {
                 Ok(rating) => Ok(rating),
                 Err(e) => Err(e),
             },
