@@ -1,5 +1,5 @@
 [package]
-name = "usage-collector-orange"
+name = "usage_collector_orange"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"

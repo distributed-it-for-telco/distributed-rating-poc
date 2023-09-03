@@ -1,5 +1,5 @@
 [package]
-name = "orange-customer-product-inventory"
+name = "orange_customer_product_inventory"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"

@@ -1,5 +1,5 @@
 [package]
-name = "usage-collector-video-provider"
+name = "usage_collector_video_provider"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"

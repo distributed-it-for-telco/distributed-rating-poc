@@ -1,7 +1,7 @@
 use rating_interface::{
-    Bucket, BucketAccessManager, RatingAgent,
-    RatingAgentReceiver, RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender,
-    UsageProofHandler, UsageProofRequest,RatingResponseBuilder,Usage,ValidationResponse,ValidationRequest
+    Bucket, BucketAccessManager, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
+    RatingResponseBuilder, Usage, UsageCollector, UsageCollectorSender, UsageProofHandler,
+    UsageProofRequest, ValidationRequest, ValidationResponse,
 };
 
 use wasmbus_rpc::actor::prelude::*;
@@ -34,15 +34,21 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             OFFER_ID
         );
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
-        let price : String;
+        let price: String;
         rating_response_builder
-        .unit( (&"EUR").to_string())
-        .message(&"Your bucket is is 3 movies with price 2 EUR");
-        
+            .unit((&"EUR").to_string())
+            .message(&"Your bucket is is 3 movies with price 2 EUR");
+
         if bucket.characteristic_count() == 0 {
             let rating = 2;
             info!("Handling rating empty buket");
-            handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, _arg.usage.clone()).await?;
+            handle_rating(
+                _ctx,
+                &rating.to_string(),
+                &_arg.customer_id,
+                _arg.usage.clone(),
+            )
+            .await?;
 
             refill_bucket(_ctx, &bucket_key).await?;
             decrement_bucket(_ctx, &bucket_key).await?;
@@ -50,7 +56,13 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             price = rating.to_string();
         } else {
             let rating = 0;
-            handle_rating(_ctx, &rating.to_string(), &_arg.customer_id, _arg.usage.clone()).await?;
+            handle_rating(
+                _ctx,
+                &rating.to_string(),
+                &_arg.customer_id,
+                _arg.usage.clone(),
+            )
+            .await?;
 
             decrement_bucket(_ctx, &bucket_key).await?;
 
@@ -61,7 +73,10 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             ));
         }
 
-       let rating_response =  rating_response_builder.price(price.to_string()).authorized().build();
+        let rating_response = rating_response_builder
+            .price(price.to_string())
+            .authorized()
+            .build();
         /*
          * Empty Response till we decide rating response how it should be
          */
@@ -76,8 +91,7 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
         validation_response.next_agent = None;
 
-        
-            validation_response.valid = true;
+        validation_response.valid = true;
 
         Ok(validation_response)
     }
@@ -108,7 +122,7 @@ async fn handle_rating(
         usage_characteristic_list: _usage.usage_characteristic_list.to_owned(),
         usage_id: usage_id.as_str().to_owned(),
         usage_date: usage_date.to_owned(),
-        offer_id: OFFER_ID.to_owned()
+        offer_id: OFFER_ID.to_owned(),
     });
 
     info!(

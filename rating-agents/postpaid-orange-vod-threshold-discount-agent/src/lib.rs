@@ -1,7 +1,7 @@
 use rating_interface::{
-    Bucket, RatingAgent, RatingAgentReceiver,
-    RatingRequest, RatingResponse, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest,RatingResponseBuilder,BucketAccessManager,Usage,ValidationResponse,ValidationRequest
+    Bucket, BucketAccessManager, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
+    RatingResponseBuilder, Usage, UsageCollector, UsageCollectorSender, UsageProofHandler,
+    UsageProofRequest, ValidationRequest, ValidationResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -27,12 +27,11 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
         info!("Hello I'm your orange postpaid vod Threshold discount rating agent");
 
-         let mut rating_response_builder = RatingResponseBuilder::new();
+        let mut rating_response_builder = RatingResponseBuilder::new();
 
         /*
          *  Contract or Offer is normal movie cost = 2 EU , if you watched 10 movies the 11th will be with discount 10%
          */
-
 
         let bucket_key = format!(
             "{}:{}:{}",
@@ -42,8 +41,8 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
         );
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
         let free_text: String;
-        let unit =(&"EUR").to_string();
-        let  price :String;
+        let unit = (&"EUR").to_string();
+        let price: String;
 
         if bucket.characteristic_count() == THRESHOLD {
             let rating = MOVIE_COST - MOVIE_COST * THRESHOLD_DISCOUNT;
@@ -70,14 +69,12 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
             }
         }
 
-        
-       
         let rating_response = rating_response_builder
-         .unit(unit.to_string())
-         .price(price.to_string())
-         .message(&free_text.to_string())
-         .authorized()
-         .build();
+            .unit(unit.to_string())
+            .price(price.to_string())
+            .message(&free_text.to_string())
+            .authorized()
+            .build();
 
         RpcResult::Ok(rating_response)
     }
@@ -90,8 +87,7 @@ impl RatingAgent for PostpaidOrangeVodThresholdDiscountAgentActor {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
         validation_response.next_agent = None;
 
-        
-            validation_response.valid = true;
+        validation_response.valid = true;
 
         Ok(validation_response)
     }
@@ -116,7 +112,7 @@ async fn increase_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
 
 async fn clear_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<()> {
     let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key).await?;
-    
+
     bucket.clear_characteristic_count();
     BucketAccessManager::save(_ctx, bucket_key, &bucket).await?;
 
@@ -138,7 +134,7 @@ async fn handle_rating(
         usage_characteristic_list: _usage.usage_characteristic_list.to_owned(),
         usage_id: usage_id.as_str().to_owned(),
         usage_date: usage_date.to_owned(),
-        offer_id: OFFER_ID.to_owned()
+        offer_id: OFFER_ID.to_owned(),
     });
 
     info!(

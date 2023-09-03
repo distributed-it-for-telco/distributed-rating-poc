@@ -1,5 +1,5 @@
 [package]
-name = "streaming-rating-agent"
+name = "streaming_rating_agent"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"
