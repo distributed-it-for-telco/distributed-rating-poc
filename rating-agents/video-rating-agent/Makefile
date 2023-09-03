@@ -15,7 +15,7 @@ ACTOR_NAME = "Rating Agent - video"
 # optional call alias for actor
 ACTOR_ALIAS=rater_video
 
-include ../actor.mk
+include ./actor.mk
 
 test::
 	cargo clippy --all-features --all-targets

@@ -13,7 +13,7 @@ PUSH_REG_CMD = wash reg push --insecure $(REG_URL)
 # friendly name for the actor
 ACTOR_NAME = "Rating Agent - Orange VOD"
 
-include ../actor.mk
+include ./actor.mk
 
 test::
 	cargo clippy --all-features --all-targets
