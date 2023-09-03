@@ -1,16 +1,16 @@
-name: Release rating-agents/orange-rating-agent to GHCR
+name: Release rating-agents/postpaid-orange-vod-threshold-discount-agent to GHCR
 on:
   workflow_dispatch:
   push:
     branches: [main]
     tags:
       - "v*"
-      - "orange-rating-agent-v*"
+      - "postpaid-orange-vod-threshold-discount-agent-v*"
 env:
-  working-directory: rating-agents/orange-rating-agent
+  working-directory: rating-agents/postpaid-orange-vod-threshold-discount-agent
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
-  WASH_SUBJECT_KEY: ${{ secrets.WASH_ORANGE_RATING_SUBJECT_KEY }}
+  WASH_SUBJECT_KEY: ${{ secrets.WASH_POSTPAID_ORANGE_VOD_THRESHOLD_SUBJECT_KEY }}
   WASMCLOUD_PAT: ${{ secrets.WASMCLOUD_PAT }}
 jobs:
   build_signed_actor:
