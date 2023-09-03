@@ -1,5 +1,5 @@
 [package]
-name = "postpaid-orange-vod-threshold-discount-agent"
+name = "postpaid_orange_vod_threshold_discount_agent"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"

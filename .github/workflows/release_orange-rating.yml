@@ -1,4 +1,4 @@
-name: Release rating-agents/orange-rating-agent to GHCR
+name: Release rating-agents/orange-vod-rating-agent to GHCR
 on:
   workflow_dispatch:
   push:
@@ -7,7 +7,7 @@ on:
       - "v*"
       - "orange-rating-agent-v*"
 env:
-  working-directory: rating-agents/orange-rating-agent
+  working-directory: rating-agents/orange-vod-rating-agent
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
   WASH_SUBJECT_KEY: ${{ secrets.WASH_ORANGE_RATING_SUBJECT_KEY }}
