@@ -17,47 +17,42 @@ spec:
     - name: api-gateway
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/api_gateway@sha256:e2d6cb1933ab3166e2b2ffc74ec0d84efe388171cab3d4279a76d62eada6214f
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/api_gateway:0.1.0
       traits:
         - type: spreadscaler
           properties:
             replicas: 1
-            spread:
-              - name: clinicapp
-                requirements:
-                  # name: stargate_host_22001
-                  stargate: "true"
-
         - type: linkdef
           properties:
             target: httpserver
             values:
               address: 0.0.0.0:8080
 
-    # - name: httpserver
-    #   type: capability
-    #   properties:
-    #     image: wasmcloud.azurecr.io/httpserver:0.16.2
-    #     contract: wasmcloud:httpserver
-    #   traits:
-    #     - type: spreadscaler
-    #       properties:
-    #         replicas: 1
-    #         spread:
-    #           - name: httpserverspread
-    #             requirements:
-    #               name: petclinic
+    - name: rating-coordinator
+      type: actor
+      properties:
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/rating_coordinator:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
 
-    # - name: postgres
-    #   type: capability
-    #   properties:
-    #     image: wasmcloud.azurecr.io/sqldb-postgres:0.3.1
-    #     contract: wasmcloud:sqldb
-    #   traits:
-    #     - type: spreadscaler
-    #       properties:
-    #         replicas: 1
-    #         spread:
-    #           - name: postgresspread
-    #             requirements:
-    #               app: petclinic
+    - name: httpserver
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/httpserver:0.16.2
+        contract: wasmcloud:httpserver
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+
+    - name: redis
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/kvredis:0.21.0
+        contract: wasmcloud:keyvalue
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
