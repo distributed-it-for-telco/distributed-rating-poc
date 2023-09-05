@@ -10,7 +10,7 @@ kind: Application
 metadata:
   name: rating-poc
   annotations:
-    version: v0.0.1
+    version: 0.0.5
     description: "Distributed Rating POC"
 spec:
   components:
@@ -26,21 +26,66 @@ spec:
           properties:
             target: httpserver
             values:
-              address: 0.0.0.0:8080
+              address: 0.0.0.0:8070
 
     - name: rating-coordinator
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/rating_coordinator:0.1.0
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/rating_coordinator:0.1.1
       traits:
         - type: spreadscaler
           properties:
             replicas: 1
 
+
+    - name: postpaid-orange-vod-bucket-rating-agent
+      type: actor
+      properties:
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/postpaid_orange_vod_bucket_rating_agent:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+
+    - name: rating-orange-inventory
+      type: actor
+      properties:
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/orange_customer_product_inventory:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+
+
+    - name: usage-collector-orange
+      type: actor
+      properties:
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/usage_collector_orange:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+
     - name: httpserver
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/httpserver:0.16.2
+        image: wasmcloud.azurecr.io/httpserver:0.17.0
+        # image: cosmonic.azurecr.io/httpserver_wormhole:0.5.4
         contract: wasmcloud:httpserver
       traits:
         - type: spreadscaler
