@@ -10,14 +10,14 @@ kind: Application
 metadata:
   name: rating-poc
   annotations:
-    version: 0.0.5
+    version: 0.0.7
     description: "Distributed Rating POC"
 spec:
   components:
     - name: api-gateway
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/api_gateway:0.1.0
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/api_gateway:0.0.5
       traits:
         - type: spreadscaler
           properties:
@@ -31,7 +31,7 @@ spec:
     - name: rating-coordinator
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/rating_coordinator:0.1.1
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/rating_coordinator:0.0.5
       traits:
         - type: spreadscaler
           properties:
@@ -41,7 +41,7 @@ spec:
     - name: postpaid-orange-vod-bucket-rating-agent
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/postpaid_orange_vod_bucket_rating_agent:0.1.0
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/postpaid_orange_vod_bucket_rating_agent:0.0.5
       traits:
         - type: spreadscaler
           properties:
@@ -55,7 +55,7 @@ spec:
     - name: rating-orange-inventory
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/orange_customer_product_inventory:0.1.0
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/orange_customer_product_inventory:0.0.5
       traits:
         - type: spreadscaler
           properties:
@@ -70,7 +70,7 @@ spec:
     - name: usage-collector-orange
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/usage_collector_orange:0.1.0
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/usage_collector_orange:0.0.5
       traits:
         - type: spreadscaler
           properties:
