@@ -51,7 +51,8 @@ jobs:
       - name: Create release text
         working-directory: ${{ env.working-directory }}
         run: |
-          export oci_version=${{  github.ref_name }}
+          TAG=${{ github.ref_name }}
+          export oci_version=${TAG#v}
           export claims=$(wash claims inspect build/*.wasm)
           echo "Your actor can be accessed at \`ghcr.io/${{ github.REPOSITORY }}:$oci_version\`" >> release.txt
           echo "Claims information:" >> release.txt
@@ -86,7 +87,8 @@ jobs:
         working-directory: ${{ env.working-directory }}
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
         run: |
-          echo "actor-version=${{  github.ref_name }}" >> $GITHUB_ENV
+          TAG=${{ github.ref_name }}
+          echo "actor-version=${TAG#v}" >> $GITHUB_ENV
       - name: Determine actor version (main)
         if: ${{ !startswith(github.ref, 'refs/tags/') }}
         run: |
