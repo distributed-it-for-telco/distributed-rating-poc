@@ -10,10 +10,9 @@ name = "orange_connectivity_rating_agent"
 
 [dependencies]
 futures = "0.3"
-wasmbus-rpc = "0.11"
-wasmcloud-interface-httpserver = "0.11"
-wasmcloud-interface-logging = "0.8.0"
-wasmcloud-interface-numbergen = "0.8.1"
+wasmbus-rpc = "0.14.0"
+wasmcloud-interface-logging = "0.10.0"
+wasmcloud-interface-numbergen = "0.10.0"
 
 rating_interface = { path = "../../rating-interface/rust" }
 

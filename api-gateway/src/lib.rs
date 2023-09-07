@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use rating_interface::{
-    CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender, RatingAgent,
-    RatingAgentSender, RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest,
+    CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender,
+    RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest,
     RatingRequest,
 };
 use serde::{Deserialize, Serialize};
