@@ -7,6 +7,7 @@ on:
       - "v*"
       - "api-gateway-v*"
 env:
+  version: git
   working-directory: api-gateway
   # For the release action, you'll have to set the following variables
   WASH_ISSUER_KEY: ${{ secrets.WASH_ISSUER_KEY }}
@@ -51,7 +52,7 @@ jobs:
       - name: Create release text
         working-directory: ${{ env.working-directory }}
         run: |
-          export oci_version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')
+          export oci_version=${{  github.ref_name }}
           export claims=$(wash claims inspect build/*.wasm)
           echo "Your actor can be accessed at \`ghcr.io/${{ github.REPOSITORY }}:$oci_version\`" >> release.txt
           echo "Claims information:" >> release.txt
@@ -86,7 +87,7 @@ jobs:
         working-directory: ${{ env.working-directory }}
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
         run: |
-          echo "actor-version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].version')" >> $GITHUB_ENV
+          echo "actor-version=${{  github.ref_name }}" >> $GITHUB_ENV
       - name: Determine actor version (main)
         if: ${{ !startswith(github.ref, 'refs/tags/') }}
         run: |
