@@ -32,5 +32,33 @@ impl UsageCollector for UsageCollectorAwsActor {
 
         Ok(())
     }
+
+    async fn list(&self, ctx: &Context) -> RpcResult<UsageProofList> {
+        let kv = KeyValueSender::new();
+        info!("Retrieving rating usage proofs for aws");
+        let res = kv
+            .list_range(
+                ctx,
+                &ListRangeRequest {
+                    list_name: USAGE_LIST_KEY.to_string(),
+                    start: 0,
+                    stop: 100000
+                },
+            )
+            .await
+            .map(|res: Vec<String>| {
+                res.iter()
+                    .filter_map(|s| match serde_json::from_str(s.as_str()) {
+                        Ok(v) => Some(v),
+                        Err(_) => None,
+                    })
+                    .collect::<UsageProofList>()
+            });
+
+        Ok(match res {
+            Ok(v) => v,
+            Err(_) => vec![],
+        })
+    }
 }
 

@@ -247,13 +247,15 @@ pub fn decode_balance(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Balance,
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => balance_characteristic =
-                        Some(decode_balance_characteristic(d).map_err(|e| {
-                            format!(
+                    0 => {
+                        balance_characteristic =
+                            Some(decode_balance_characteristic(d).map_err(|e| {
+                                format!(
                                 "decoding 'co.uk.orange.rating.agent#BalanceCharacteristic': {}",
                                 e
                             )
-                        })?),
+                            })?)
+                    }
                     1 => party_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
@@ -262,13 +264,15 @@ pub fn decode_balance(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Balance,
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
-                    "balanceCharacteristic" => balance_characteristic =
-                        Some(decode_balance_characteristic(d).map_err(|e| {
-                            format!(
+                    "balanceCharacteristic" => {
+                        balance_characteristic =
+                            Some(decode_balance_characteristic(d).map_err(|e| {
+                                format!(
                                 "decoding 'co.uk.orange.rating.agent#BalanceCharacteristic': {}",
                                 e
                             )
-                        })?),
+                            })?)
+                    }
                     "party_id" => party_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
@@ -521,91 +525,94 @@ where
 // Decode Bucket from cbor input stream
 #[doc(hidden)]
 pub fn decode_bucket(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Bucket, RpcError> {
-    let __result =
-        {
-            let mut bucket_characteristic: Option<BucketCharacteristic> = None;
-            let mut name: Option<String> = None;
-            let mut offer_id: Option<String> = None;
-            let mut party_id: Option<String> = None;
+    let __result = {
+        let mut bucket_characteristic: Option<BucketCharacteristic> = None;
+        let mut name: Option<String> = None;
+        let mut offer_id: Option<String> = None;
+        let mut party_id: Option<String> = None;
 
-            let is_array = match d.datatype()? {
-                wasmbus_rpc::cbor::Type::Array => true,
-                wasmbus_rpc::cbor::Type::Map => false,
-                _ => {
-                    return Err(RpcError::Deser(
-                        "decoding struct Bucket, expected array or map".to_string(),
-                    ))
-                }
-            };
-            if is_array {
-                let len = d.fixed_array()?;
-                for __i in 0..(len as usize) {
-                    match __i {
-                        0 => bucket_characteristic =
-                            Some(decode_bucket_characteristic(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
-                                    e
-                                )
-                            })?),
-                        1 => name = Some(d.str()?.to_string()),
-                        2 => offer_id = Some(d.str()?.to_string()),
-                        3 => party_id = Some(d.str()?.to_string()),
-                        _ => d.skip()?,
-                    }
-                }
-            } else {
-                let len = d.fixed_map()?;
-                for __i in 0..(len as usize) {
-                    match d.str()? {
-                        "bucketCharacteristic" => bucket_characteristic =
-                            Some(decode_bucket_characteristic(d).map_err(|e| {
-                                format!(
-                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
-                                    e
-                                )
-                            })?),
-                        "name" => name = Some(d.str()?.to_string()),
-                        "offerId" => offer_id = Some(d.str()?.to_string()),
-                        "partyId" => party_id = Some(d.str()?.to_string()),
-                        _ => d.skip()?,
-                    }
-                }
-            }
-            Bucket {
-                bucket_characteristic: if let Some(__x) = bucket_characteristic {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field Bucket.bucket_characteristic (#0)".to_string(),
-                    ));
-                },
-
-                name: if let Some(__x) = name {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field Bucket.name (#1)".to_string(),
-                    ));
-                },
-
-                offer_id: if let Some(__x) = offer_id {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field Bucket.offer_id (#2)".to_string(),
-                    ));
-                },
-
-                party_id: if let Some(__x) = party_id {
-                    __x
-                } else {
-                    return Err(RpcError::Deser(
-                        "missing field Bucket.party_id (#3)".to_string(),
-                    ));
-                },
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct Bucket, expected array or map".to_string(),
+                ))
             }
         };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => {
+                        bucket_characteristic =
+                            Some(decode_bucket_characteristic(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
+                                    e
+                                )
+                            })?)
+                    }
+                    1 => name = Some(d.str()?.to_string()),
+                    2 => offer_id = Some(d.str()?.to_string()),
+                    3 => party_id = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "bucketCharacteristic" => {
+                        bucket_characteristic =
+                            Some(decode_bucket_characteristic(d).map_err(|e| {
+                                format!(
+                                    "decoding 'co.uk.orange.rating.agent#BucketCharacteristic': {}",
+                                    e
+                                )
+                            })?)
+                    }
+                    "name" => name = Some(d.str()?.to_string()),
+                    "offerId" => offer_id = Some(d.str()?.to_string()),
+                    "partyId" => party_id = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        Bucket {
+            bucket_characteristic: if let Some(__x) = bucket_characteristic {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Bucket.bucket_characteristic (#0)".to_string(),
+                ));
+            },
+
+            name: if let Some(__x) = name {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Bucket.name (#1)".to_string(),
+                ));
+            },
+
+            offer_id: if let Some(__x) = offer_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Bucket.offer_id (#2)".to_string(),
+                ));
+            },
+
+            party_id: if let Some(__x) = party_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field Bucket.party_id (#3)".to_string(),
+                ));
+            },
+        }
+    };
     Ok(__result)
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -1413,13 +1420,15 @@ pub fn decode_usage(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Usage, Rpc
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => usage_characteristic_list =
-                        Some(decode_usage_characteristic_list(d).map_err(|e| {
-                            format!(
+                    0 => {
+                        usage_characteristic_list =
+                            Some(decode_usage_characteristic_list(d).map_err(|e| {
+                                format!(
                                 "decoding 'co.uk.orange.rating.agent#UsageCharacteristicList': {}",
                                 e
                             )
-                        })?),
+                            })?)
+                    }
                     _ => d.skip()?,
                 }
             }
@@ -1427,13 +1436,15 @@ pub fn decode_usage(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Usage, Rpc
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
-                    "usageCharacteristicList" => usage_characteristic_list =
-                        Some(decode_usage_characteristic_list(d).map_err(|e| {
-                            format!(
+                    "usageCharacteristicList" => {
+                        usage_characteristic_list =
+                            Some(decode_usage_characteristic_list(d).map_err(|e| {
+                                format!(
                                 "decoding 'co.uk.orange.rating.agent#UsageCharacteristicList': {}",
                                 e
                             )
-                        })?),
+                            })?)
+                    }
                     _ => d.skip()?,
                 }
             }
@@ -1680,13 +1691,15 @@ pub fn decode_usage_proof_request(
                     0 => offer_id = Some(d.str()?.to_string()),
                     1 => party_id = Some(d.str()?.to_string()),
                     2 => rating = Some(d.str()?.to_string()),
-                    3 => usage_characteristic_list =
-                        Some(decode_usage_characteristic_list(d).map_err(|e| {
-                            format!(
+                    3 => {
+                        usage_characteristic_list =
+                            Some(decode_usage_characteristic_list(d).map_err(|e| {
+                                format!(
                                 "decoding 'co.uk.orange.rating.agent#UsageCharacteristicList': {}",
                                 e
                             )
-                        })?),
+                            })?)
+                    }
                     4 => usage_date = Some(d.str()?.to_string()),
                     5 => usage_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
@@ -1699,13 +1712,15 @@ pub fn decode_usage_proof_request(
                     "offerId" => offer_id = Some(d.str()?.to_string()),
                     "partyId" => party_id = Some(d.str()?.to_string()),
                     "rating" => rating = Some(d.str()?.to_string()),
-                    "usageCharacteristicList" => usage_characteristic_list =
-                        Some(decode_usage_characteristic_list(d).map_err(|e| {
-                            format!(
+                    "usageCharacteristicList" => {
+                        usage_characteristic_list =
+                            Some(decode_usage_characteristic_list(d).map_err(|e| {
+                                format!(
                                 "decoding 'co.uk.orange.rating.agent#UsageCharacteristicList': {}",
                                 e
                             )
-                        })?),
+                            })?)
+                    }
                     "usageDate" => usage_date = Some(d.str()?.to_string()),
                     "usageId" => usage_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,

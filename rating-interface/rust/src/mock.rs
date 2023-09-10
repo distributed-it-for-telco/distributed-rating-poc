@@ -395,6 +395,130 @@ pub fn decode_offers_list(d: &mut wasmbus_rpc::cbor::Decoder<'_>) -> Result<Offe
     };
     Ok(__result)
 }
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct UsageProofDetails {
+    #[serde(default)]
+    pub value: String,
+}
+
+// Encode UsageProofDetails as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_usage_proof_details<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &UsageProofDetails,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(1)?;
+    e.str("value")?;
+    e.str(&val.value)?;
+    Ok(())
+}
+
+// Decode UsageProofDetails from cbor input stream
+#[doc(hidden)]
+pub fn decode_usage_proof_details(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<UsageProofDetails, RpcError> {
+    let __result = {
+        let mut value: Option<String> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct UsageProofDetails, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => value = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "value" => value = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        UsageProofDetails {
+            value: if let Some(__x) = value {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field UsageProofDetails.value (#0)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
+pub type UsageProofList = Vec<UsageProofDetails>;
+
+// Encode UsageProofList as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_usage_proof_list<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &UsageProofList,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.array(val.len() as u64)?;
+    for item in val.iter() {
+        encode_usage_proof_details(e, item)?;
+    }
+    Ok(())
+}
+
+// Decode UsageProofList from cbor input stream
+#[doc(hidden)]
+pub fn decode_usage_proof_list(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<UsageProofList, RpcError> {
+    let __result = {
+        if let Some(n) = d.array()? {
+            let mut arr: Vec<UsageProofDetails> = Vec::with_capacity(n as usize);
+            for _ in 0..(n as usize) {
+                arr.push(decode_usage_proof_details(d).map_err(|e| {
+                    format!(
+                        "decoding 'co.uk.orange.rating.mock#UsageProofDetails': {}",
+                        e
+                    )
+                })?)
+            }
+            arr
+        } else {
+            // indefinite array
+            let mut arr: Vec<UsageProofDetails> = Vec::new();
+            loop {
+                match d.datatype() {
+                    Err(_) => break,
+                    Ok(wasmbus_rpc::cbor::Type::Break) => break,
+                    Ok(_) => arr.push(decode_usage_proof_details(d).map_err(|e| {
+                        format!(
+                            "decoding 'co.uk.orange.rating.mock#UsageProofDetails': {}",
+                            e
+                        )
+                    })?),
+                }
+            }
+            arr
+        }
+    };
+    Ok(__result)
+}
 /// Description of the customer inventory mock service
 /// wasmbus.actorReceive
 #[async_trait]
@@ -632,6 +756,7 @@ pub trait UsageCollector {
         ctx: &Context,
         arg: &TS,
     ) -> RpcResult<()>;
+    async fn list(&self, ctx: &Context) -> RpcResult<UsageProofList>;
 }
 
 /// UsageCollectorReceiver receives messages defined in the UsageCollector service trait
@@ -647,6 +772,12 @@ pub trait UsageCollectorReceiver: MessageDispatch + UsageCollector {
 
                 let _resp = UsageCollector::store(self, ctx, &value).await?;
                 let buf = Vec::new();
+                Ok(buf)
+            }
+            "List" => {
+                let resp = UsageCollector::list(self, ctx).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
                 Ok(buf)
             }
             _ => Err(RpcError::MethodNotHandled(format!(
@@ -720,5 +851,24 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> UsageCollector
             )
             .await?;
         Ok(())
+    }
+    #[allow(unused)]
+    async fn list(&self, ctx: &Context) -> RpcResult<UsageProofList> {
+        let buf = *b"";
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "UsageCollector.List",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: UsageProofList = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': UsageProofList", e)))?;
+        Ok(value)
     }
 }

@@ -29,7 +29,7 @@ service CustomerInventoryAgent {
 @wasmbus( actorReceive: true )
 service UsageCollector {
   version: "0.1",
-  operations: [ Store ]
+  operations: [ Store, List ]
 }
 
 operation Seed {
@@ -47,6 +47,10 @@ operation GetDataItem {
 
 operation Store {
   input: String
+}
+
+operation List {
+  output: UsageProofList
 }
 
 structure DataItem {
@@ -73,4 +77,13 @@ structure OfferDetails {
 
 list OffersList {
     member: OfferDetails
+}
+
+list UsageProofList {
+  member: UsageProofDetails
+}
+
+structure UsageProofDetails {
+  @required
+  value: String
 }

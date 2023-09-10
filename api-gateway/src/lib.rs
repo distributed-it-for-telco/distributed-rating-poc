@@ -3,14 +3,11 @@ use std::collections::HashMap;
 use rating_interface::{
     CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender,
     RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest,
-    RatingRequest,
+    RatingRequest, UsageCollectorSender, UsageCollector,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use types::{
-    AuthorizationStatus, BillingInformation, RequestApproval, ServiceUsageRatingRequest,
-    ServiceUsageRatingResponse, ServiceUsageRequest, ServiceUsageResponse,
-};
+
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_httpserver::{HttpRequest, HttpResponse, HttpServer, HttpServerReceiver};
 use wasmcloud_interface_logging::info;
@@ -49,9 +46,8 @@ impl HttpServer for ApiGatewayActor {
             ("POST", ["usage", "rating"]) => {
                 request_rate(ctx, deser(&req.body)?, extract_headers(ctx, req).await?).await
             }
-            ("POST", ["usage", "requests"]) => request_usage(ctx, deser(&req.body)?).await,
-            ("POST", ["usage", "rating_events"]) => {
-                record_rated_usage(ctx, deser(&req.body)?).await
+            ("GET", ["usage", "rating-proofs", usage_collector_id]) => {
+                list_usage_proofs(ctx, usage_collector_id).await
             }
             ("POST", ["seed", "orange", "customer", "inventory"]) => {
                 seed_data_for_orange_cust_inventory(ctx).await
@@ -63,7 +59,7 @@ impl HttpServer for ApiGatewayActor {
         }
     }
 }
-//
+
 async fn extract_headers(_ctx: &Context, req: &HttpRequest) -> RpcResult<HashMap<String, String>> {
     let mut headers: HashMap<String, String> = HashMap::new();
     if req.header.contains_key("cf-ipcountry") {
@@ -129,27 +125,7 @@ async fn get_party_offers(
         .filter(|product| product["partnerId"] == _vendor)
         .collect::<Vec<_>>();
 
-    let mut headers: HashMap<String, Vec<String>> = HashMap::new();
-    headers.insert(
-        "Access-Control-Allow-Headers".to_owned(),
-        vec!["Content-Type, api_key, Authorization".to_string()],
-    );
-    headers.insert(
-        "Access-Control-Allow-Origin".to_owned(),
-        vec!["https://editor.swagger.io".to_owned()],
-    );
-
-    HttpResponse::json_with_headers(offers, 200, headers)
-}
-
-async fn request_usage(_ctx: &Context, _request: ServiceUsageRequest) -> RpcResult<HttpResponse> {
-    // TODO: make request of backend to get this data
-    let resp = ServiceUsageResponse {
-        authorization_status: AuthorizationStatus::default(),
-        billing_information: BillingInformation::default(),
-        request_approvals: vec![RequestApproval::default()],
-    };
-    HttpResponse::json(resp, 200)
+    HttpResponse::json_with_headers(offers, 200, get_response_headers())
 }
 
 async fn request_rate(
@@ -186,18 +162,26 @@ async fn seed_data_for_orange_cust_inventory(_ctx: &Context) -> RpcResult<HttpRe
     Ok(HttpResponse::default())
 }
 
-async fn record_rated_usage(
-    _ctx: &Context,
-    _request: ServiceUsageRatingRequest,
-) -> RpcResult<HttpResponse> {
-    // TODO: make request of backend to get this data
-    let resp = ServiceUsageRatingResponse {
-        authorization_status: AuthorizationStatus::default(),
-        billing_information: BillingInformation::default(),
-    };
-    HttpResponse::json(resp, 200)
+async fn list_usage_proofs(ctx: &Context, usage_collector_id: &str) -> RpcResult<HttpResponse> {
+    let usage_proof_list = UsageCollectorSender::to_actor(&format!("mock/{}", usage_collector_id))
+        .list(ctx).await?;
+    
+    HttpResponse::json_with_headers(usage_proof_list, 200, get_response_headers())
 }
 
 fn deser<'de, T: Deserialize<'de>>(raw: &'de [u8]) -> RpcResult<T> {
     serde_json::from_slice(raw).map_err(|e| RpcError::Deser(format!("{}", e)))
+}
+
+fn get_response_headers() -> HashMap<String, Vec<String>> {
+    let mut headers: HashMap<String, Vec<String>> = HashMap::new();
+    headers.insert(
+        "Access-Control-Allow-Headers".to_owned(),
+        vec!["Content-Type, api_key, Authorization".to_string()],
+    );
+    headers.insert(
+        "Access-Control-Allow-Origin".to_owned(),
+        vec!["https://editor.swagger.io".to_owned()],
+    );
+    headers
 }
