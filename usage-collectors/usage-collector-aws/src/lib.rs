@@ -46,13 +46,10 @@ impl UsageCollector for UsageCollectorAwsActor {
                 },
             )
             .await
-            .map(|res: Vec<String>| {
+            .map(|res| {
                 res.iter()
-                    .filter_map(|s| match serde_json::from_str(s.as_str()) {
-                        Ok(v) => Some(v),
-                        Err(_) => None,
-                    })
-                    .collect::<UsageProofList>()
+                    .map(|s| UsageProofDetails {value: s.to_string()})
+                    .collect::<Vec<_>>()
             });
 
         Ok(match res {

@@ -165,8 +165,16 @@ async fn seed_data_for_orange_cust_inventory(_ctx: &Context) -> RpcResult<HttpRe
 async fn list_usage_proofs(ctx: &Context, usage_collector_id: &str) -> RpcResult<HttpResponse> {
     let usage_proof_list = UsageCollectorSender::to_actor(&format!("mock/{}", usage_collector_id))
         .list(ctx).await?;
-    
-    HttpResponse::json_with_headers(usage_proof_list, 200, get_response_headers())
+
+    let res = usage_proof_list
+        .iter()
+        .filter_map(|s| match serde_json::from_str(&s.value.as_str()) {
+            Ok(v) => Some(v),
+            Err(_) => None,
+        })
+        .collect::<Vec<Value>>();
+
+    HttpResponse::json_with_headers(res, 200, get_response_headers())
 }
 
 fn deser<'de, T: Deserialize<'de>>(raw: &'de [u8]) -> RpcResult<T> {
