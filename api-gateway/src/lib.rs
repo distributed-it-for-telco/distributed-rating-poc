@@ -52,8 +52,8 @@ impl HttpServer for ApiGatewayActor {
             ("POST", ["seed", "orange", "customer", "inventory"]) => {
                 seed_data_for_orange_cust_inventory(ctx).await
             }
-            ("GET", ["party", party_id, "offers", vendor]) => {
-                get_party_offers(ctx, party_id, vendor).await
+            ("GET", ["party", party_id, "offers", inventory_agent_id]) => {
+                get_party_offers(ctx, party_id, inventory_agent_id).await
             }
             (_, _) => Ok(HttpResponse::not_found()),
         }
@@ -107,9 +107,9 @@ async fn get_options_response(_ctx: &Context) -> RpcResult<HttpResponse> {
 async fn get_party_offers(
     _ctx: &Context,
     _party_id: &str,
-    _vendor: &str,
+    _inventory_agent_id: &str,
 ) -> RpcResult<HttpResponse> {
-    let customer = CustomerInventoryAgentSender::to_actor(&format!("mock/{}", "orange_inventory"))
+    let customer = CustomerInventoryAgentSender::to_actor(&format!("mock/{}", _inventory_agent_id))
         .get_customer(_ctx, &_party_id)
         .await?;
 
@@ -122,7 +122,6 @@ async fn get_party_offers(
         .as_array()
         .unwrap()
         .iter()
-        .filter(|product| product["partnerId"] == _vendor)
         .collect::<Vec<_>>();
 
     HttpResponse::json_with_headers(offers, 200, get_response_headers())
