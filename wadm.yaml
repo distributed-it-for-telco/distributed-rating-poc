@@ -37,7 +37,6 @@ spec:
           properties:
             replicas: 1
 
-
     - name: orange-vod-rating-agent
       type: actor
       properties:
@@ -46,8 +45,6 @@ spec:
         - type: spreadscaler
           properties:
             replicas: 1
-
-
 
     - name: video_rating_agent
       type: actor
@@ -71,7 +68,6 @@ spec:
             target: redis
             values:
               URL: redis://0.0.0.0:6379/
-
 
     - name: postpaid-orange-vod-bucket-rating-agent
       type: actor
@@ -100,7 +96,6 @@ spec:
             target: redis
             values:
               URL: redis://0.0.0.0:6379/
-
 
     - name: usage-collector-orange
       type: actor
