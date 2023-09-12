@@ -13,8 +13,10 @@ use wasmcloud_interface_numbergen::generate_guid;
 struct PostpaidOrangeVodBucketRatingAgentActor {}
 
 const BUCKET_KEY_PREFIX: &str = "bucket";
-
 const OFFER_ID: &str = "2";
+const RATING_PROOF_DESC: &str = "Video on Demand with Bucket";
+const RATING_PROOF_USAGE_TYPE: &str = "VoDBUCK";
+const RATING_PROOF_PRODUCT_NAME: &str = "Video on Demand with Bucket";
 
 /// Implementation of Rating Agent trait methods
 #[async_trait]
@@ -123,6 +125,9 @@ async fn handle_rating(
         usage_id: usage_id.as_str().to_owned(),
         usage_date: usage_date.to_owned(),
         offer_id: OFFER_ID.to_owned(),
+        description: RATING_PROOF_DESC.to_owned(),
+        usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
+        product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
     });
 
     info!(

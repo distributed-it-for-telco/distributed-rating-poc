@@ -1607,12 +1607,17 @@ pub fn decode_usage_characteristic_list(
 }
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct UsageProofRequest {
+    #[serde(default)]
+    pub description: String,
     #[serde(rename = "offerId")]
     #[serde(default)]
     pub offer_id: String,
     #[serde(rename = "partyId")]
     #[serde(default)]
     pub party_id: String,
+    #[serde(rename = "productName")]
+    #[serde(default)]
+    pub product_name: String,
     #[serde(default)]
     pub rating: String,
     #[serde(rename = "usageCharacteristicList")]
@@ -1623,6 +1628,9 @@ pub struct UsageProofRequest {
     #[serde(rename = "usageId")]
     #[serde(default)]
     pub usage_id: String,
+    #[serde(rename = "usageType")]
+    #[serde(default)]
+    pub usage_type: String,
 }
 
 // Encode UsageProofRequest as CBOR and append to output stream
@@ -1635,11 +1643,15 @@ pub fn encode_usage_proof_request<W: wasmbus_rpc::cbor::Write>(
 where
     <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
 {
-    e.map(6)?;
+    e.map(9)?;
+    e.str("description")?;
+    e.str(&val.description)?;
     e.str("offerId")?;
     e.str(&val.offer_id)?;
     e.str("partyId")?;
     e.str(&val.party_id)?;
+    e.str("productName")?;
+    e.str(&val.product_name)?;
     e.str("rating")?;
     e.str(&val.rating)?;
     e.str("usageCharacteristicList")?;
@@ -1648,6 +1660,8 @@ where
     e.str(&val.usage_date)?;
     e.str("usageId")?;
     e.str(&val.usage_id)?;
+    e.str("usageType")?;
+    e.str(&val.usage_type)?;
     Ok(())
 }
 
@@ -1657,12 +1671,15 @@ pub fn decode_usage_proof_request(
     d: &mut wasmbus_rpc::cbor::Decoder<'_>,
 ) -> Result<UsageProofRequest, RpcError> {
     let __result = {
+        let mut description: Option<String> = None;
         let mut offer_id: Option<String> = None;
         let mut party_id: Option<String> = None;
+        let mut product_name: Option<String> = None;
         let mut rating: Option<String> = None;
         let mut usage_characteristic_list: Option<UsageCharacteristicList> = None;
         let mut usage_date: Option<String> = None;
         let mut usage_id: Option<String> = None;
+        let mut usage_type: Option<String> = None;
 
         let is_array = match d.datatype()? {
             wasmbus_rpc::cbor::Type::Array => true,
@@ -1677,18 +1694,21 @@ pub fn decode_usage_proof_request(
             let len = d.fixed_array()?;
             for __i in 0..(len as usize) {
                 match __i {
-                    0 => offer_id = Some(d.str()?.to_string()),
-                    1 => party_id = Some(d.str()?.to_string()),
-                    2 => rating = Some(d.str()?.to_string()),
-                    3 => usage_characteristic_list =
+                    0 => description = Some(d.str()?.to_string()),
+                    1 => offer_id = Some(d.str()?.to_string()),
+                    2 => party_id = Some(d.str()?.to_string()),
+                    3 => product_name = Some(d.str()?.to_string()),
+                    4 => rating = Some(d.str()?.to_string()),
+                    5 => usage_characteristic_list =
                         Some(decode_usage_characteristic_list(d).map_err(|e| {
                             format!(
                                 "decoding 'co.uk.orange.rating.agent#UsageCharacteristicList': {}",
                                 e
                             )
                         })?),
-                    4 => usage_date = Some(d.str()?.to_string()),
-                    5 => usage_id = Some(d.str()?.to_string()),
+                    6 => usage_date = Some(d.str()?.to_string()),
+                    7 => usage_id = Some(d.str()?.to_string()),
+                    8 => usage_type = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
@@ -1696,8 +1716,10 @@ pub fn decode_usage_proof_request(
             let len = d.fixed_map()?;
             for __i in 0..(len as usize) {
                 match d.str()? {
+                    "description" => description = Some(d.str()?.to_string()),
                     "offerId" => offer_id = Some(d.str()?.to_string()),
                     "partyId" => party_id = Some(d.str()?.to_string()),
+                    "productName" => product_name = Some(d.str()?.to_string()),
                     "rating" => rating = Some(d.str()?.to_string()),
                     "usageCharacteristicList" => usage_characteristic_list =
                         Some(decode_usage_characteristic_list(d).map_err(|e| {
@@ -1708,16 +1730,25 @@ pub fn decode_usage_proof_request(
                         })?),
                     "usageDate" => usage_date = Some(d.str()?.to_string()),
                     "usageId" => usage_id = Some(d.str()?.to_string()),
+                    "usageType" => usage_type = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }
         }
         UsageProofRequest {
+            description: if let Some(__x) = description {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field UsageProofRequest.description (#0)".to_string(),
+                ));
+            },
+
             offer_id: if let Some(__x) = offer_id {
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.offer_id (#0)".to_string(),
+                    "missing field UsageProofRequest.offer_id (#1)".to_string(),
                 ));
             },
 
@@ -1725,7 +1756,15 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.party_id (#1)".to_string(),
+                    "missing field UsageProofRequest.party_id (#2)".to_string(),
+                ));
+            },
+
+            product_name: if let Some(__x) = product_name {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field UsageProofRequest.product_name (#3)".to_string(),
                 ));
             },
 
@@ -1733,7 +1772,7 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.rating (#2)".to_string(),
+                    "missing field UsageProofRequest.rating (#4)".to_string(),
                 ));
             },
 
@@ -1741,7 +1780,7 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.usage_characteristic_list (#3)".to_string(),
+                    "missing field UsageProofRequest.usage_characteristic_list (#5)".to_string(),
                 ));
             },
 
@@ -1749,7 +1788,7 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.usage_date (#4)".to_string(),
+                    "missing field UsageProofRequest.usage_date (#6)".to_string(),
                 ));
             },
 
@@ -1757,7 +1796,15 @@ pub fn decode_usage_proof_request(
                 __x
             } else {
                 return Err(RpcError::Deser(
-                    "missing field UsageProofRequest.usage_id (#5)".to_string(),
+                    "missing field UsageProofRequest.usage_id (#7)".to_string(),
+                ));
+            },
+
+            usage_type: if let Some(__x) = usage_type {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field UsageProofRequest.usage_type (#8)".to_string(),
                 ));
             },
         }

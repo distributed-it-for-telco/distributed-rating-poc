@@ -4,6 +4,9 @@ use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "video";
+const RATING_PROOF_DESC: &str = "Video on Demand for Vendors";
+const RATING_PROOF_USAGE_TYPE: &str = "VoDVend";
+const RATING_PROOF_PRODUCT_NAME: &str = "Video on Demand for Vendors";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
@@ -34,6 +37,9 @@ impl RatingAgent for VideoRatingAgentActor {
             usage_id: usage_id.as_str().to_owned(),
             usage_date: usage_date.to_owned(),
             offer_id: OFFER_ID.to_owned(),
+            description: RATING_PROOF_DESC.to_owned(),
+            usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
+            product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
         });
 
         info!(

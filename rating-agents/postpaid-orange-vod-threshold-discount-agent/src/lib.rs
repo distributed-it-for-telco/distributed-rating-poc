@@ -12,14 +12,13 @@ use wasmcloud_interface_numbergen::generate_guid;
 struct PostpaidOrangeVodThresholdDiscountAgentActor {}
 
 const BUCKET_KEY_PREFIX: &str = "bucket";
-
 const OFFER_ID: &str = "3";
-
 const THRESHOLD: u16 = 10;
-
 const MOVIE_COST: f64 = 2.0;
-
 const THRESHOLD_DISCOUNT: f64 = 0.10;
+const RATING_PROOF_DESC: &str = "Video on Demand with Threshold Pricing";
+const RATING_PROOF_USAGE_TYPE: &str = "VoDThreshold";
+const RATING_PROOF_PRODUCT_NAME: &str = "Video on Demand with Threshold Pricing";
 
 /// Implementation of RatingAgent trait methods
 #[async_trait]
@@ -135,6 +134,9 @@ async fn handle_rating(
         usage_id: usage_id.as_str().to_owned(),
         usage_date: usage_date.to_owned(),
         offer_id: OFFER_ID.to_owned(),
+        description: RATING_PROOF_DESC.to_owned(),
+        usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
+        product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
     });
 
     info!(

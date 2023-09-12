@@ -14,6 +14,9 @@ use wasmcloud_interface_numbergen::generate_guid;
 const OFFER_ID: &str = "1";
 const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
 const RATE_FEE: f64 = 0.5;
+const RATING_PROOF_DESC: &str = "Video on Demand";
+const RATING_PROOF_USAGE_TYPE: &str = "VoD";
+const RATING_PROOF_PRODUCT_NAME: &str = "Video on Demand";
 
 lazy_static! {
     static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
@@ -52,6 +55,9 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             usage_id: usage_id.as_str().to_owned(),
             usage_date: usage_date.to_owned(),
             offer_id: OFFER_ID.to_owned(),
+            description: RATING_PROOF_DESC.to_owned(),
+            usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
+            product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
         });
 
         info!(

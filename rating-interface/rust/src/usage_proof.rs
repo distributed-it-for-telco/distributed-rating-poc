@@ -10,8 +10,8 @@ impl UsageProofHandler {
         let usage_template_str = json!({
             "id": usage_proof_request.usage_id,
             "usageDate": usage_proof_request.usage_date,
-            "description": "Video on Demand with Bucket",
-            "usageType": "VoD",
+            "description": usage_proof_request.description,
+            "usageType": usage_proof_request.usage_type,
             "ratedProductUsage": {
                 "isBilled": false,
                 "ratingAmountType": "Total",
@@ -22,7 +22,7 @@ impl UsageProofHandler {
                 },
                 "productRef": {
                     "id": usage_proof_request.offer_id,
-                    "name": "Video on Demand with Bucket"
+                    "name": usage_proof_request.product_name
                 }
             },
             "relatedParty": {

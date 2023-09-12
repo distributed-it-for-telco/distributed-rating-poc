@@ -203,7 +203,13 @@ structure UsageProofRequest {
     @required
     usageDate: String,
     @required
-    offerId: String
+    offerId: String,
+    @required
+    description: String,
+    @required
+    usageType: String,
+    @required
+    productName: String,
 }
 
 structure Usage {

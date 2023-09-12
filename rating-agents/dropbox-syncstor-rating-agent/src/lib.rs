@@ -12,6 +12,9 @@ const DROPBOX_PARTY_ID_AT_PARTNER_SIDE: &str = "dropbox_my_partner";
 const PROVIDER_AGENT_NAME: &str = "aws_stor";
 const REPLICATION_FACTOR: i32 = 2;
 const RATE_FEE: i32 = 1;
+const RATING_PROOF_DESC: &str = "Dropbox Syncstor";
+const RATING_PROOF_USAGE_TYPE: &str = "DSS";
+const RATING_PROOF_PRODUCT_NAME: &str = "Dropbox Syncstor";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
@@ -50,6 +53,9 @@ impl RatingAgent for DropboxSyncstorRatingAgentActor {
             usage_id: usage_id.as_str().to_owned(),
             usage_date: usage_date.to_owned(),
             offer_id: OFFER_ID.to_owned(),
+            description: RATING_PROOF_DESC.to_owned(),
+            usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
+            product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
         });
 
         info!(
