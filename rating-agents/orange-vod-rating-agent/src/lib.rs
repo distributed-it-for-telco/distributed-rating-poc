@@ -13,7 +13,7 @@ use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "1";
 const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
-const RATE_FEE: f64 = 0.5;
+const RATE_FEE: f64 = 0.1;
 const RATING_PROOF_DESC: &str = "Streamzie Movies on demand";
 const RATING_PROOF_USAGE_TYPE: &str = "VoD";
 const RATING_PROOF_PRODUCT_NAME: &str = "Streamzie Movies on demand";

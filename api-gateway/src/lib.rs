@@ -110,7 +110,7 @@ async fn get_party_offers(
     _inventory_agent_id: &str,
 ) -> RpcResult<HttpResponse> {
     let customer = CustomerInventoryAgentSender::to_actor(&format!("mock/{}", _inventory_agent_id))
-        .get_customer(_ctx, &_party_id)
+        .get_customer(_ctx, &_party_id.to_lowercase())
         .await?;
 
     info!("retrieved cutomer details: {:?}", customer.value);

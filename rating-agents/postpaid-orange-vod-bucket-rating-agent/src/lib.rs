@@ -32,7 +32,7 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         let bucket_key = format!(
             "{}:{}:{}",
             BUCKET_KEY_PREFIX,
-            &_arg.customer_id.as_str(),
+            &_arg.customer_id.as_str().to_lowercase(),
             OFFER_ID
         );
         let bucket = get_party_bucket(_ctx, bucket_key.as_str()).await?;
