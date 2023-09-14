@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use rating_interface::{
     CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender,
-    RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest,
-    RatingRequest, UsageCollectorSender, UsageCollector,
+    RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest, RatingRequest,
+    UsageCollector, UsageCollectorSender,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -110,7 +110,7 @@ async fn get_party_offers(
     _inventory_agent_id: &str,
 ) -> RpcResult<HttpResponse> {
     let customer = CustomerInventoryAgentSender::to_actor(&format!("mock/{}", _inventory_agent_id))
-        .get_customer(_ctx, &_party_id)
+        .get_customer(_ctx, &_party_id.to_lowercase())
         .await?;
 
     info!("retrieved cutomer details: {:?}", customer.value);
@@ -163,7 +163,8 @@ async fn seed_data_for_orange_cust_inventory(_ctx: &Context) -> RpcResult<HttpRe
 
 async fn list_usage_proofs(ctx: &Context, usage_collector_id: &str) -> RpcResult<HttpResponse> {
     let usage_proof_list = UsageCollectorSender::to_actor(&format!("mock/{}", usage_collector_id))
-        .list(ctx).await?;
+        .list(ctx)
+        .await?;
 
     let res = usage_proof_list
         .iter()

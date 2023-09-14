@@ -4,9 +4,9 @@ use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "video";
-const RATING_PROOF_DESC: &str = "Video on Demand for Vendors";
+const RATING_PROOF_DESC: &str = "Streamzie Movies on demand";
 const RATING_PROOF_USAGE_TYPE: &str = "VoDVend";
-const RATING_PROOF_PRODUCT_NAME: &str = "Video on Demand for Vendors";
+const RATING_PROOF_PRODUCT_NAME: &str = "Streamzie Movies on demand";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
@@ -24,10 +24,13 @@ impl RatingAgent for VideoRatingAgentActor {
         /*
          *  Contract or Offer is one Movie equal one EURO
          */
-        info!("_arg.usage.usage_characteristic_list {}",_arg.usage.usage_characteristic_list.len());
-        let mut rating=0;
-         if let Some(first) = _arg.usage.usage_characteristic_list.first() {
-            rating = first.value.parse::<i32>().unwrap()*1;
+        info!(
+            "_arg.usage.usage_characteristic_list {}",
+            _arg.usage.usage_characteristic_list.len()
+        );
+        let mut rating = 0;
+        if let Some(first) = _arg.usage.usage_characteristic_list.first() {
+            rating = first.value.parse::<i32>().unwrap() * 1;
         }
 
         let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {

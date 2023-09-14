@@ -13,10 +13,10 @@ use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "1";
 const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
-const RATE_FEE: f64 = 0.5;
-const RATING_PROOF_DESC: &str = "Video on Demand";
+const RATE_FEE: f64 = 0.1;
+const RATING_PROOF_DESC: &str = "Streamzie Movies on demand";
 const RATING_PROOF_USAGE_TYPE: &str = "VoD";
-const RATING_PROOF_PRODUCT_NAME: &str = "Video on Demand";
+const RATING_PROOF_PRODUCT_NAME: &str = "Streamzie Movies on demand";
 
 lazy_static! {
     static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
@@ -74,6 +74,11 @@ impl RatingAgent for OrangeVodRatingAgentActor {
         let rating_response = rating_response_builder
             .unit((&"EUR").to_string())
             .price(rating.to_string())
+            .message(&format!("You can now enjoy your movie on Streamzie"))
+            .message(&format!(
+                "The cost of this transaction is {} EUR",
+                rating.to_string()
+            ))
             .authorized()
             .build();
 
