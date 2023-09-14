@@ -4,9 +4,9 @@ use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "video";
-const RATING_PROOF_DESC: &str = "Video on Demand for Vendors";
+const RATING_PROOF_DESC: &str = "Streamzie Movies on demand";
 const RATING_PROOF_USAGE_TYPE: &str = "VoDVend";
-const RATING_PROOF_PRODUCT_NAME: &str = "Video on Demand for Vendors";
+const RATING_PROOF_PRODUCT_NAME: &str = "Streamzie Movies on demand";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]

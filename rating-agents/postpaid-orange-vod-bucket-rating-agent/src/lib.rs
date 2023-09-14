@@ -14,9 +14,9 @@ struct PostpaidOrangeVodBucketRatingAgentActor {}
 
 const BUCKET_KEY_PREFIX: &str = "bucket";
 const OFFER_ID: &str = "2";
-const RATING_PROOF_DESC: &str = "Video on Demand with Bucket";
+const RATING_PROOF_DESC: &str = "Fun Bundle - Orange Streaming";
 const RATING_PROOF_USAGE_TYPE: &str = "VoDBUCK";
-const RATING_PROOF_PRODUCT_NAME: &str = "Video on Demand with Bucket";
+const RATING_PROOF_PRODUCT_NAME: &str = "Fun Bundle - Orange Streaming";
 
 /// Implementation of Rating Agent trait methods
 #[async_trait]
@@ -39,7 +39,7 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         let price: String;
         rating_response_builder
             .unit((&"EUR").to_string())
-            .message(&"Your bucket is is 3 movies with price 2 EUR");
+            .message(&format!("You have {} movies left in your bucket",bucket.characteristic_count().to_string()));
 
         if bucket.characteristic_count() == 0 {
             let rating = 2;
@@ -69,11 +69,16 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             decrement_bucket(_ctx, &bucket_key).await?;
 
             price = rating.to_string();
-            rating_response_builder.message(&format!(
-                "Current price is {}, because it's part of package",
-                rating
-            ));
+            
         }
+
+        rating_response_builder.message(&format!(
+            "the cost of this transaction is {} EUR",
+            price
+        )).message(&format!(
+            "You can now watch the movie."
+        ));
+
 
         let rating_response = rating_response_builder
             .price(price.to_string())
