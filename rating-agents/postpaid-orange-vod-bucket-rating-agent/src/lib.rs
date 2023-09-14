@@ -39,7 +39,10 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         let price: String;
         rating_response_builder
             .unit((&"EUR").to_string())
-            .message(&format!("You have {} movies left in your bucket",bucket.characteristic_count().to_string()));
+            .message(&format!(
+                "You have {} movies left in your bucket",
+                bucket.characteristic_count().to_string()
+            ));
 
         if bucket.characteristic_count() == 0 {
             let rating = 2;
@@ -69,16 +72,11 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
             decrement_bucket(_ctx, &bucket_key).await?;
 
             price = rating.to_string();
-            
         }
 
-        rating_response_builder.message(&format!(
-            "the cost of this transaction is {} EUR",
-            price
-        )).message(&format!(
-            "You can now watch the movie."
-        ));
-
+        rating_response_builder
+            .message(&format!("the cost of this transaction is {} EUR", price))
+            .message(&format!("You can now watch the movie."));
 
         let rating_response = rating_response_builder
             .price(price.to_string())

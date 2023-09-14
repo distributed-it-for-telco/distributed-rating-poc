@@ -75,7 +75,10 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             .unit((&"EUR").to_string())
             .price(rating.to_string())
             .message(&format!("You can now enjoy your movie on Streamzie"))
-            .message(&format!("The cost of this transaction is {} EUR",rating.to_string()))
+            .message(&format!(
+                "The cost of this transaction is {} EUR",
+                rating.to_string()
+            ))
             .authorized()
             .build();
 
