@@ -1,0 +1,10 @@
+{
+	"name":"vod",
+	"offerId":"2",
+	"partyId":"yann",
+	"bucketCharacteristic":{
+	  "unit":"1",
+	  "count":3
+	}
+
+}

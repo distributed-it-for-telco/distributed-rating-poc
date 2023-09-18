@@ -14,7 +14,7 @@ wash up --wasmcloud-version v0.78.0-rc6 --nats-websocket-port 4001 --experimenta
 echo "Waiting for everything to start"
 sleep 10
 
-wash app get rating-poc $WADM_APP_VERSION 2>&1 > /dev/null || wash app put $WADM_FILE
+wash app put $WADM_FILE
 wash app deploy rating-poc $WADM_APP_VERSION
 
 sleep 10

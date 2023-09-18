@@ -1,0 +1,54 @@
+{
+    "relatedParty": {
+        "id": "Yann",
+        "name": "Yann Cardon"
+    },
+    "products": [
+        {
+           "partnerId": "orange",
+           "id": 1234,
+           "description": "Watch your favorite movies on our streaming platform, you can enjoy a bundle of 3 movies at the price of 2 EUR",
+           "productOffering": {
+              "id": "1",
+              "name": "Fun Bundle - Orange Streaming",
+              "agentId": "postpaid_orange_vod_bucket"
+           },
+           "productPrice": {
+              "description": "Cost per movie",
+              "validTill": "1/March/2024",
+              "priceType": "recurring",
+              "unitOfMeasure": {
+                 "amount": "1",
+                 "units": "movie-bucket"
+              },
+              "price": {
+                 "unit": "EUR",
+                 "value": "2"
+              }
+           }
+        },
+        {
+           "partnerId": "Streamzie",
+           "id": 1235,
+           "description": "Subscribe through orange to enjoy movies from Streamzie platform, you can enjoy a movie on demand at the price of 1.1 EUR",
+           "productOffering": {
+              "id": "video",
+              "name": "Streamzie Movies on demand",
+              "agentId": "orange_vod"
+           },
+           "productPrice": {
+              "description": "Cost per movie",
+              "validTill": "1/March/2024",
+              "priceType": "non-recurring",
+              "unitOfMeasure": {
+                 "amount": "1",
+                 "units": "movie-count"
+              },
+              "price": {
+                 "unit": "eur",
+                 "value": "1.1"
+              }
+           }
+        }
+     ]
+}

@@ -1,0 +1,29 @@
+{
+    "description": "Fun Bundle - Orange Streaming",
+    "id": "96cbc281-b0c1-4c6c-be1e-726a851eb438",
+    "ratedProductUsage": {
+        "bucketValueConvertedInAmount": {
+            "unit": "EUR",
+            "value": "2"
+        },
+        "isBilled": false,
+        "productRef": {
+            "id": "1",
+            "name": "Fun Bundle - Orange Streaming"
+        },
+        "ratingAmountType": "Total",
+        "ratingDate": "04/04/2023"
+    },
+    "relatedParty": {
+        "id": "yann"
+    },
+    "usageCharacteristic": [
+        {
+            "name": "storage-usage",
+            "value": "5",
+            "valueType": "Giga"
+        }
+    ],
+    "usageDate": "04/04/2023",
+    "usageType": "VoD"
+}
