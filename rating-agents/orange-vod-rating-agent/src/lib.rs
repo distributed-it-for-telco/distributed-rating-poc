@@ -103,14 +103,14 @@ impl RatingAgent for OrangeVodRatingAgentActor {
 
 
     async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
-
-        let mut child=Agent::default();
+        
+        let mut children_list = AgentList::new();
 
         if arg.atomic_offer_id.is_some()
             && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
                 .contains_key(arg.atomic_offer_id.to_owned().unwrap().as_str())
         {
-             child = Agent {
+            let child = Agent {
                 identifiation: AgentIdentifiation {
                     name: OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
                     .get(arg.atomic_offer_id.to_owned().unwrap().as_str())
@@ -120,10 +120,8 @@ impl RatingAgent for OrangeVodRatingAgentActor {
                 },
                 usage: Some(arg.usage.clone()),
             };
+            children_list.push(child);
         }
-
-        let mut children_list = AgentList::new();
-        children_list.push(child);
 
         Ok(children_list)
     }
