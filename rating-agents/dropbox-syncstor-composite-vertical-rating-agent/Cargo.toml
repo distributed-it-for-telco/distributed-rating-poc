@@ -1,12 +1,12 @@
 [package]
-name = "dropbox-syncstor-rating-agent"
+name = "dropbox-syncstor-composite-vertical-rating-agent"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "dropbox_syncstor_rating_agent"
+name = "dropbox_syncstor_composite_vertical_rating_agent"
 
 [dependencies]
 async-trait = "0.1"

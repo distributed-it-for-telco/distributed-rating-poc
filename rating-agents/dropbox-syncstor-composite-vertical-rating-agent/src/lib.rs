@@ -8,21 +8,21 @@ use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "100";
-const DROPBOX_PARTY_ID_AT_PARTNER_SIDE: &str = "dropbox_my_partner";
+const DROPBOX_PARTY_ID_AT_PARTNER_SIDE: &str = "dropbox_composit_vertical_my_partner";
 const PROVIDER_AGENT_NAME: &str = "aws_stor";
 const REPLICATION_FACTOR: i32 = 2;
 const RATE_FEE: i32 = 1;
-const RATING_PROOF_DESC: &str = "Dropbox Syncstor";
+const RATING_PROOF_DESC: &str = "Dropbox Syncstor Composite Vertical";
 const RATING_PROOF_USAGE_TYPE: &str = "DSS";
-const RATING_PROOF_PRODUCT_NAME: &str = "Dropbox Syncstor";
+const RATING_PROOF_PRODUCT_NAME: &str = "Dropbox Syncstor Composite Vertical";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
-struct DropboxSyncstorRatingAgentActor {}
+struct DropboxSyncstorCompositeVerticalRatingAgentActor {}
 
 /// Implementation of the HttpServer capability contract
 #[async_trait]
-impl RatingAgent for DropboxSyncstorRatingAgentActor {
+impl RatingAgent for DropboxSyncstorCompositeVerticalRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
 
         if _arg.usage.usage_characteristic_list.is_empty() {
