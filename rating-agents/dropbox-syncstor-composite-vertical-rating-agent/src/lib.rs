@@ -1,28 +1,28 @@
 use rating_interface::{
     AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
     RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse, UsageCharacteristic,
+    UsageProofRequest, ValidationRequest, ValidationResponse, UsageCharacteristic, AgentList, Usage, Agent, GetChildrenRequest,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
 const OFFER_ID: &str = "100";
-const DROPBOX_PARTY_ID_AT_PARTNER_SIDE: &str = "dropbox_my_partner";
+const DROPBOX_PARTY_ID_AT_PARTNER_SIDE: &str = "dropbox_composit_vertical_my_partner";
 const PROVIDER_AGENT_NAME: &str = "aws_stor";
 const REPLICATION_FACTOR: i32 = 2;
 const RATE_FEE: i32 = 1;
-const RATING_PROOF_DESC: &str = "Dropbox Syncstor";
+const RATING_PROOF_DESC: &str = "Dropbox Syncstor Composite Vertical";
 const RATING_PROOF_USAGE_TYPE: &str = "DSS";
-const RATING_PROOF_PRODUCT_NAME: &str = "Dropbox Syncstor";
+const RATING_PROOF_PRODUCT_NAME: &str = "Dropbox Syncstor Composite Vertical";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
-struct DropboxSyncstorRatingAgentActor {}
+struct DropboxSyncstorCompositeVerticalRatingAgentActor {}
 
 /// Implementation of the HttpServer capability contract
 #[async_trait]
-impl RatingAgent for DropboxSyncstorRatingAgentActor {
+impl RatingAgent for DropboxSyncstorCompositeVerticalRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
 
         if _arg.usage.usage_characteristic_list.is_empty() {
@@ -78,10 +78,6 @@ impl RatingAgent for DropboxSyncstorRatingAgentActor {
         RpcResult::Ok(rating_response)
     }
 
-    /// Validate 
-    /// 1- apply business validation.
-    /// 2- translate usage.
-    /// 3- return validation status and tranlated usage.
     async fn validate(
         &self,
         ctx: &Context,
@@ -95,23 +91,31 @@ impl RatingAgent for DropboxSyncstorRatingAgentActor {
             validation_response.valid = false;
         }
 
+        Ok(validation_response)
+    }
 
-        let mut next_agent: AgentIdentifiation = AgentIdentifiation::default();
-
-        next_agent.name = PROVIDER_AGENT_NAME.to_string();
-        next_agent.partner_id = DROPBOX_PARTY_ID_AT_PARTNER_SIDE.to_string();
-
-        validation_response.next_agent = Some(next_agent);
-
-        let mut translated_usage = arg.rating_request.usage.to_owned();
-        let replica_count_usage = UsageCharacteristic {
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+     
+       let replica_count_usage = UsageCharacteristic {
             name: "replica-count".to_string(),
             value: REPLICATION_FACTOR.to_string(),
             value_type: "integer".to_string()
         };
+
+        let mut translated_usage = arg.usage.to_owned();
         translated_usage.usage_characteristic_list.push(replica_count_usage);
 
-        validation_response.translated_usage = Some(translated_usage);
-        Ok(validation_response)
+        let child = Agent {
+            identifiation: AgentIdentifiation {
+                name: PROVIDER_AGENT_NAME.to_string(),
+                partner_id: DROPBOX_PARTY_ID_AT_PARTNER_SIDE.to_string(),
+            },
+            usage: Some(translated_usage),
+        };
+
+        let mut children_list = AgentList::new();
+        children_list.push(child);
+
+        Ok(children_list)
     }
 }

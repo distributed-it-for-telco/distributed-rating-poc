@@ -1,51 +1,62 @@
 use rating_interface::{
-    Agent, AgentIdentifiation, AgentList, RatingAgent, RatingAgentReceiver, RatingRequest,
-    RatingResponse, RatingResponseBuilder, Usage, UsageCharacteristic, UsageCollector,
-    UsageCollectorSender, UsageProofHandler, UsageProofRequest, ValidationRequest,
-    ValidationResponse,GetChildrenRequest,
+    AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
+    RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
+    UsageProofRequest, ValidationRequest, ValidationResponse, UsageCharacteristic, AgentList, Usage, Agent, GetChildrenRequest,
 };
+use lazy_static::lazy_static;
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
 
-const OFFER_ID: &str = "1000";
-const AWS_PARTY_ID_AT_PARTNER_SIDE: &str = "aws_my_partner";
-const PROVIDER_AGENT_NAME: &str = "orange_connectivity";
-const REPLICATION_FACTOR: u32 = 2;
-const RATE_FEE: f32 = 1.0;
-const RATING_PROOF_DESC: &str = "AWS Stor";
-const RATING_PROOF_USAGE_TYPE: &str = "AWSStor";
-const RATING_PROOF_PRODUCT_NAME: &str = "AWS Stor";
+const OFFER_ID: &str = "100";
+const DROPBOX_PARTY_ID_AT_PARTNER_SIDE: &str = "dropbox_composit_horizontal_my_partner";
+//const PROVIDER_AGENTS_NAMES:Vec<&str> = vec!["aws_stor", "orange_connectivity"];
+
+lazy_static! {
+    static ref PROVIDER_AGENTS_NAMES: Vec<&'static str> = {
+        let mut v = Vec::new();
+        v.push("aws_stor");
+        v.push("orange_connectivity");
+        v
+    };
+}
+
+const REPLICATION_FACTOR: i32 = 2;
+const RATE_FEE: i32 = 1;
+const RATING_PROOF_DESC: &str = "Dropbox Syncstor Composite Horizontal";
+const RATING_PROOF_USAGE_TYPE: &str = "DSS";
+const RATING_PROOF_PRODUCT_NAME: &str = "Dropbox Syncstor Composite Horizontal";
 
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, RatingAgent)]
-struct AwsStorRatingAgentActor {}
+struct DropboxSyncstorCompositeHorizontalRatingAgentActor {}
 
+/// Implementation of the HttpServer capability contract
 #[async_trait]
-impl RatingAgent for AwsStorRatingAgentActor {
+impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
+
         if _arg.usage.usage_characteristic_list.is_empty() {
             return RpcResult::from(Err(RpcError::Other(
                 "Can't rate usage, no characteristic sent!".to_owned(),
             )));
         }
 
-        info!("Hello I'm your AWS stor postpaid rating agent");
+        info!("Hello I'm your Dropbox Syncstor postpaid rating agent");
 
         let usage_date = "07/08/2023";
         let usage_id: String = generate_guid().await?;
 
         /*
-         *  Contract or Offer is 1 GB = 1 EUR
+         *  Contract or Offer is 1 GB = 1 EUR 
          */
 
-        let mut storage_usage: f32 = 1.0;
-        for characteristic in _arg.usage.usage_characteristic_list.clone().iter_mut() {
-            storage_usage *= characteristic.value.parse::<f32>().unwrap();
+        let mut rating = RATE_FEE;
+
+        if let Some(first) = _arg.usage.usage_characteristic_list.first() {
+            rating *= first.value.parse::<i32>().unwrap();
         }
-
-        let rating = RATE_FEE * storage_usage;
-
+        
         let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
             party_id: _arg.customer_id.to_owned(),
             rating: rating.to_string(),
@@ -63,7 +74,7 @@ impl RatingAgent for AwsStorRatingAgentActor {
             _arg.customer_id.to_string()
         );
 
-        UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector_aws"))
+        UsageCollectorSender::to_actor(&format!("mock/{}", "usage_collector_dropbox"))
             .store(_ctx, &usage_template_str)
             .await?;
 
@@ -78,10 +89,6 @@ impl RatingAgent for AwsStorRatingAgentActor {
         RpcResult::Ok(rating_response)
     }
 
-    /// Validate
-    /// 1- apply business validation.
-    /// 2- translate usage.
-    /// 3- return validation status and tranlated usage.
     async fn validate(
         &self,
         ctx: &Context,
@@ -94,10 +101,38 @@ impl RatingAgent for AwsStorRatingAgentActor {
         } else {
             validation_response.valid = false;
         }
+
         Ok(validation_response)
     }
 
     async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+
+
+     
+       let replica_count_usage = UsageCharacteristic {
+            name: "replica-count".to_string(),
+            value: REPLICATION_FACTOR.to_string(),
+            value_type: "integer".to_string()
+        };
+
+        let mut translated_usage = arg.usage.to_owned();
+        translated_usage.usage_characteristic_list.push(replica_count_usage);
+
+        let child = Agent {
+            identifiation: AgentIdentifiation {
+                name: PROVIDER_AGENTS_NAMES.get(0).unwrap().to_string(),
+                partner_id: DROPBOX_PARTY_ID_AT_PARTNER_SIDE.to_string(),
+            },
+            usage: Some(translated_usage),
+        };
+
+        let mut children_list = AgentList::new();
+        children_list.push(child);
+
+
+
+
+
         let mut connectivity: f32 = 1.0;
         for characteristic in arg.usage.usage_characteristic_list.to_owned().iter_mut() {
             connectivity *= characteristic.value.parse::<f32>().unwrap();
@@ -115,8 +150,8 @@ impl RatingAgent for AwsStorRatingAgentActor {
 
         let child = Agent {
             identifiation: AgentIdentifiation {
-                name: PROVIDER_AGENT_NAME.to_string(),
-                partner_id: AWS_PARTY_ID_AT_PARTNER_SIDE.to_string(),
+                name: PROVIDER_AGENTS_NAMES.get(1).unwrap().to_string(),
+                partner_id: DROPBOX_PARTY_ID_AT_PARTNER_SIDE.to_string(),
             },
             usage: Some(translated_usage),
         };

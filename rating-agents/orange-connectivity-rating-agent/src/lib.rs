@@ -1,7 +1,7 @@
 use rating_interface::{
     RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
     RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse,
+    UsageProofRequest, ValidationRequest, ValidationResponse, AgentList, Usage, GetChildrenRequest,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -92,6 +92,11 @@ impl RatingAgent for OrangeConnectivityRatingAgentActor {
         }
 
         Ok(validation_response)
+    }
+
+
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+        Ok(AgentList::new())
     }
 }
 

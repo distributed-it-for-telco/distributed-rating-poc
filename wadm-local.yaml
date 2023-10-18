@@ -22,7 +22,7 @@ spec:
       type: actor
       properties:
         # image: localhost:5001/api_gateway:0.1.0
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/api-gateway/build/api_gateway_s.wasm
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/api-gateway/build/api_gateway_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -36,7 +36,7 @@ spec:
     - name: rating-coordinator
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-coordinator/build/rating_coordinator_s.wasm
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-coordinator/build/rating_coordinator_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -45,7 +45,7 @@ spec:
     - name: orange-vod-rating-agent
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/orange-vod-rating-agent/build/orange_vod_rating_agent_s.wasm
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/orange-vod-rating-agent/build/orange_vod_rating_agent_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -54,7 +54,7 @@ spec:
     - name: video_rating_agent
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/video-rating-agent/build/video_rating_agent_s.wasm
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/video-rating-agent/build/video_rating_agent_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -63,7 +63,7 @@ spec:
     - name: usage_collector_video_provider
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/usage-collectors/usage-collector-video-provider/build/usage_collector_video_provider_s.wasm
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-video-provider/build/usage_collector_video_provider_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -77,7 +77,7 @@ spec:
     - name: postpaid-orange-vod-bucket-rating-agent
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-bucket-rating-agent/build/postpaid_orange_vod_bucket_rating_agent_s.wasm
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-bucket-rating-agent/build/postpaid_orange_vod_bucket_rating_agent_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -91,7 +91,7 @@ spec:
     - name: rating-orange-inventory
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/mocks/orange-customer-product-inventory/build/orange_customer_product_inventory_s.wasm
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/mocks/orange-customer-product-inventory/build/orange_customer_product_inventory_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -105,7 +105,7 @@ spec:
     - name: usage-collector-orange
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/usage-collectors/usage-collector-orange/build/usage_collector_orange_s.wasm
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-orange/build/usage_collector_orange_s.wasm
       traits:
         - type: spreadscaler
           properties:

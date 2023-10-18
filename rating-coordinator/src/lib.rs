@@ -1,11 +1,14 @@
+mod agent_graph;
+mod build_agents_hierarchy;
 mod rating;
 mod validation;
-use validation::*;
+use agent_graph::*;
+use build_agents_hierarchy::*;
 use rating::*;
+use validation::*;
 
 use rating_interface::{
-    RatingCoordinator, RatingCoordinatorReceiver,
-    RatingProcessRequest, RatingResponse, Usage
+    RatingCoordinator, RatingCoordinatorReceiver, RatingProcessRequest, RatingResponse, Usage,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -25,10 +28,10 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
         info!("Hello I'm your rating coordinator");
         info!("Current used agent is: {}", _arg.rating_request.agent_id);
 
-        let mut rating_agents_stack: Vec<(String, String, Option<Usage>)> = Vec::new();
+        let agent_graph = build_agent_hierarchy(&_ctx, &_arg.rating_request).await?;
 
         let validation_response_as_rating =
-            match handle_validation_cycle(_ctx, _arg, &mut rating_agents_stack).await {
+            match handle_validation_cycle(_ctx, _arg, &agent_graph).await {
                 Ok(validation) => validation,
                 Err(e) => return RpcResult::from(Err(e)),
             };
@@ -37,11 +40,9 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
             return RpcResult::Ok(validation_response_as_rating);
         }
 
-        RpcResult::from(
-            match handle_rating_cycle(_ctx, _arg, &mut rating_agents_stack).await {
-                Ok(rating) => Ok(rating),
-                Err(e) => Err(e),
-            },
-        )
+        RpcResult::from(match handle_rating_cycle(_ctx, _arg, &agent_graph).await {
+            Ok(rating) => Ok(rating),
+            Err(e) => Err(e),
+        })
     }
 }

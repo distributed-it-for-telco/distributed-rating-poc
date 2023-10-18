@@ -19,4 +19,8 @@ impl RatingAgent for StreamingRatingAgentActor {
     ) -> RpcResult<ValidationResponse> {
         todo!()
     }
+
+    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+        Ok(AgentList::new())
+    }
 }

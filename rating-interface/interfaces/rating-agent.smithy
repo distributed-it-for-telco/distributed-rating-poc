@@ -32,7 +32,7 @@ service RatingCoordinator {
 @wasmbus( actorReceive: true )
 service RatingAgent {
   version: "0.1",
-  operations: [ RateUsage, Validate ]
+  operations: [ RateUsage, Validate ,GetChildren]
 }
 
 operation HandleRatingProcess {
@@ -50,6 +50,17 @@ operation Validate {
     output: ValidationResponse
 }
 
+operation GetChildren {
+    input:  GetChildrenRequest,
+    output: AgentList
+}
+
+
+structure GetChildrenRequest{
+    @required
+    usage :Usage,
+    atomicOfferId:String
+}
 
 map HeadersMap {
     key:String,
@@ -64,6 +75,7 @@ structure RatingProcessRequest{
     headers :HeadersMap,
 
 }
+
 
 
 structure RatingRequest {
@@ -114,10 +126,16 @@ structure ValidationRequest {
 structure ValidationResponse {
     @required
     valid: Boolean,
+}
 
-    nextAgent: AgentIdentifiation,
+list AgentList {
+    member: Agent
+}
 
-    translatedUsage: Usage,
+structure Agent {
+    @required
+    identifiation: AgentIdentifiation,
+    usage: Usage,
 }
 
 structure AgentIdentifiation {
@@ -126,6 +144,26 @@ structure AgentIdentifiation {
 
     @required
     partnerId: String
+}
+
+structure Usage {
+    @required
+    usageCharacteristicList: UsageCharacteristicList
+}
+
+structure UsageCharacteristic {
+    @required
+    name: String,
+
+    @required
+    value: String,
+
+    @required
+    valueType: String,
+}
+
+list UsageCharacteristicList {
+    member: UsageCharacteristic
 }
 
 structure BillingInformation {
@@ -212,22 +250,3 @@ structure UsageProofRequest {
     productName: String,
 }
 
-structure Usage {
-    @required
-    usageCharacteristicList: UsageCharacteristicList
-}
-
-structure UsageCharacteristic {
-    @required
-    name: String,
-
-    @required
-    value: String,
-
-    @required
-    valueType: String,
-}
-
-list UsageCharacteristicList {
-    member: UsageCharacteristic
-}

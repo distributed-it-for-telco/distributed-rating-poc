@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-WADM_FILE=wadm.yaml
+WADM_FILE=wadm-local.yaml
 WADM_APP_VERSION=$1
 
 wash down

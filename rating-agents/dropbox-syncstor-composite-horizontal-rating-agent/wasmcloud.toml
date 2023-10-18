@@ -1,8 +1,8 @@
-name = "dropbox_syncstor_rating_agent"
+name = "dropbox_syncstor_composite_horizontal_rating_agent"
 language = "rust"
 type = "actor"
 version = "0.1.0"
 
 [actor]
 claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging", "wasmcloud:builtin:numbergen"]
-call_alias = "agent/dropbox_syncstor"
+call_alias = "agent/dropbox_syncstor_composite_horizontal"
