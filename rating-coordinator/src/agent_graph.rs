@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use rating_interface::Agent;
+use std::collections::HashMap;
 
 pub struct AgentGraph {
     pub adjacency_list: HashMap<String, Vec<Agent>>,
@@ -7,8 +7,7 @@ pub struct AgentGraph {
     start_vertex: Option<Agent>,
 }
 
-
-impl AgentGraph{
+impl AgentGraph {
     // Create a new empty graph
     pub fn new() -> Self {
         AgentGraph {
@@ -29,8 +28,12 @@ impl AgentGraph{
 
     // Add a vertex to the graph
     pub fn add_vertex(&mut self, vertex: Agent) {
-        self.adjacency_list.entry(vertex.identifiation.name.clone()).or_insert(Vec::new());
-        self.agents_map.entry(vertex.identifiation.name.clone()).or_insert(vertex);
+        self.adjacency_list
+            .entry(vertex.identifiation.name.clone())
+            .or_insert(Vec::new());
+        self.agents_map
+            .entry(vertex.identifiation.name.clone())
+            .or_insert(vertex);
     }
 
     // Add an edge between two vertices
@@ -39,8 +42,6 @@ impl AgentGraph{
             .entry(from.identifiation.name)
             .or_insert(Vec::new())
             .push(to);
-
-           
     }
 
     // Perform depth-first search traversal
@@ -57,19 +58,14 @@ impl AgentGraph{
             let mut kids_rating = Vec::new();
 
             for neighbor in neighbors {
-
                 if !visited[&neighbor.identifiation.name] {
-                      self.dfs_recursive(neighbor.clone(), visited);
-                      kids_rating.push(neighbor);
+                    self.dfs_recursive(neighbor.clone(), visited);
+                    kids_rating.push(neighbor);
                 }
             }
-            
+
             println!(" kids rating {:?}", kids_rating);
             println!("My Rating {:?} ", vertex);
-         
         }
     }
-    
-    
-
 }

@@ -1,7 +1,8 @@
 use rating_interface::{
-    Bucket, BucketAccessManager, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
-    RatingResponseBuilder, Usage, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse,GetChildrenRequest,AgentList
+    AgentList, Bucket, BucketAccessManager, GetChildrenRequest, RatingAgent, RatingAgentReceiver,
+    RatingRequest, RatingResponse, RatingResponseBuilder, Usage, UsageCollector,
+    UsageCollectorSender, UsageProofHandler, UsageProofRequest, ValidationRequest,
+    ValidationResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;

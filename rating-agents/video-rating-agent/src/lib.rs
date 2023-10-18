@@ -72,7 +72,6 @@ impl RatingAgent for VideoRatingAgentActor {
     ) -> RpcResult<ValidationResponse> {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
 
-
         if arg.client_country.is_some() && arg.client_country.to_owned().unwrap() == "EG" {
             validation_response.valid = true;
         } else {
@@ -81,7 +80,6 @@ impl RatingAgent for VideoRatingAgentActor {
 
         Ok(validation_response)
     }
-
 
     async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
         Ok(AgentList::new())
