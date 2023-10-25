@@ -71,10 +71,10 @@ async fn dfs_recursive(
         }
     }
 
-        println!("My Rating {:?} ", vertex);
-        let current_agent =  vertex.clone();
-        rating_request.agent_id = current_agent.identifiation.name;
-        rating_request.customer_id = current_agent.identifiation.partner_id;
+    println!("My Rating {:?} ", vertex);
+    let current_agent = vertex.clone();
+    rating_request.agent_id = current_agent.identifiation.name;
+    rating_request.customer_id = current_agent.identifiation.partner_id;
 
     if let Some(usage) = current_agent.usage {
         rating_request.usage = usage;

@@ -28,8 +28,7 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
         info!("Hello I'm your rating coordinator");
         info!("Current used agent is: {}", _arg.rating_request.agent_id);
 
-
-        let  agent_graph = build_agent_hierarchy(&_ctx, &_arg.rating_request).await?;
+        let agent_graph = build_agent_hierarchy(&_ctx, &_arg.rating_request).await?;
 
         info!("Graph generated ......");
 
