@@ -107,7 +107,7 @@ impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
 
     async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
 
-
+        let mut children_list = AgentList::new();
      
        let replica_count_usage = UsageCharacteristic {
             name: "replica-count".to_string(),
@@ -126,7 +126,7 @@ impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
             usage: Some(translated_usage),
         };
 
-        let mut children_list = AgentList::new();
+       
         children_list.push(child);
 
 
@@ -155,8 +155,7 @@ impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
             },
             usage: Some(translated_usage),
         };
-
-        let mut children_list = AgentList::new();
+        
         children_list.push(child);
 
         Ok(children_list)

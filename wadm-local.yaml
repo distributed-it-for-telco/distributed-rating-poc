@@ -14,7 +14,7 @@ kind: Application
 metadata:
   name: rating-poc
   annotations:
-    version: 0.0.9
+    version: 0.0.14
     description: "Distributed Rating POC"
 spec:
   components:
@@ -87,6 +87,77 @@ spec:
             target: redis
             values:
               URL: redis://0.0.0.0:6379/
+
+    - name: usage_collector_dropbox
+      type: actor
+      properties:
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-dropbox/build/usage_collector_dropbox_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+
+    - name: usage_collector_aws
+      type: actor
+      properties:
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-aws/build/usage_collector_aws_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+
+    - name: usage_collector_orange_connectivity
+      type: actor
+      properties:
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-orange-connectivity/build/usage_collector_orange_connectivity_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+
+    - name: dropbox_syncstor_composite_horizontal
+      type: actor
+      properties:
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/dropbox-syncstor-composite-horizontal-rating-agent/build/dropbox_syncstor_composite_horizontal_rating_agent_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+
+    - name: aws_stor
+      type: actor
+      properties:
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/aws-stor-rating-agent/build/aws_stor_rating_agent_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+
+
+
+    - name: orange_connectivity
+      type: actor
+      properties:
+        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/orange-connectivity-rating-agent/build/orange_connectivity_rating_agent_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
 
     - name: rating-orange-inventory
       type: actor

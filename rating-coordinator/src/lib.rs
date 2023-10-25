@@ -32,7 +32,7 @@ impl RatingCoordinator for RatingAgentCoordinatorActor {
 
         let  agent_graph = build_agent_hierarchy(&_ctx, &_arg.rating_request).await?;
 
-    
+        info!("Graph generated ......");
 
         let validation_response_as_rating =
             match handle_validation_cycle(_ctx, _arg,&agent_graph).await {
