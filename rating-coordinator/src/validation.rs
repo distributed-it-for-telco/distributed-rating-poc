@@ -1,9 +1,8 @@
 use std::collections::{HashMap, VecDeque};
 
 use rating_interface::{
-    RatingAgent, RatingAgentSender,
-    RatingProcessRequest, RatingResponse, RatingResponseBuilder,
-    ValidationRequest, ValidationResponse, Usage, RatingRequest, Agent, AgentIdentifiation,
+    Agent, AgentIdentifiation, RatingAgent, RatingAgentSender, RatingProcessRequest, RatingRequest,
+    RatingResponse, RatingResponseBuilder, Usage, ValidationRequest, ValidationResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -13,7 +12,7 @@ use crate::agent_graph::AgentGraph;
 pub async fn handle_validation_cycle(
     _ctx: &Context,
     rating_process_request: &RatingProcessRequest,
-    agents_graph: &AgentGraph
+    agents_graph: &AgentGraph,
 ) -> RpcResult<RatingResponse> {
     if rating_process_request.headers.is_none() {
         return RpcResult::from(Err(RpcError::Other(
@@ -37,8 +36,7 @@ pub async fn handle_validation_cycle(
         rating_process_request.rating_request.agent_id
     );
 
-  
-    let mut validation_response =ValidationResponse::default();
+    let mut validation_response = ValidationResponse::default();
     let mut rating_response_builder = RatingResponseBuilder::new();
 
     let mut visited: HashMap<String, bool> = HashMap::new();
@@ -59,7 +57,7 @@ pub async fn handle_validation_cycle(
         updated_rating_request.agent_id = current.identifiation.name.clone();
         updated_rating_request.usage = current.clone().usage.unwrap().clone();
 
-         validation_response = validate_through_agent(
+        validation_response = validate_through_agent(
             _ctx,
             &updated_rating_request,
             client_ip.to_string(),
@@ -72,7 +70,7 @@ pub async fn handle_validation_cycle(
                 .message(&"Validation failed")
                 .not_authorized();
             return Ok(rating_response_builder.build());
-        } 
+        }
 
         if let Some(neighbors) = agents_graph.adjacency_list.get(&current.identifiation.name) {
             for neighbor in neighbors {
@@ -86,9 +84,7 @@ pub async fn handle_validation_cycle(
 
     rating_response_builder.message(&"Valid usage").authorized();
     Ok(rating_response_builder.build())
-
 }
-
 
 pub async fn validate_through_agent(
     ctx: &Context,

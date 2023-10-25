@@ -2,9 +2,9 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 
 use rating_interface::{
-    AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
-    RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse, GetChildrenRequest, AgentList, Agent,
+    Agent, AgentIdentifiation, AgentList, GetChildrenRequest, RatingAgent, RatingAgentReceiver,
+    RatingRequest, RatingResponse, RatingResponseBuilder, UsageCollector, UsageCollectorSender,
+    UsageProofHandler, UsageProofRequest, ValidationRequest, ValidationResponse,
 };
 
 use wasmbus_rpc::actor::prelude::*;
@@ -101,9 +101,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
         Ok(validation_response)
     }
 
-
     async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
-        
         let mut children_list = AgentList::new();
 
         if arg.atomic_offer_id.is_some()
@@ -113,10 +111,10 @@ impl RatingAgent for OrangeVodRatingAgentActor {
             let child = Agent {
                 identifiation: AgentIdentifiation {
                     name: OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
-                    .get(arg.atomic_offer_id.to_owned().unwrap().as_str())
-                    .unwrap()
-                    .to_string(),
-                    partner_id:  ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string(),
+                        .get(arg.atomic_offer_id.to_owned().unwrap().as_str())
+                        .unwrap()
+                        .to_string(),
+                    partner_id: ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string(),
                 },
                 usage: Some(arg.usage.clone()),
             };
