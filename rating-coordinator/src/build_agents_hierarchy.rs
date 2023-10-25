@@ -15,6 +15,7 @@ pub async fn build_agent_hierarchy(
 ) -> RpcResult<AgentGraph> {
     let mut agentGraph = AgentGraph::new();
 
+    info!("Add Root to Graph ......");
     let mut root: Agent = Agent {
         identifiation: AgentIdentifiation {
             name: rating_request.agent_id.to_owned(),
@@ -37,14 +38,21 @@ pub async fn attach_children(
     graph: &mut AgentGraph,
     root: Agent,
 ) -> RpcResult<()> {
+    info!(
+        "Add Chilren to Graph  for {} ......",
+        root.identifiation.name.to_string()
+    );
     let children = get_agent_children(&_ctx, &rating_request).await?;
 
     for child in children {
+        info!("Add child {}", child.identifiation.name.to_string());
         graph.add_vertex(child.clone());
         graph.add_edge(root.clone(), child.clone());
         let mut child_rating_request = rating_request.clone();
+        child_rating_request.agent_id = child.clone().identifiation.name;
+        child_rating_request.customer_id = child.clone().identifiation.partner_id;
         child_rating_request.usage = child.clone().usage.unwrap().clone();
-        attach_children(&_ctx, rating_request, graph, child.clone()).await?;
+        attach_children(&_ctx, &child_rating_request, graph, child.clone()).await?;
     }
 
     Ok(())

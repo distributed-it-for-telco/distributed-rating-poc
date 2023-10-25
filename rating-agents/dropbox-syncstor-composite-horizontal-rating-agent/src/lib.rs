@@ -1,9 +1,10 @@
-use rating_interface::{
-    AgentIdentifiation, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
-    RatingResponseBuilder, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse, UsageCharacteristic, AgentList, Usage, Agent, GetChildrenRequest,
-};
 use lazy_static::lazy_static;
+use rating_interface::{
+    Agent, AgentIdentifiation, AgentList, GetChildrenRequest, RatingAgent, RatingAgentReceiver,
+    RatingRequest, RatingResponse, RatingResponseBuilder, Usage, UsageCharacteristic,
+    UsageCollector, UsageCollectorSender, UsageProofHandler, UsageProofRequest, ValidationRequest,
+    ValidationResponse,
+};
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
 use wasmcloud_interface_numbergen::generate_guid;
@@ -35,7 +36,6 @@ struct DropboxSyncstorCompositeHorizontalRatingAgentActor {}
 #[async_trait]
 impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
     async fn rate_usage(&self, _ctx: &Context, _arg: &RatingRequest) -> RpcResult<RatingResponse> {
-
         if _arg.usage.usage_characteristic_list.is_empty() {
             return RpcResult::from(Err(RpcError::Other(
                 "Can't rate usage, no characteristic sent!".to_owned(),
@@ -48,7 +48,7 @@ impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
         let usage_id: String = generate_guid().await?;
 
         /*
-         *  Contract or Offer is 1 GB = 1 EUR 
+         *  Contract or Offer is 1 GB = 1 EUR
          */
 
         let mut rating = RATE_FEE;
@@ -56,7 +56,7 @@ impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
         if let Some(first) = _arg.usage.usage_characteristic_list.first() {
             rating *= first.value.parse::<i32>().unwrap();
         }
-        
+
         let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
             party_id: _arg.customer_id.to_owned(),
             rating: rating.to_string(),
@@ -106,17 +106,18 @@ impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
     }
 
     async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+        let mut children_list = AgentList::new();
 
-
-     
-       let replica_count_usage = UsageCharacteristic {
+        let replica_count_usage = UsageCharacteristic {
             name: "replica-count".to_string(),
             value: REPLICATION_FACTOR.to_string(),
-            value_type: "integer".to_string()
+            value_type: "integer".to_string(),
         };
 
         let mut translated_usage = arg.usage.to_owned();
-        translated_usage.usage_characteristic_list.push(replica_count_usage);
+        translated_usage
+            .usage_characteristic_list
+            .push(replica_count_usage);
 
         let child = Agent {
             identifiation: AgentIdentifiation {
@@ -126,12 +127,7 @@ impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
             usage: Some(translated_usage),
         };
 
-        let mut children_list = AgentList::new();
         children_list.push(child);
-
-
-
-
 
         let mut connectivity: f32 = 1.0;
         for characteristic in arg.usage.usage_characteristic_list.to_owned().iter_mut() {
@@ -156,7 +152,6 @@ impl RatingAgent for DropboxSyncstorCompositeHorizontalRatingAgentActor {
             usage: Some(translated_usage),
         };
 
-        let mut children_list = AgentList::new();
         children_list.push(child);
 
         Ok(children_list)
