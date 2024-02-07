@@ -41,7 +41,7 @@ impl RatingAgent for OrangeVodRatingAgentActor {
         let usage_id: String = generate_guid().await?;
 
         /*
-         *  Contract or Offer is 50% added to provider price
+         *  Contract or Offer is 10% added to provider price
          */
 
         let previouse_rating_price_str = _arg.rating_history.clone().unwrap().pop().unwrap().price;

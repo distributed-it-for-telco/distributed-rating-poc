@@ -1,0 +1,92 @@
+# This is a full example of how to run the rating-poc example. Using this example requires you to
+# have WADM running: https://github.com/wasmCloud/wadm/tree/main/wadm and a host labeled with
+# `app=rating-poc`. You can deploy this example with two simple commands:
+#
+# `wash app put wadm.yaml`
+# `wash app deploy rating-poc <version>`
+
+# When launching an actor from a local file,
+# ensure that the environment variable WASMCLOUD_ALLOW_FILE_LOAD=true is set when you launch wasmCloud. 
+# This is the default for hosts ran with wash up. 
+
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: rating-poc
+  annotations:
+    version: 0.0.1
+    description: "Distributed Rating POC"
+spec:
+  components:
+    - name: api-gateway
+      type: actor
+      properties:
+        image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/api-gateway/build/api_gateway_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: stargate
+                requirements:
+                  # hostcore.os: macos
+                  stargate: "true"
+        # - type: linkdef
+        #   properties:
+        #     target: httpserver
+        #     values:
+        #       address: 0.0.0.0:8070
+
+    - name: rating-coordinator
+      type: actor
+      properties:
+        image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-coordinator/build/rating_coordinator_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: stargate
+                requirements:
+                  # hostcore.os: macos
+                  stargate: "true"
+
+    # - name: postpaid-orange-vod-bucket-rating-agent
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-bucket-rating-agent/build/postpaid_orange_vod_bucket_rating_agent_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #         spread:
+    #           - name: stargate
+    #             requirements:
+    #               # hostcore.os: macos
+    #               stargate: "true"
+        # - type: linkdef
+        #   properties:
+        #     target: Redis KeyValue Store
+        #     values:
+        #       URL: redis://0.0.0.0:6379/
+
+    # - name: usage-collector-orange
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/usage-collectors/usage-collector-orange/build/usage_collector_orange_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #         spread:
+    #           - name: oncosmonic
+    #             requirements:
+    #               cosmonic_managed: "true"
+          
+        # - type: linkdef
+        #   properties:
+        #     target: redis
+        #     values:
+        #       URL: redis://0.0.0.0:6379/
+
+    

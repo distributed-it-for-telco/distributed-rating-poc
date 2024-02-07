@@ -14,7 +14,7 @@ kind: Application
 metadata:
   name: rating-poc
   annotations:
-    version: 0.0.14
+    version: 0.0.1
     description: "Distributed Rating POC"
 spec:
   components:
@@ -22,7 +22,7 @@ spec:
       type: actor
       properties:
         # image: localhost:5001/api_gateway:0.1.0
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/api-gateway/build/api_gateway_s.wasm
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/api-gateway/build/api_gateway_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -33,159 +33,159 @@ spec:
             values:
               address: 0.0.0.0:8070
 
-    - name: rating-coordinator
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-coordinator/build/rating_coordinator_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
+    # - name: rating-coordinator
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-coordinator/build/rating_coordinator_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
 
-    - name: orange-vod-rating-agent
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/orange-vod-rating-agent/build/orange_vod_rating_agent_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
+    # - name: orange-vod-rating-agent
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/orange-vod-rating-agent/build/orange_vod_rating_agent_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
 
-    - name: video_rating_agent
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/video-rating-agent/build/video_rating_agent_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
+    # - name: video_rating_agent
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/video-rating-agent/build/video_rating_agent_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
 
-    - name: usage_collector_video_provider
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-video-provider/build/usage_collector_video_provider_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-        - type: linkdef
-          properties:
-            target: redis
-            values:
-              URL: redis://0.0.0.0:6379/
+    # - name: usage_collector_video_provider
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/usage-collectors/usage-collector-video-provider/build/usage_collector_video_provider_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #     - type: linkdef
+    #       properties:
+    #         target: redis
+    #         values:
+    #           URL: redis://0.0.0.0:6379/
 
-    - name: postpaid-orange-vod-bucket-rating-agent
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-bucket-rating-agent/build/postpaid_orange_vod_bucket_rating_agent_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-        - type: linkdef
-          properties:
-            target: redis
-            values:
-              URL: redis://0.0.0.0:6379/
+    # - name: postpaid-orange-vod-bucket-rating-agent
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/postpaid-orange-vod-bucket-rating-agent/build/postpaid_orange_vod_bucket_rating_agent_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #     - type: linkdef
+    #       properties:
+    #         target: redis
+    #         values:
+    #           URL: redis://0.0.0.0:6379/
 
-    - name: usage_collector_dropbox
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-dropbox/build/usage_collector_dropbox_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-        - type: linkdef
-          properties:
-            target: redis
-            values:
-              URL: redis://0.0.0.0:6379/
+    # - name: usage_collector_dropbox
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-dropbox/build/usage_collector_dropbox_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #     - type: linkdef
+    #       properties:
+    #         target: redis
+    #         values:
+    #           URL: redis://0.0.0.0:6379/
 
-    - name: usage_collector_aws
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-aws/build/usage_collector_aws_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-        - type: linkdef
-          properties:
-            target: redis
-            values:
-              URL: redis://0.0.0.0:6379/
+    # - name: usage_collector_aws
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-aws/build/usage_collector_aws_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #     - type: linkdef
+    #       properties:
+    #         target: redis
+    #         values:
+    #           URL: redis://0.0.0.0:6379/
 
-    - name: usage_collector_orange_connectivity
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-orange-connectivity/build/usage_collector_orange_connectivity_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-        - type: linkdef
-          properties:
-            target: redis
-            values:
-              URL: redis://0.0.0.0:6379/
+    # - name: usage_collector_orange_connectivity
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-orange-connectivity/build/usage_collector_orange_connectivity_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #     - type: linkdef
+    #       properties:
+    #         target: redis
+    #         values:
+    #           URL: redis://0.0.0.0:6379/
 
-    - name: dropbox_syncstor_composite_horizontal
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/dropbox-syncstor-composite-horizontal-rating-agent/build/dropbox_syncstor_composite_horizontal_rating_agent_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
+    # - name: dropbox_syncstor_composite_horizontal
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/dropbox-syncstor-composite-horizontal-rating-agent/build/dropbox_syncstor_composite_horizontal_rating_agent_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
 
-    - name: aws_stor
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/aws-stor-rating-agent/build/aws_stor_rating_agent_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
+    # - name: aws_stor
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/aws-stor-rating-agent/build/aws_stor_rating_agent_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
 
 
 
-    - name: orange_connectivity
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/orange-connectivity-rating-agent/build/orange_connectivity_rating_agent_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
+    # - name: orange_connectivity
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/rating-agents/orange-connectivity-rating-agent/build/orange_connectivity_rating_agent_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
 
-    - name: rating-orange-inventory
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/mocks/orange-customer-product-inventory/build/orange_customer_product_inventory_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-        - type: linkdef
-          properties:
-            target: redis
-            values:
-              URL: redis://0.0.0.0:6379/
+    # - name: rating-orange-inventory
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/mocks/orange-customer-product-inventory/build/orange_customer_product_inventory_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #     - type: linkdef
+    #       properties:
+    #         target: redis
+    #         values:
+    #           URL: redis://0.0.0.0:6379/
 
-    - name: usage-collector-orange
-      type: actor
-      properties:
-        image: file:////Users/redaelsayed/Reda/Work/OLE/Projects/rating/distributed-rating-poc/usage-collectors/usage-collector-orange/build/usage_collector_orange_s.wasm
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-        - type: linkdef
-          properties:
-            target: redis
-            values:
-              URL: redis://0.0.0.0:6379/
+    # - name: usage-collector-orange
+    #   type: actor
+    #   properties:
+    #     image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/usage-collectors/usage-collector-orange/build/usage_collector_orange_s.wasm
+    #   traits:
+    #     - type: spreadscaler
+    #       properties:
+    #         replicas: 1
+    #     - type: linkdef
+    #       properties:
+    #         target: redis
+    #         values:
+    #           URL: redis://0.0.0.0:6379/
 
     - name: httpserver
       type: capability
