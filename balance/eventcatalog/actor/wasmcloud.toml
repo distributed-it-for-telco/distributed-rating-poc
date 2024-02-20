@@ -1,0 +1,7 @@
+name = "BankAccountCatalog"
+language = "rust"
+type = "actor"
+
+[actor]
+key_directory = "./.keys"
+claims = ["wasmcloud:httpserver"]

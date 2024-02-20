@@ -1,0 +1,17 @@
+{
+  "$id": "CreateBalance.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CreateBalance",
+  "type": "object",
+  "properties": {
+    "balance": {
+      "type": "integer",
+      "description": "balance"
+    },
+    "partyId": {
+      "type": "string",
+      "description": "The ID of the party"
+    }
+  },
+  "required": ["balance",  "partyId"]
+}
