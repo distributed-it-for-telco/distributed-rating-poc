@@ -250,3 +250,11 @@ structure UsageProofRequest {
     productName: String,
 }
 
+structure DeductBalance {
+    @required
+    commandType: String,
+    @required
+    key: String,
+    @required
+    data: String
+}
