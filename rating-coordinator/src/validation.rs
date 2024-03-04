@@ -1,8 +1,8 @@
 use std::collections::{HashMap, VecDeque};
 
 use rating_interface::{
-    Agent, AgentIdentifiation, RatingAgent, RatingAgentSender, RatingProcessRequest, RatingRequest,
-    RatingResponse, RatingResponseBuilder, Usage, ValidationRequest, ValidationResponse,
+    Agent, RatingAgent, RatingAgentSender, RatingProcessRequest, RatingRequest,
+    RatingResponse, RatingResponseBuilder, ValidationRequest, ValidationResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -36,7 +36,7 @@ pub async fn handle_validation_cycle(
         rating_process_request.rating_request.agent_id
     );
 
-    let mut validation_response = ValidationResponse::default();
+    let mut validation_response ;
     let mut rating_response_builder = RatingResponseBuilder::new();
 
     let mut visited: HashMap<String, bool> = HashMap::new();

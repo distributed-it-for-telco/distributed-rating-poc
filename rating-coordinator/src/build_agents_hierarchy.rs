@@ -1,8 +1,7 @@
 use async_recursion::async_recursion;
 use rating_interface::{
     Agent, AgentIdentifiation, AgentList, GetChildrenRequest, RatingAgent, RatingAgentSender,
-    RatingProcessRequest, RatingRequest, RatingResponse, RatingResponseBuilder, Usage,
-    ValidationRequest, ValidationResponse,
+    RatingRequest
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
@@ -13,10 +12,10 @@ pub async fn build_agent_hierarchy(
     _ctx: &Context,
     rating_request: &RatingRequest,
 ) -> RpcResult<AgentGraph> {
-    let mut agentGraph = AgentGraph::new();
+    let mut agent_graph = AgentGraph::new();
 
     info!("Add Root to Graph ......");
-    let mut root: Agent = Agent {
+    let root: Agent = Agent {
         identifiation: AgentIdentifiation {
             name: rating_request.agent_id.to_owned(),
             partner_id: rating_request.customer_id.to_owned(),
@@ -24,11 +23,11 @@ pub async fn build_agent_hierarchy(
         usage: Some(rating_request.usage.to_owned()),
     };
 
-    agentGraph.add_vertex(root.clone());
-    agentGraph.set_start_vertex(root.clone());
-    attach_children(&_ctx, &rating_request, &mut agentGraph, root).await?;
+    agent_graph.add_vertex(root.clone());
+    agent_graph.set_start_vertex(root.clone());
+    attach_children(&_ctx, &rating_request, &mut agent_graph, root).await?;
 
-    Ok(agentGraph)
+    Ok(agent_graph)
 }
 
 #[async_recursion]
