@@ -1,4 +1,4 @@
-# Bank Account Event Catalog
+# Party Balance Event Catalog
 
 This is the event catalog for the balance service. You can either run the event catalog locally or compile it into a component.
 

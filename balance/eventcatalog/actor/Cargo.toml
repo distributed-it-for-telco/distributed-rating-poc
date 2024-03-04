@@ -1,12 +1,12 @@
 [package]
-name = "bankaccountcatalog"
-version = "0.2.0"
-authors = ["Cosmonic Team"]
+name = "balancecatalog"
+version = "0.1.0"
+authors = ["Orange"]
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "bankaccountcatalog"
+name = "balancecatalog"
 
 [dependencies]
 async-trait = "0.1"
