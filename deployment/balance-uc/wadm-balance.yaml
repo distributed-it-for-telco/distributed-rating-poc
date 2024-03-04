@@ -1,0 +1,183 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: balance-management
+  annotations:
+    version: v0.3.0
+    description: "The party balance management usecase"
+spec:
+  components:
+    - name: api-gateway
+      type: actor
+      properties:
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/api-gateway/build/api_gateway_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: stargate
+                requirements:
+                  # hostcore.os: macos
+                  stargate: "true"
+        - type: linkdef
+          properties:
+            target: httpserver
+            # values:
+            #   address: 0.0.0.0:8070
+
+    - name: rating-coordinator
+      type: actor
+      properties:
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-coordinator/build/rating_coordinator_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: stargate
+                requirements:
+                  # hostcore.os: macos
+                  stargate: "true"
+
+    - name: postpaid-orange-vod-oneshot-cqrs-agent
+      type: actor
+      properties:
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/prepaid-orange-vod-oneshot-cqrs-agent/build/prepaid_orange_vod_oneshot_cqrs_agent_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+        - type: linkdef
+          properties:
+            target: messaging
+    
+    - name: catalog
+      type: actor
+      properties:
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance/eventcatalog/actor/build/balancecatalog_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: stargate
+                requirements:
+                  # hostcore.os: macos
+                  stargate: "true"
+        - type: linkdef
+          properties:
+            target: httpserver
+
+    - name: projector
+      type: actor
+      properties:
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance/projector/build/balance_projector_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: stargate
+                requirements:
+                  # hostcore.os: macos
+                  stargate: "true"
+        - type: linkdef
+          properties:
+            target: concordance
+            values:
+              NAME: balance_projector
+              ROLE: projector
+              INTEREST: balance_created,balance_deposited,balance_deducted
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+
+    - name: aggregate
+      type: actor
+      properties:
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance/aggregate/build/balance_aggregate_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: stargate
+                requirements:
+                  # hostcore.os: macos
+                  stargate: "true"
+        - type: linkdef
+          properties:
+            target: concordance
+            values:
+              ROLE: aggregate
+              INTEREST: balance
+              NAME: balance
+              KEY: partyId
+
+    - name: concordance
+      type: capability
+      properties:
+        config:
+          js_domain: cosmonic
+          nats_url: 0.0.0.0:4222
+        contract: cosmonic:eventsourcing
+        image: registry.hub.docker.com/cosmonic/concordance:0.1.0
+      traits:
+        - properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  cosmonic_managed: "true"
+          type: spreadscaler
+
+    - name: redis
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/kvredis:0.21.0
+        contract: wasmcloud:keyvalue
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: stargate
+                requirements:
+                  # hostcore.os: macos
+                  stargate: "true"
+
+    - name: httpserver
+      type: capability
+      properties:
+        image: cosmonic.azurecr.io/httpserver_wormhole:0.6.2
+        contract: wasmcloud:httpserver
+      traits:
+        - properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  cosmonic_managed: "true"
+          type: spreadscaler
+    
+    - name: messaging
+      type: capability
+      properties:
+        contract: wasmcloud:messaging
+        image: wasmcloud.azurecr.io/nats_messaging:0.17.4
+      traits:
+        - properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  cosmonic_managed: "true"
+          type: spreadscaler
