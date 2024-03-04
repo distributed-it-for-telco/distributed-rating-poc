@@ -3,7 +3,7 @@ use crate::*;
 impl From<BalanceCreated> for BalanceAggregateState {
     fn from(input: BalanceCreated) -> BalanceAggregateState {
         BalanceAggregateState {
-            balance: input.balance.unwrap_or(0) as _,
+            balance: input.balance as _,
             party_id: input.party_id,
         }
     }
@@ -47,7 +47,7 @@ pub(crate) fn apply_balance_deducted(
             None::<BalanceAggregateState>,
         ));
     };
-    let state = state.withdraw(input.amount as u32);
+    let state = state.deduct(input.amount as u32);
     Ok(StateAck::ok(Some(state)))
 }
 

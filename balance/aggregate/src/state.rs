@@ -1,4 +1,4 @@
-use crate::;
+use crate::*;
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
 pub struct BalanceAggregateState {
@@ -6,7 +6,7 @@ pub struct BalanceAggregateState {
     pub party_id: String,
 }
 
-impl BankAccountAggregateState {
+impl BalanceAggregateState {
     /// Returns the regular balance
     pub fn available_balance(&self) -> u32 {
         self.balance

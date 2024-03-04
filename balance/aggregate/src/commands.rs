@@ -51,14 +51,14 @@ pub(crate) fn handle_deposit_balance(
         ));
     };
 
-    if input.amount as u32 < 0 {
+    if input.amount < 0 {
         error!("Rejecting command to deposit balance with negative amount");
         Ok(vec![])
     } else {
         Ok(vec![Event::new(
             BalanceDeposited::TYPE,
             STREAM,
-            &FundsDeposited {
+            &BalanceDeposited {
                 amount: input.amount,
                 party_id: input.party_id,
             },

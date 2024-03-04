@@ -1,5 +1,4 @@
 use anyhow::Result;
-use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use wasmcloud_interface_logging::error;
@@ -54,7 +53,7 @@ impl BalanceAggregate for BalanceAggregateImpl {
     fn apply_balance_deposited(
         &self,
         input: BalanceDeposited,
-        state: Option<BankAccountAggregateState>,
+        state: Option<BalanceAggregateState>,
     ) -> anyhow::Result<StateAck> {
         events::apply_balance_deposited(input, state)
     }
