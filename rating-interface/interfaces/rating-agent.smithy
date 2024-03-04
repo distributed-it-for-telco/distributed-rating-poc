@@ -10,12 +10,12 @@
 // Tell the code generator how to reference symbols defined in this namespace
 metadata package = [ 
   { 
-    namespace: "co.uk.orange.rating.agent",
+    namespace: "co.uk.orange.rating",
     crate: "rating_interface"
   }
 ]
 
-namespace co.uk.orange.rating.agent
+namespace co.uk.orange.rating
 
 use org.wasmcloud.model#U16
 use org.wasmcloud.model#wasmbus

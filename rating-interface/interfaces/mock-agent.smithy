@@ -1,11 +1,4 @@
-metadata package = [ 
-  { 
-    namespace: "co.uk.orange.rating.mock",
-    crate: "rating_interface"
-  }
-]
-
-namespace co.uk.orange.rating.mock
+namespace co.uk.orange.rating
 
 use org.wasmcloud.model#U16
 use org.wasmcloud.model#wasmbus
