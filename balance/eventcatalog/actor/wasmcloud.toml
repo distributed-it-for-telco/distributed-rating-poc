@@ -1,4 +1,4 @@
-name = "BankAccountCatalog"
+name = "BalanceCatalog"
 language = "rust"
 type = "actor"
 
