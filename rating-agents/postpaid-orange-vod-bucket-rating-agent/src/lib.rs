@@ -94,7 +94,6 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
         arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
-        validation_response.next_agent = None;
 
         validation_response.valid = true;
 
