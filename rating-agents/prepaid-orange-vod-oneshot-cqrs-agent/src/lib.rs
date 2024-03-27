@@ -1,7 +1,7 @@
 use rating_interface::{
-    AgentList, BalanceAccessManager, GetChildrenRequest, KeyValueStoreWrapper,
-     RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse, 
-     RatingResponseBuilder, ValidationRequest, ValidationResponse, DeductBalance
+    AgentList, DeductBalance, GetChildrenRequest, KeyValueStoreWrapper, RatingAgent,
+    RatingAgentReceiver, RatingRequest, RatingResponse, RatingResponseBuilder, ValidationRequest,
+    ValidationResponse,
 };
 use serde_json::json;
 use wasmbus_rpc::actor::prelude::*;
@@ -30,10 +30,17 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
         let customer_id = &_arg.customer_id;
 
         let mut rating_response_builder = RatingResponseBuilder::new();
-        let balance_access_manager = BalanceAccessManager::default();
 
         let balance_key = format!("balance.{customer_id}");
-        let balance_value = KeyValueStoreWrapper::get(_ctx, &balance_key).await?.parse::<u32>().unwrap_or(0);
+
+        info!("balance key is: {}", balance_key);
+
+        let balance_value = KeyValueStoreWrapper::get(_ctx, &balance_key)
+            .await?
+            .parse::<u32>()
+            .unwrap_or(0);
+
+        info!("balance for customer {} is: {}", customer_id, balance_key);
 
         let rating = calc_rate(usage);
 
@@ -53,22 +60,27 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
             });
 
             let deduct_balance_command = DeductBalance {
-                command_type: "DeductBalance".to_string(),
+                command_type: "deduct_balance".to_string(),
                 key: customer_id.to_string(),
                 data: data.to_string(),
             };
 
             let provider = MessagingSender::new();
-            provider.publish(
-                _ctx,
-                &PubMessage {
-                    body: serde_json::to_vec(&deduct_balance_command).unwrap(),
-                    reply_to: None,
-                    subject: BALANCE_COMMANDS_TOPIC.to_owned(),
-                },
-            ).await;
+            let _ = provider
+                .publish(
+                    _ctx,
+                    &PubMessage {
+                        body: serde_json::to_vec(&deduct_balance_command).unwrap(),
+                        reply_to: None,
+                        subject: BALANCE_COMMANDS_TOPIC.to_owned(),
+                    },
+                )
+                .await;
 
-            let new_balance_value = KeyValueStoreWrapper::get(_ctx, &balance_key).await?.parse::<u32>().unwrap_or(0);
+            let new_balance_value = KeyValueStoreWrapper::get(_ctx, &balance_key)
+                .await?
+                .parse::<u32>()
+                .unwrap_or(0);
 
             rating_response_builder
                 .unit((&"EUR").to_string())
@@ -79,8 +91,7 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
                 ))
                 .message(&format!(
                     " Your Balance now is {} {}",
-                    new_balance_value,
-                    "EUR"
+                    new_balance_value, "EUR"
                 ))
                 .authorized();
 
@@ -100,8 +111,8 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
 
     async fn validate(
         &self,
-        ctx: &Context,
-        arg: &ValidationRequest,
+        _ctx: &Context,
+        _arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
 
@@ -110,7 +121,11 @@ impl RatingAgent for PrepaidOrangeVodOneshotAgentActor {
         Ok(validation_response)
     }
 
-    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+    async fn get_children(
+        &self,
+        _ctx: &Context,
+        _arg: &GetChildrenRequest,
+    ) -> RpcResult<AgentList> {
         Ok(AgentList::new())
     }
 }

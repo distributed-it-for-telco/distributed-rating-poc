@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: balance-management
   annotations:
-    version: v0.3.0
+    version: v0.1.0
     description: "The party balance management usecase"
 spec:
   components:
@@ -23,8 +23,6 @@ spec:
         - type: linkdef
           properties:
             target: httpserver
-            # values:
-            #   address: 0.0.0.0:8070
 
     - name: rating-coordinator
       type: actor
@@ -56,6 +54,8 @@ spec:
         - type: linkdef
           properties:
             target: messaging
+            # values:
+            #   SUBSCRIPTION: cc.commands.balance
     
     - name: catalog
       type: actor
@@ -138,6 +138,14 @@ spec:
                 requirements:
                   cosmonic_managed: "true"
           type: spreadscaler
+        # - type: spreadscaler
+        #   properties:
+        #     replicas: 1
+        #     spread:
+        #       - name: stargate
+        #         requirements:
+        #           # hostcore.os: macos
+        #           stargate: "true"
 
     - name: redis
       type: capability
@@ -149,14 +157,22 @@ spec:
           properties:
             replicas: 1
             spread:
-              - name: stargate
+              - name: oncosmonic
                 requirements:
-                  # hostcore.os: macos
-                  stargate: "true"
+                  cosmonic_managed: "true"
+        # - type: spreadscaler
+        #   properties:
+        #     replicas: 1
+        #     spread:
+        #       - name: stargate
+        #         requirements:
+        #           # hostcore.os: macos
+        #           stargate: "true"
 
     - name: httpserver
       type: capability
       properties:
+        # image: wasmcloud.azurecr.io/httpserver:0.17.0
         image: cosmonic.azurecr.io/httpserver_wormhole:0.6.2
         contract: wasmcloud:httpserver
       traits:
@@ -167,10 +183,21 @@ spec:
                 requirements:
                   cosmonic_managed: "true"
           type: spreadscaler
+        # - type: spreadscaler
+        #   properties:
+        #     replicas: 1
+        #     spread:
+        #       - name: stargate
+        #         requirements:
+        #           # hostcore.os: macos
+        #           stargate: "true"
     
     - name: messaging
       type: capability
       properties:
+        # config:
+        #   js_domain: cosmonic
+        #   nats_url: 0.0.0.0:4222
         contract: wasmcloud:messaging
         image: wasmcloud.azurecr.io/nats_messaging:0.17.4
       traits:
@@ -181,3 +208,11 @@ spec:
                 requirements:
                   cosmonic_managed: "true"
           type: spreadscaler
+        # - type: spreadscaler
+        #   properties:
+        #     replicas: 1
+        #     spread:
+        #       - name: stargate
+        #         requirements:
+        #           # hostcore.os: macos
+        #           stargate: "true"

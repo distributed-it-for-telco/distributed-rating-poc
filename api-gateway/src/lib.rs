@@ -132,7 +132,7 @@ async fn request_rate(
     _request: RatingRequest,
     request_headers: HashMap<String, String>,
 ) -> RpcResult<HttpResponse> {
-    let mut rating_process_request = RatingProcessRequest::default();
+    let mut rating_process_request: RatingProcessRequest = RatingProcessRequest::default();
     rating_process_request.headers = Some(request_headers);
     rating_process_request.rating_request = _request;
 

@@ -1,0 +1,9 @@
+{
+    "command_type": "deduct_balance", 
+    "key": "ABC123", 
+    "data": 
+        {
+            "amount": 5, 
+            "partyId": "ABC123"
+        }
+}
