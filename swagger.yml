@@ -3,7 +3,7 @@ info:
   title: WasmCloud Rating
   version: 1.0.0
 servers:
-- url: https://weathered-mountain-8378.cosmonic.app/
+- url: ''
 tags:
 - name: Rating
   externalDocs:
@@ -14,7 +14,7 @@ paths:
     post:
       tags:
       - Rating
-      summary: Rate user usage
+      summary: Rate party usage
       operationId: rateUsage
       requestBody:
         description: Usage that needs to be rated
@@ -22,14 +22,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RatingRequest'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/RatingRequest'
         required: true
       responses:
         200:
           description: successful operation
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingResponse'
         400:
           description: Invalid username supplied
           content: {}
@@ -77,14 +77,32 @@ components:
       type: object
       properties:
         customerId:
+          description: 'Party Id who is using the service'
           type: string
         usage:
-          type: string
+          description: 'usage list'
+          type: array
+          items: 
+            $ref: "#/components/schemas/UsageCharacteristic"
         agentId:
+          description: "The agent id aka actor call alias, to be used as the rating agent for this request"
           type: string
       xml:
         name: RatingRequest
-    ApiResponse:
+    UsageCharacteristic:
+      type: object
+      description: 'Describes usage characteristic of some product'
+      properties:
+        name:
+          description: "Name of the usage characteristic"
+          type: "string"
+        value:
+          description: "Value of the usage characteristic"
+          type: "string"
+        valueType:
+          description: "Data type of the value of the usage characteristic"
+          type: "string"
+    RatingResponse:
       type: object
       properties:
         code:
