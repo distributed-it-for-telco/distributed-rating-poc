@@ -11,10 +11,11 @@ use wasmcloud_interface_logging::info;
 #[services(Actor, RatingAgent)]
 struct OrangeVodMetaverseAgentActor {}
 
-const BUCKET_KEY_PREFIX: &str = "bucket";
+// const BUCKET_KEY_PREFIX: &str = "bucket";
+const ROOM_ENTRING_COST: f32 = 1.0;
 const MOVIE_COST: f32 = 2.0;
 const MOVIE_OFFER_ID: &str = "metaverse-vod";
-const ROOM_OFFER_ID: &str = "metaverse-room-access";
+// const ROOM_OFFER_ID: &str = "metaverse-room-access";
 const ROOM_USAGE_NAME: &str = "room-entering-usage";
 const MOVIE_USAGE_NAME: &str = "movie-usage";
 
@@ -71,58 +72,75 @@ async fn handle_room_rating(
     advertiser_id: &String,
     usage_characteristic: &UsageCharacteristic,
 ) -> RpcResult<RatingResponse> {
-    let usage = usage_characteristic.value.parse::<f32>().unwrap();
-
-    let mut rating_response_builder = RatingResponseBuilder::new();
-
-    let bucket_key = format!("{}:{}:{}", BUCKET_KEY_PREFIX, advertiser_id, ROOM_OFFER_ID);
-
-    let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key.as_str()).await?;
-
-    // not depending on the balance <=0  but calc rate and keep sufficient
-    //balance in has_sufficient_balance to centralize the decision..
-    // may be we have a case the customer has 0 balance but he still can use the service ...... [to be validated]
-
-    if bucket.characteristic_count() > 0 {
-        info!(
-            "Usage {} , Bucket {} ",
-            usage,
-            bucket.characteristic_count()
-        );
-
-        bucket.decrement_characteristic_count();
-
-        BucketAccessManager::save(_ctx, bucket_key.as_str(), &bucket).await?;
-
-        rating_response_builder
-            .unit(bucket.characteristic_unit().to_string())
-            .price((&"1").to_string())
-            .message(&format!(
-                " Your Bucket now has {} {}",
-                bucket.characteristic_count(),
-                bucket.characteristic_unit()
-            ))
-            .authorized();
-
-        info!(
-            "Usage {} , Bucket {} ",
-            usage,
-            bucket.characteristic_count()
-        );
-    } else {
-        rating_response_builder
-            .message(&"You have insufficient room access tokens in your bucket")
-            .not_authorized();
-    }
-    let rating_response = rating_response_builder.build();
-
-    RpcResult::Ok(rating_response)
+   return handle_rating(&_ctx, &advertiser_id, &usage_characteristic,ROOM_ENTRING_COST).await;
 }
+
+// async fn handle_room_rating(
+//     _ctx: &Context,
+//     advertiser_id: &String,
+//     usage_characteristic: &UsageCharacteristic,
+// ) -> RpcResult<RatingResponse> {
+//     let usage = usage_characteristic.value.parse::<f32>().unwrap();
+
+//     let mut rating_response_builder = RatingResponseBuilder::new();
+
+//     let bucket_key = format!("{}:{}:{}", BUCKET_KEY_PREFIX, advertiser_id, ROOM_OFFER_ID);
+
+//     let mut bucket: Bucket = BucketAccessManager::get(_ctx, bucket_key.as_str()).await?;
+
+//     // not depending on the balance <=0  but calc rate and keep sufficient
+//     //balance in has_sufficient_balance to centralize the decision..
+//     // may be we have a case the customer has 0 balance but he still can use the service ...... [to be validated]
+
+//     if bucket.characteristic_count() > 0 {
+//         info!(
+//             "Usage {} , Bucket {} ",
+//             usage,
+//             bucket.characteristic_count()
+//         );
+
+//         bucket.decrement_characteristic_count();
+
+//         BucketAccessManager::save(_ctx, bucket_key.as_str(), &bucket).await?;
+
+//         rating_response_builder
+//             .unit(bucket.characteristic_unit().to_string())
+//             .price((&"1").to_string())
+//             .message(&format!(
+//                 " Your Bucket now has {} {}",
+//                 bucket.characteristic_count(),
+//                 bucket.characteristic_unit()
+//             ))
+//             .authorized();
+
+//         info!(
+//             "Usage {} , Bucket {} ",
+//             usage,
+//             bucket.characteristic_count()
+//         );
+//     } else {
+//         rating_response_builder
+//             .message(&"You have insufficient room access tokens in your bucket")
+//             .not_authorized();
+//     }
+//     let rating_response = rating_response_builder.build();
+
+//     RpcResult::Ok(rating_response)
+// }
 
 async fn handle_movie_rating(
     _ctx: &Context,
     customer_id: &String,
     usage_characteristic: &UsageCharacteristic,
+) -> RpcResult<RatingResponse> {
+    return handle_rating(&_ctx, &customer_id, &usage_characteristic,MOVIE_COST).await;
+}
+
+async fn handle_rating(
+    _ctx: &Context,
+    customer_id: &String,
+    usage_characteristic: &UsageCharacteristic,
+    decrement_cost: f32
 ) -> RpcResult<RatingResponse> {
     let usage = usage_characteristic.value.parse::<f32>().unwrap();
 
@@ -133,7 +151,7 @@ async fn handle_movie_rating(
         .get_balance(_ctx, customer_id, MOVIE_OFFER_ID)
         .await?;
 
-    let rating = calc_rate(usage);
+    let rating = calc_rate(usage,decrement_cost);
 
     // not depending on the balance <=0  but calc rate and keep sufficient
     //balance in has_sufficient_balance to centralize the decision..
@@ -184,6 +202,6 @@ fn has_sufficient_balance(balance: f32, charge: f32) -> bool {
     }
 }
 
-fn calc_rate(usage: f32) -> f32 {
-    MOVIE_COST * usage
+fn calc_rate(usage: f32,DECREMENT_COST: f32) -> f32 {
+    DECREMENT_COST * usage
 }
