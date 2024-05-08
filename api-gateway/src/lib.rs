@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
 use rating_interface::{
-    CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender,
-    RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest, RatingRequest,
-    UsageCollector, UsageCollectorSender,
+ CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender, RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest, RatingRequest, UsageCollector, UsageCollectorSender
 };
+
+use BalanceManager;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -55,6 +55,11 @@ impl HttpServer for ApiGatewayActor {
             ("GET", ["party", party_id, "offers", inventory_agent_id]) => {
                 get_party_offers(ctx, party_id, inventory_agent_id).await
             }
+
+            ("POST", ["usage","balance","topup"]) => {
+                topup_balance(ctx, deser(&req.body)).await
+            }
+
             (_, _) => Ok(HttpResponse::not_found()),
         }
     }
@@ -192,4 +197,31 @@ fn get_response_headers() -> HashMap<String, Vec<String>> {
         vec!["https://editor.swagger.io".to_owned()],
     );
     headers
+}
+
+
+
+async fn topup_balance(
+    _ctx: &Context,
+    _request: RatingRequest
+) -> RpcResult<HttpResponse> {
+    let mut rating_process_request = RatingProcessRequest::default();
+    rating_process_request.rating_request = _request;
+
+    let balance = BalanceManager::to_actor("balance_manager")
+        .deposit(_ctx, &rating_process_request)
+        .await?;
+
+    
+    let mut headers: HashMap<String, Vec<String>> = HashMap::new();
+    headers.insert(
+        "Access-Control-Allow-Headers".to_owned(),
+        vec!["Content-Type, api_key, Authorization".to_string()],
+    );
+    headers.insert(
+        "Access-Control-Allow-Origin".to_owned(),
+        vec!["https://editor.swagger.io".to_owned()],
+    );
+
+    HttpResponse::json_with_headers(rating, 200, headers)
 }

@@ -1,0 +1,26 @@
+[package]
+name = "balance-manager"
+version = "0.1.0"
+authors = [ "" ]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "balance_manager"
+
+[dependencies]
+async-trait = "0.1"
+futures = "0.3"
+serde_bytes = "0.11"
+serde_json ="1.0"
+serde = {version = "1.0", features = ["derive"]}
+
+wasmbus-rpc = "0.15"
+wasmcloud-interface-keyvalue = "0.12"
+wasmcloud-interface-httpserver = "0.12"
+
+[profile.release]
+# Optimize for small code size
+lto = true
+opt-level = "s"
+strip = true
