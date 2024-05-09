@@ -9,7 +9,9 @@ wash down
 echo "Waiting for host to stop"
 sleep 5
 
-wash up --wasmcloud-version v0.78.0-rc6 --nats-websocket-port 4001 --experimental -d
+wash up --nats-websocket-port 4001 --experimental -d
+
+# wash up --wasmcloud-version v0.78.0-rc6 --nats-websocket-port 4001 --experimental -d
 
 echo "Waiting for everything to start"
 sleep 10

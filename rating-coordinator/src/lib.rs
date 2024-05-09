@@ -2,13 +2,13 @@ mod agent_graph;
 mod build_agents_hierarchy;
 mod rating;
 mod validation;
-use agent_graph::*;
+
 use build_agents_hierarchy::*;
 use rating::*;
 use validation::*;
 
 use rating_interface::{
-    RatingCoordinator, RatingCoordinatorReceiver, RatingProcessRequest, RatingResponse, Usage,
+    RatingCoordinator, RatingCoordinatorReceiver, RatingProcessRequest, RatingResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;

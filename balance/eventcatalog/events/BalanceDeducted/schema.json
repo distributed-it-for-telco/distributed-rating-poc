@@ -1,0 +1,18 @@
+{
+    "$id": "BalanceDeducted.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "BalanceDeducted",
+    "type": "object",
+    "properties": {
+      "amount": {
+        "type": "integer",
+        "description": "Amount to deducted from balance"
+      },
+      "partyId": {
+        "type": "string",
+        "description": "The ID of the party"
+      }
+    },
+    "required": ["amount",  "partyId"]
+  }
+  

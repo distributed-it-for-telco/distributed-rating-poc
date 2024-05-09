@@ -1,0 +1,9 @@
+{
+    "command_type": "create_balance", 
+    "key": "ABC123", 
+    "data": 
+        {
+            "balance": 100000, 
+            "partyId": "ABC123"
+        }
+}

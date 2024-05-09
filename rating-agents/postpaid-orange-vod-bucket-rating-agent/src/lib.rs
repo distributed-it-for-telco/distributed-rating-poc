@@ -1,7 +1,8 @@
 use rating_interface::{
-    Bucket, BucketAccessManager, RatingAgent, RatingAgentReceiver, RatingRequest, RatingResponse,
-    RatingResponseBuilder, Usage, UsageCollector, UsageCollectorSender, UsageProofHandler,
-    UsageProofRequest, ValidationRequest, ValidationResponse,GetChildrenRequest,AgentList
+    AgentList, Bucket, BucketAccessManager, GetChildrenRequest, RatingAgent, RatingAgentReceiver,
+    RatingRequest, RatingResponse, RatingResponseBuilder, Usage, UsageCollector,
+    UsageCollectorSender, UsageProofHandler, UsageProofRequest, ValidationRequest,
+    ValidationResponse,
 };
 
 use wasmbus_rpc::actor::prelude::*;
@@ -90,21 +91,22 @@ impl RatingAgent for PostpaidOrangeVodBucketRatingAgentActor {
 
     async fn validate(
         &self,
-        ctx: &Context,
-        arg: &ValidationRequest,
+        _ctx: &Context,
+        _arg: &ValidationRequest,
     ) -> RpcResult<ValidationResponse> {
         let mut validation_response: ValidationResponse = ValidationResponse::default();
-        validation_response.next_agent = None;
-
         validation_response.valid = true;
 
         Ok(validation_response)
     }
 
-    async fn get_children(&self, ctx: &Context, arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+    async fn get_children(
+        &self,
+        _ctx: &Context,
+        _arg: &GetChildrenRequest,
+    ) -> RpcResult<AgentList> {
         Ok(AgentList::new())
     }
-
 }
 
 async fn get_party_bucket(_ctx: &Context, bucket_key: &str) -> RpcResult<Bucket> {

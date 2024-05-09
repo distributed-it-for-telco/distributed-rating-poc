@@ -2,7 +2,7 @@
 path = "./interfaces"
 files = [
     "rating-agent.smithy",
-    "mock-agent.smithy" 
+    "mock-agent.smithy"
 ]
 
 [[models]]
@@ -22,8 +22,5 @@ output_dir = "."
 
 [[rust.files]]
 path = "rust/src/interface.rs"
-namespace = "co.uk.orange.rating.agent"
+namespace = "co.uk.orange.rating"
 
-[[rust.files]]
-path = "rust/src/mock.rs"
-namespace = "co.uk.orange.rating.mock"

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use async_recursion::async_recursion;
 use rating_interface::{
     Agent, RatingAgent, RatingAgentSender, RatingProcessRequest, RatingRecord, RatingRequest,
-    RatingResponse, Usage,
+    RatingResponse,
 };
 use wasmbus_rpc::actor::prelude::*;
 use wasmcloud_interface_logging::info;
