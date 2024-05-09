@@ -188,3 +188,85 @@ Proof of concept illustrating a sample implementation of wasmCloud-based distrib
             },
             "agentId":"dropbox_syncstor_composite_horizontal"
         }'
+
+## Metaverse Advertiser offering movies through meta room
+
+  Metaverse advertiser offer vod/ movie service though his meta room.
+
+### Agent
+
+    - orange_vod_metaverse
+
+### Sample Curl Request
+
+#### Room usage
+
+     curl --location --request POST 'http://localhost:8070/usage/rating' \
+        --header 'cf-ipcountry: EG' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+          "customerId":"advertiser1",
+          "usage": {
+            "usageCharacteristicList": [
+                {
+                      "name":"room-entering-usage",
+                      "value":"1",
+                      "valueType":"integer"
+                }
+              ]
+          },   
+          "agentId": "orange_vod_metaverse"
+      }'
+
+##### Response
+
+    {
+        "authorizationStatus": {
+            "code": 200,
+            "key": "This user is authorized to use this service"
+        },
+        "billingInformation": {
+            "messages": [
+                " 1 will be deducted from your balance",
+                " Your Balance now is 992 EUR"
+            ],
+            "price": "1",
+            "unit": "EUR"
+        }
+    }
+
+#### Movie usage
+
+     curl --location --request POST 'http://localhost:8070/usage/rating' \
+        --header 'cf-ipcountry: EG' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+          "customerId":"advertiser1",
+          "usage": {
+            "usageCharacteristicList": [
+                {
+                      "name":"movie-usage",
+                      "value":"1",
+                      "valueType":"integer"
+                }
+              ]
+          },   
+          "agentId": "orange_vod_metaverse"
+      }'
+
+##### Response
+
+    {
+      "authorizationStatus": {
+        "code": 200,
+        "key": "This user is authorized to use this service"
+    },
+      "billingInformation": {
+        "messages": [
+            " 2 will be deducted from your balance",
+            " Your Balance now is 992 EUR"
+        ],
+        "price": "2",
+        "unit": "EUR"
+      }
+    }
