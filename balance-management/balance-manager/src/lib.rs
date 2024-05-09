@@ -1,19 +1,18 @@
 
 use async_trait::async_trait;
 
-use rating_interface::{Balance, KeyValueStoreWrapper};
+use rating_interface::{Balance, BalanceManager, KeyValueStoreWrapper};
 use wasmbus_rpc::{
     actor::prelude::{Actor, HealthResponder, ActorReceiver,RpcError, RpcResult},
     common::Context,
 };
-use wasmbus_rpc::actor::prelude::*;
 use wasmbus_rpc::core::provider::prelude::services;
 
 
 
 
-#[derive(Debug, Default, Actor,HealthResponder)]
-#[services(Actor, BalanceActor)]
+#[derive(Debug, Default, Actor, HealthResponder)]
+#[services(Actor, BalanceManager)]
 pub struct BalanceManagerActor {}
 
 const BALANCE_BUCKET_NAME: &str = "balance";

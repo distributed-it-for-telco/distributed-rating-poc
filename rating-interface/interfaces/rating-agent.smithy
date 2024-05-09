@@ -35,6 +35,14 @@ service RatingAgent {
   operations: [ RateUsage, Validate ,GetChildren]
 }
 
+/// Description of the rating agent service
+@wasmbus( actorReceive: true )
+service BalanceManager {
+  version: "0.1",
+  operations: [ Deposit ]
+}
+
+
 operation HandleRatingProcess {
     input: RatingProcessRequest,
     output: RatingResponse
@@ -53,6 +61,11 @@ operation Validate {
 operation GetChildren {
     input:  GetChildrenRequest,
     output: AgentList
+}
+
+operation Deposit{
+    input: DespoitRequest
+    output: String
 }
 
 
@@ -257,4 +270,14 @@ structure DeductBalance {
     key: String,
     @required
     data: String
+}
+@codegenRust(noDeriveEq: true )
+structure DespoitRequest{
+    @required
+    amount: Float,
+    @required
+    customer_id: String,
+    @required
+    offer_id: String
+
 }
