@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
 use rating_interface::{
- CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender, RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest, RatingRequest, UsageCollector, UsageCollectorSender
+ CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender, RatingCoordinator, RatingCoordinatorSender,
+  RatingProcessRequest, RatingRequest, UsageCollector, UsageCollectorSender, BalanceManager,BalanceManagerSender, DespoitRequest
 };
 
-use BalanceManager;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -57,7 +57,7 @@ impl HttpServer for ApiGatewayActor {
             }
 
             ("POST", ["usage","balance","topup"]) => {
-                topup_balance(ctx, deser(&req.body)).await
+                topup_balance(ctx, deser(&req.body)?).await
             }
 
             (_, _) => Ok(HttpResponse::not_found()),
@@ -203,13 +203,16 @@ fn get_response_headers() -> HashMap<String, Vec<String>> {
 
 async fn topup_balance(
     _ctx: &Context,
-    _request: RatingRequest
+    _request: DespoitRequest
 ) -> RpcResult<HttpResponse> {
-    let mut rating_process_request = RatingProcessRequest::default();
-    rating_process_request.rating_request = _request;
 
-    let balance = BalanceManager::to_actor("balance_manager")
-        .deposit(_ctx, &rating_process_request)
+    let depositRequest = DespoitRequest{
+        amount: 0.0,
+        customer_id:"0".to_string(),
+        offer_id: "0".to_string()
+    };
+    let balance = BalanceManagerSender::to_actor("balance_manager")
+        .deposit(_ctx, &depositRequest)
         .await?;
 
     
@@ -223,5 +226,5 @@ async fn topup_balance(
         vec!["https://editor.swagger.io".to_owned()],
     );
 
-    HttpResponse::json_with_headers(rating, 200, headers)
+    HttpResponse::json_with_headers(balance, 200, headers)
 }
