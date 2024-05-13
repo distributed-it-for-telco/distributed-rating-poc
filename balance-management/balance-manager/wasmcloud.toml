@@ -1,8 +1,8 @@
-name = "balance-manager"
+name = "balance_manager"
 language = "rust"
 type = "actor"
 version = "0.1.0"
 
 [actor]
-claims = ["wasmcloud:httpserver", "wasmcloud:keyvalue"]
+claims = ["wasmcloud:keyvalue"]
 call_alias = "balancemanager"

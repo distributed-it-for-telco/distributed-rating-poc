@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
 use rating_interface::{
- CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender, RatingCoordinator, RatingCoordinatorSender,
-  RatingProcessRequest, RatingRequest, UsageCollector, UsageCollectorSender, BalanceManager,BalanceManagerSender, DespoitRequest
+    BalanceManager, BalanceManagerSender, CustomerInventoryAgent, CustomerInventoryAgentSender,
+    DespoitRequest, MockAgent, MockAgentSender, RatingCoordinator, RatingCoordinatorSender,
+    RatingProcessRequest, RatingRequest, UsageCollector, UsageCollectorSender,
 };
 
 use serde::{Deserialize, Serialize};
@@ -56,9 +57,7 @@ impl HttpServer for ApiGatewayActor {
                 get_party_offers(ctx, party_id, inventory_agent_id).await
             }
 
-            ("POST", ["usage","balance","topup"]) => {
-                topup_balance(ctx, deser(&req.body)?).await
-            }
+            ("POST", ["usage", "balance", "topup"]) => topup_balance(ctx, deser(&req.body)?).await,
 
             (_, _) => Ok(HttpResponse::not_found()),
         }
@@ -199,23 +198,11 @@ fn get_response_headers() -> HashMap<String, Vec<String>> {
     headers
 }
 
-
-
-async fn topup_balance(
-    _ctx: &Context,
-    _request: DespoitRequest
-) -> RpcResult<HttpResponse> {
-
-    let depositRequest = DespoitRequest{
-        amount: 0.0,
-        customer_id:"0".to_string(),
-        offer_id: "0".to_string()
-    };
-    let balance = BalanceManagerSender::to_actor("balance_manager")
-        .deposit(_ctx, &depositRequest)
+async fn topup_balance(_ctx: &Context, _request: DespoitRequest) -> RpcResult<HttpResponse> {
+    let balance = BalanceManagerSender::to_actor("balancemanager")
+        .deposit(_ctx, &_request)
         .await?;
 
-    
     let mut headers: HashMap<String, Vec<String>> = HashMap::new();
     headers.insert(
         "Access-Control-Allow-Headers".to_owned(),
