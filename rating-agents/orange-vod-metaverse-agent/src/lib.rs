@@ -46,8 +46,6 @@ impl RatingAgent for OrangeVodMetaverseAgentActor {
             "Unknown usage name {}",
             _arg.usage.usage_characteristic_list.first().unwrap().name
         ))))
-
-        // let usage: f32 = _arg.usage.parse().unwrap();
     }
 
     async fn validate(
@@ -62,7 +60,11 @@ impl RatingAgent for OrangeVodMetaverseAgentActor {
         Ok(validation_response)
     }
 
-    async fn get_children(&self, _ctx: &Context, _arg: &GetChildrenRequest) -> RpcResult<AgentList> {
+    async fn get_children(
+        &self,
+        _ctx: &Context,
+        _arg: &GetChildrenRequest,
+    ) -> RpcResult<AgentList> {
         Ok(AgentList::new())
     }
 }
@@ -72,23 +74,28 @@ async fn handle_room_rating(
     advertiser_id: &String,
     usage_characteristic: &UsageCharacteristic,
 ) -> RpcResult<RatingResponse> {
-   return handle_rating(&_ctx, &advertiser_id, &usage_characteristic,ROOM_ENTRING_COST).await;
+    return handle_rating(
+        &_ctx,
+        &advertiser_id,
+        &usage_characteristic,
+        ROOM_ENTRING_COST,
+    )
+    .await;
 }
-
 
 async fn handle_movie_rating(
     _ctx: &Context,
     customer_id: &String,
     usage_characteristic: &UsageCharacteristic,
 ) -> RpcResult<RatingResponse> {
-    return handle_rating(&_ctx, &customer_id, &usage_characteristic,MOVIE_COST).await;
+    return handle_rating(&_ctx, &customer_id, &usage_characteristic, MOVIE_COST).await;
 }
 
 async fn handle_rating(
     _ctx: &Context,
     customer_id: &String,
     usage_characteristic: &UsageCharacteristic,
-    decrement_cost: f32
+    unit_charge: f32,
 ) -> RpcResult<RatingResponse> {
     let usage = usage_characteristic.value.parse::<f32>().unwrap();
 
@@ -99,7 +106,7 @@ async fn handle_rating(
         .get_balance(_ctx, customer_id, MOVIE_OFFER_ID)
         .await?;
 
-    let rating = calc_rate(usage,decrement_cost);
+    let rating = calc_rate(usage, unit_charge);
 
     // not depending on the balance <=0  but calc rate and keep sufficient
     //balance in has_sufficient_balance to centralize the decision..
@@ -120,17 +127,21 @@ async fn handle_rating(
             .price(rating.to_string())
             .message(&format!(
                 "{} {} deducted from your balance",
-                rating.to_string(), new_balance.balance_unit()
+                rating.to_string(),
+                new_balance.balance_unit()
             ))
             .message(&format!(
                 " Your Balance now is {} {}",
-                new_balance.balance_count(), new_balance.balance_unit()
+                new_balance.balance_count(),
+                new_balance.balance_unit()
             ))
             .authorized();
 
         info!(
             "Usage {} , Rating {} , & balance {}",
-            usage, rating, new_balance.balance_count()
+            usage,
+            rating,
+            new_balance.balance_count()
         );
     } else {
         rating_response_builder
@@ -150,6 +161,6 @@ fn has_sufficient_balance(balance: f32, charge: f32) -> bool {
     }
 }
 
-fn calc_rate(usage: f32,DECREMENT_COST: f32) -> f32 {
-    DECREMENT_COST * usage
+fn calc_rate(usage: f32, UNIT_CHARGE: f32) -> f32 {
+    UNIT_CHARGE * usage
 }
