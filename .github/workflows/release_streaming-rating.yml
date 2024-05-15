@@ -82,7 +82,7 @@ jobs:
       - name: Determine actor name
         working-directory: ${{ env.working-directory }}
         run: |
-          echo "actor-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].name')" >> $GITHUB_ENV
+          echo "actor-name=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[].targets[].name')" >> $GITHUB_ENV
       - name: Determine actor version
         working-directory: ${{ env.working-directory }}
         if: startswith(github.ref, 'refs/tags/') # Only run on tag push
