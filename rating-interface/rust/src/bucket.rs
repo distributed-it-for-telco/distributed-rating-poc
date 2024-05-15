@@ -39,6 +39,11 @@ impl Bucket {
     pub fn set_characteristic_count(&mut self, count: u16) {
         self.bucket_characteristic.count = count;
     }
+
+    pub fn characteristic_unit(&self) -> &str {
+        self.bucket_characteristic.unit.as_str()
+    }
+    
 }
 
 pub struct BucketAccessManager {}
