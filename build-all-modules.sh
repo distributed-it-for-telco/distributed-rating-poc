@@ -1,18 +1,24 @@
 #!/bin/bash
 set -e
-current=$PWD
+PROJECT_ROOT=$PWD
+
+# Building Api gateway
 cd api-gateway
 wash build
 cd ..
+
+# Building rating coordinator
 cd rating-coordinator
 wash build
 cd ..
-for PASSED in ./rating-agents/*; do
-   if [[ -d $PASSED ]]; then
-    cd $PASSED
-    wash build
-    cd ..
+
+# Building rating agents
+cd rating-agents
+for item in ./*; do
+    if [[ -d "$item" ]]; then
+        cd $item
+        wash build
+        cd ..
     fi
 done
-cd $current
-pwd
+cd $PROJECT_ROOT
