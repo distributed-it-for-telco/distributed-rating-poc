@@ -14,7 +14,7 @@
 #                whether or not VERSION has changed
 # REG_URL      - Registry url, e.g. 'localhost:5000' or 'wasmcloud.azurecr.io'
 # PUSH_REG_CMD - Command to push to registry, for example:
-#                    wash reg push --insecure $(REG_URL)
+#                    wash push --insecure $(REG_URL)
 #
 # 
 # Optional
