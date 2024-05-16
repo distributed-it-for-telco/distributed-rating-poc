@@ -1,0 +1,96 @@
+# This is a full example of how to run the rating-poc example. Using this example requires you to
+# have WADM running: https://github.com/wasmCloud/wadm/tree/main/wadm and a host labeled with
+# `app=rating-poc`. You can deploy this example with two simple commands:
+#
+# `wash app put wadm.yaml`
+# `wash app deploy rating-poc <version>`
+
+# When launching an actor from a local file,
+# ensure that the environment variable WASMCLOUD_ALLOW_FILE_LOAD=true is set when you launch wasmCloud. 
+# This is the default for hosts ran with wash up. 
+
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: rating-poc
+  annotations:
+    version: 0.0.1
+    description: "Distributed Rating POC"
+spec:
+  components:
+    - name: api-gateway
+      type: actor
+      properties:
+        # image: localhost:5001/api_gateway:0.1.0
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/api_gateway:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  cosmonic_managed: "true"
+        - type: linkdef
+          properties:
+            target: httpserver
+          
+    - name: rating-coordinator
+      type: actor
+      properties:
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/rating_coordinator:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  cosmonic_managed: "true"
+
+    - name: orange-vod-metaverse-agent
+      type: actor
+      properties:
+        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/prepaid_orange_vod_oneshot_metaverse_agent:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  cosmonic_managed: "true"
+        - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: redis://0.0.0.0:6379/
+
+    - name: httpserver
+      type: capability
+      properties:
+        # image: wasmcloud.azurecr.io/httpserver:0.17.0
+        image: cosmonic.azurecr.io/httpserver_wormhole:0.6.2
+        contract: wasmcloud:httpserver
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  cosmonic_managed: "true"
+
+    - name: redis
+      type: capability
+      properties:
+        image: wasmcloud.azurecr.io/kvredis:0.21.0
+        contract: wasmcloud:keyvalue
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  cosmonic_managed: "true"
