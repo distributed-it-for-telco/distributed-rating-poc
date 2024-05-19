@@ -3,17 +3,17 @@ info:
   title: WasmCloud Rating
   version: 1.0.0
 servers:
-- url: ''
+  - url: ''
 tags:
-- name: Rating
-  externalDocs:
-    description: Find out more
-    url: http://swagger.io
+  - name: Rating
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
 paths:
   /usage/rating:
     post:
       tags:
-      - Rating
+        - Rating
       summary: Rate party usage
       operationId: rateUsage
       requestBody:
@@ -44,7 +44,7 @@ paths:
   /party/{partyId}/offers/{vendor}:
     get:
       tags:
-      - Inventory
+        - Inventory
       summary: Rate user usage
       operationId: getPartyOffers
       parameters:
@@ -71,6 +71,34 @@ paths:
           description: Invalid input
           content: {}
       x-codegen-request-body-name: body
+
+  /usage/balance/topup:
+    post:
+      tags:
+        - Inventory
+      summary: Topup user balance
+      operationId: topupUserBalance
+      requestBody:
+        description: Usage that needs to be rated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositRequest'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        400:
+          description: Invalid customerId or offerId supplied
+          content: {}
+        405:
+          description: Invalid input
+          content: {}
+      x-codegen-request-body-name: body
 components:
   schemas:
     RatingRequest:
@@ -82,7 +110,7 @@ components:
         usage:
           description: 'usage list'
           type: array
-          items: 
+          items:
             $ref: "#/components/schemas/UsageCharacteristic"
         agentId:
           description: "The agent id aka actor call alias, to be used as the rating agent for this request"
@@ -111,4 +139,26 @@ components:
         type:
           type: string
         message:
+          type: string
+    DepositRequest:
+      type: object
+      properties:
+        customer-id:
+          type: string
+        amount:
+          type: integer
+        offer-id:
+          type: string
+    Balance:
+      type: object
+      properties:
+        balanceCharacteristic:
+          type: object
+          properties:
+            count:
+              type: number
+              format: double
+            unit:
+              type: string
+        party_id:
           type: string
