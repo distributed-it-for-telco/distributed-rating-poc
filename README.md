@@ -270,3 +270,33 @@ Proof of concept illustrating a sample implementation of wasmCloud-based distrib
         "unit": "EUR"
       }
     }
+
+
+## Metaverse User topup their balance
+
+Metaverse User topup their balance
+
+### Agent
+
+    - balancemanager
+
+### Sample Curl Request
+
+     curl --location --request POST 'http://localhost:8070/usage/balance/topup' \
+        --header 'cf-ipcountry: EG' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+          "customerId":"advertiser1",
+          "amount": "10",
+          "offer_id": "metaverse-vod"
+      }'
+
+##### Response
+
+    {
+      "balanceCharacteristic": {
+        "count": 1059.0,
+        "unit": "EUR"
+        },
+      "party_id": ""
+    }
