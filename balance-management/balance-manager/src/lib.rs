@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 use rating_interface::{
-    Balance, BalanceManager, BalanceManagerReceiver, DespoitRequest, KeyValueStoreWrapper,
+    Balance, BalanceManager, BalanceManagerReceiver, DepositRequest, KeyValueStoreWrapper,
 };
 use wasmbus_rpc::{
     actor::prelude::{Actor, ActorReceiver, HealthResponder, RpcResult},
@@ -67,23 +67,23 @@ const BALANCE_BUCKET_NAME: &str = "balance";
 
 #[async_trait]
 impl BalanceManager for BalanceManagerActor {
-    async fn deposit(&self, _ctx: &Context, despoitRequest: &DespoitRequest) -> RpcResult<String> {
-        let balance_key: String = self.get_key(despoitRequest.customer_id.as_str(), despoitRequest.offer_id.as_str());
+    async fn deposit(&self, _ctx: &Context, depositRequest: &DepositRequest) -> RpcResult<Balance> {
 
+        let balance_key: String = self.get_key(depositRequest.customer_id.as_str(), depositRequest.offer_id.as_str());
         let mut balance: Balance = self
             .get_balance(
                 _ctx,
-                despoitRequest.customer_id.as_str(),
-                despoitRequest.offer_id.as_str(),
+                depositRequest.customer_id.as_str(),
+                depositRequest.offer_id.as_str(),
             )
             .await?;
 
         // here we can add any business validations
-        balance.balance_characteristic.count += despoitRequest.amount;
+        balance.balance_characteristic.count += depositRequest.amount;
 
         self.put_to_store(_ctx, &balance_key, balance.clone())
             .await?;
 
-        Ok(balance.balance_characteristic.count.to_string())
+        Ok(balance)
     }
 }

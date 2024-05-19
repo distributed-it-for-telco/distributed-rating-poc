@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use rating_interface::{
     BalanceManager, BalanceManagerSender, CustomerInventoryAgent, CustomerInventoryAgentSender,
-    DespoitRequest, MockAgent, MockAgentSender, RatingCoordinator, RatingCoordinatorSender,
+    DepositRequest, MockAgent, MockAgentSender, RatingCoordinator, RatingCoordinatorSender,
     RatingProcessRequest, RatingRequest, UsageCollector, UsageCollectorSender,
 };
 
@@ -198,7 +198,7 @@ fn get_response_headers() -> HashMap<String, Vec<String>> {
     headers
 }
 
-async fn topup_balance(_ctx: &Context, _request: DespoitRequest) -> RpcResult<HttpResponse> {
+async fn topup_balance(_ctx: &Context, _request: DepositRequest) -> RpcResult<HttpResponse> {
     let balance = BalanceManagerSender::to_actor("balancemanager")
         .deposit(_ctx, &_request)
         .await?;

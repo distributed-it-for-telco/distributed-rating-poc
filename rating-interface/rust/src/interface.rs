@@ -852,104 +852,6 @@ pub fn decode_bucket_characteristic(
     };
     Ok(__result)
 }
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
-pub struct DespoitRequest {
-    #[serde(default)]
-    pub amount: f32,
-    #[serde(default)]
-    pub customer_id: String,
-    #[serde(default)]
-    pub offer_id: String,
-}
-
-// Encode DespoitRequest as CBOR and append to output stream
-#[doc(hidden)]
-#[allow(unused_mut)]
-pub fn encode_despoit_request<W: wasmbus_rpc::cbor::Write>(
-    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
-    val: &DespoitRequest,
-) -> RpcResult<()>
-where
-    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
-{
-    e.map(3)?;
-    e.str("amount")?;
-    e.f32(val.amount)?;
-    e.str("customer_id")?;
-    e.str(&val.customer_id)?;
-    e.str("offer_id")?;
-    e.str(&val.offer_id)?;
-    Ok(())
-}
-
-// Decode DespoitRequest from cbor input stream
-#[doc(hidden)]
-pub fn decode_despoit_request(
-    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
-) -> Result<DespoitRequest, RpcError> {
-    let __result = {
-        let mut amount: Option<f32> = None;
-        let mut customer_id: Option<String> = None;
-        let mut offer_id: Option<String> = None;
-
-        let is_array = match d.datatype()? {
-            wasmbus_rpc::cbor::Type::Array => true,
-            wasmbus_rpc::cbor::Type::Map => false,
-            _ => {
-                return Err(RpcError::Deser(
-                    "decoding struct DespoitRequest, expected array or map".to_string(),
-                ))
-            }
-        };
-        if is_array {
-            let len = d.fixed_array()?;
-            for __i in 0..(len as usize) {
-                match __i {
-                    0 => amount = Some(d.f32()?),
-                    1 => customer_id = Some(d.str()?.to_string()),
-                    2 => offer_id = Some(d.str()?.to_string()),
-                    _ => d.skip()?,
-                }
-            }
-        } else {
-            let len = d.fixed_map()?;
-            for __i in 0..(len as usize) {
-                match d.str()? {
-                    "amount" => amount = Some(d.f32()?),
-                    "customer_id" => customer_id = Some(d.str()?.to_string()),
-                    "offer_id" => offer_id = Some(d.str()?.to_string()),
-                    _ => d.skip()?,
-                }
-            }
-        }
-        DespoitRequest {
-            amount: if let Some(__x) = amount {
-                __x
-            } else {
-                return Err(RpcError::Deser(
-                    "missing field DespoitRequest.amount (#0)".to_string(),
-                ));
-            },
-
-            customer_id: if let Some(__x) = customer_id {
-                __x
-            } else {
-                return Err(RpcError::Deser(
-                    "missing field DespoitRequest.customer_id (#1)".to_string(),
-                ));
-            },
-
-            offer_id: if let Some(__x) = offer_id {
-                __x
-            } else {
-                return Err(RpcError::Deser(
-                    "missing field DespoitRequest.offer_id (#2)".to_string(),
-                ));
-            },
-        }
-    };
-    Ok(__result)
-}
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Customer {
     #[serde(default)]
@@ -1175,6 +1077,104 @@ pub fn decode_deduct_balance(
             } else {
                 return Err(RpcError::Deser(
                     "missing field DeductBalance.key (#2)".to_string(),
+                ));
+            },
+        }
+    };
+    Ok(__result)
+}
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+pub struct DepositRequest {
+    #[serde(default)]
+    pub amount: f32,
+    #[serde(default)]
+    pub customer_id: String,
+    #[serde(default)]
+    pub offer_id: String,
+}
+
+// Encode DepositRequest as CBOR and append to output stream
+#[doc(hidden)]
+#[allow(unused_mut)]
+pub fn encode_deposit_request<W: wasmbus_rpc::cbor::Write>(
+    mut e: &mut wasmbus_rpc::cbor::Encoder<W>,
+    val: &DepositRequest,
+) -> RpcResult<()>
+where
+    <W as wasmbus_rpc::cbor::Write>::Error: std::fmt::Display,
+{
+    e.map(3)?;
+    e.str("amount")?;
+    e.f32(val.amount)?;
+    e.str("customer_id")?;
+    e.str(&val.customer_id)?;
+    e.str("offer_id")?;
+    e.str(&val.offer_id)?;
+    Ok(())
+}
+
+// Decode DepositRequest from cbor input stream
+#[doc(hidden)]
+pub fn decode_deposit_request(
+    d: &mut wasmbus_rpc::cbor::Decoder<'_>,
+) -> Result<DepositRequest, RpcError> {
+    let __result = {
+        let mut amount: Option<f32> = None;
+        let mut customer_id: Option<String> = None;
+        let mut offer_id: Option<String> = None;
+
+        let is_array = match d.datatype()? {
+            wasmbus_rpc::cbor::Type::Array => true,
+            wasmbus_rpc::cbor::Type::Map => false,
+            _ => {
+                return Err(RpcError::Deser(
+                    "decoding struct DepositRequest, expected array or map".to_string(),
+                ))
+            }
+        };
+        if is_array {
+            let len = d.fixed_array()?;
+            for __i in 0..(len as usize) {
+                match __i {
+                    0 => amount = Some(d.f32()?),
+                    1 => customer_id = Some(d.str()?.to_string()),
+                    2 => offer_id = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        } else {
+            let len = d.fixed_map()?;
+            for __i in 0..(len as usize) {
+                match d.str()? {
+                    "amount" => amount = Some(d.f32()?),
+                    "customer_id" => customer_id = Some(d.str()?.to_string()),
+                    "offer_id" => offer_id = Some(d.str()?.to_string()),
+                    _ => d.skip()?,
+                }
+            }
+        }
+        DepositRequest {
+            amount: if let Some(__x) = amount {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field DepositRequest.amount (#0)".to_string(),
+                ));
+            },
+
+            customer_id: if let Some(__x) = customer_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field DepositRequest.customer_id (#1)".to_string(),
+                ));
+            },
+
+            offer_id: if let Some(__x) = offer_id {
+                __x
+            } else {
+                return Err(RpcError::Deser(
+                    "missing field DepositRequest.offer_id (#2)".to_string(),
                 ));
             },
         }
@@ -2934,6 +2934,102 @@ pub fn decode_validation_response(
     };
     Ok(__result)
 }
+/// Description of the rating agent service
+/// wasmbus.actorReceive
+#[async_trait]
+pub trait BalanceManager {
+    async fn deposit(&self, ctx: &Context, arg: &DepositRequest) -> RpcResult<Balance>;
+}
+
+/// BalanceManagerReceiver receives messages defined in the BalanceManager service trait
+/// Description of the rating agent service
+#[doc(hidden)]
+#[async_trait]
+pub trait BalanceManagerReceiver: MessageDispatch + BalanceManager {
+    async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
+        match message.method {
+            "Deposit" => {
+                let value: DepositRequest = wasmbus_rpc::common::deserialize(&message.arg)
+                    .map_err(|e| RpcError::Deser(format!("'DepositRequest': {}", e)))?;
+
+                let resp = BalanceManager::deposit(self, ctx, &value).await?;
+                let buf = wasmbus_rpc::common::serialize(&resp)?;
+
+                Ok(buf)
+            }
+            _ => Err(RpcError::MethodNotHandled(format!(
+                "BalanceManager::{}",
+                message.method
+            ))),
+        }
+    }
+}
+
+/// BalanceManagerSender sends messages to a BalanceManager service
+/// Description of the rating agent service
+/// client for sending BalanceManager messages
+#[derive(Debug)]
+pub struct BalanceManagerSender<T: Transport> {
+    transport: T,
+}
+
+impl<T: Transport> BalanceManagerSender<T> {
+    /// Constructs a BalanceManagerSender with the specified transport
+    pub fn via(transport: T) -> Self {
+        Self { transport }
+    }
+
+    pub fn set_timeout(&self, interval: std::time::Duration) {
+        self.transport.set_timeout(interval);
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'send> BalanceManagerSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
+    /// Constructs a Sender using an actor's LinkDefinition,
+    /// Uses the provider's HostBridge for rpc
+    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
+        Self {
+            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
+        }
+    }
+}
+#[cfg(target_arch = "wasm32")]
+impl BalanceManagerSender<wasmbus_rpc::actor::prelude::WasmHost> {
+    /// Constructs a client for actor-to-actor messaging
+    /// using the recipient actor's public key
+    pub fn to_actor(actor_id: &str) -> Self {
+        let transport =
+            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
+        Self { transport }
+    }
+}
+#[async_trait]
+impl<T: Transport + std::marker::Sync + std::marker::Send> BalanceManager
+    for BalanceManagerSender<T>
+{
+    #[allow(unused)]
+    async fn deposit(&self, ctx: &Context, arg: &DepositRequest) -> RpcResult<Balance> {
+        let buf = wasmbus_rpc::common::serialize(arg)?;
+
+        let resp = self
+            .transport
+            .send(
+                ctx,
+                Message {
+                    method: "BalanceManager.Deposit",
+                    arg: Cow::Borrowed(&buf),
+                },
+                None,
+            )
+            .await?;
+
+        let value: Balance = wasmbus_rpc::common::deserialize(&resp)
+            .map_err(|e| RpcError::Deser(format!("'{}': Balance", e)))?;
+        Ok(value)
+    }
+}
+
 /// Description of the customer inventory mock service
 /// wasmbus.actorReceive
 #[async_trait]
@@ -3158,102 +3254,6 @@ impl<T: Transport + std::marker::Sync + std::marker::Send> MockAgent for MockAge
 
         let value: DataItem = wasmbus_rpc::common::deserialize(&resp)
             .map_err(|e| RpcError::Deser(format!("'{}': DataItem", e)))?;
-        Ok(value)
-    }
-}
-
-/// Description of the rating agent service
-/// wasmbus.actorReceive
-#[async_trait]
-pub trait BalanceManager {
-    async fn deposit(&self, ctx: &Context, arg: &DespoitRequest) -> RpcResult<String>;
-}
-
-/// BalanceManagerReceiver receives messages defined in the BalanceManager service trait
-/// Description of the rating agent service
-#[doc(hidden)]
-#[async_trait]
-pub trait BalanceManagerReceiver: MessageDispatch + BalanceManager {
-    async fn dispatch(&self, ctx: &Context, message: Message<'_>) -> Result<Vec<u8>, RpcError> {
-        match message.method {
-            "Deposit" => {
-                let value: DespoitRequest = wasmbus_rpc::common::deserialize(&message.arg)
-                    .map_err(|e| RpcError::Deser(format!("'DespoitRequest': {}", e)))?;
-
-                let resp = BalanceManager::deposit(self, ctx, &value).await?;
-                let buf = wasmbus_rpc::common::serialize(&resp)?;
-
-                Ok(buf)
-            }
-            _ => Err(RpcError::MethodNotHandled(format!(
-                "BalanceManager::{}",
-                message.method
-            ))),
-        }
-    }
-}
-
-/// BalanceManagerSender sends messages to a BalanceManager service
-/// Description of the rating agent service
-/// client for sending BalanceManager messages
-#[derive(Debug)]
-pub struct BalanceManagerSender<T: Transport> {
-    transport: T,
-}
-
-impl<T: Transport> BalanceManagerSender<T> {
-    /// Constructs a BalanceManagerSender with the specified transport
-    pub fn via(transport: T) -> Self {
-        Self { transport }
-    }
-
-    pub fn set_timeout(&self, interval: std::time::Duration) {
-        self.transport.set_timeout(interval);
-    }
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-impl<'send> BalanceManagerSender<wasmbus_rpc::provider::ProviderTransport<'send>> {
-    /// Constructs a Sender using an actor's LinkDefinition,
-    /// Uses the provider's HostBridge for rpc
-    pub fn for_actor(ld: &'send wasmbus_rpc::core::LinkDefinition) -> Self {
-        Self {
-            transport: wasmbus_rpc::provider::ProviderTransport::new(ld, None),
-        }
-    }
-}
-#[cfg(target_arch = "wasm32")]
-impl BalanceManagerSender<wasmbus_rpc::actor::prelude::WasmHost> {
-    /// Constructs a client for actor-to-actor messaging
-    /// using the recipient actor's public key
-    pub fn to_actor(actor_id: &str) -> Self {
-        let transport =
-            wasmbus_rpc::actor::prelude::WasmHost::to_actor(actor_id.to_string()).unwrap();
-        Self { transport }
-    }
-}
-#[async_trait]
-impl<T: Transport + std::marker::Sync + std::marker::Send> BalanceManager
-    for BalanceManagerSender<T>
-{
-    #[allow(unused)]
-    async fn deposit(&self, ctx: &Context, arg: &DespoitRequest) -> RpcResult<String> {
-        let buf = wasmbus_rpc::common::serialize(arg)?;
-
-        let resp = self
-            .transport
-            .send(
-                ctx,
-                Message {
-                    method: "BalanceManager.Deposit",
-                    arg: Cow::Borrowed(&buf),
-                },
-                None,
-            )
-            .await?;
-
-        let value: String = wasmbus_rpc::common::deserialize(&resp)
-            .map_err(|e| RpcError::Deser(format!("'{}': String", e)))?;
         Ok(value)
     }
 }

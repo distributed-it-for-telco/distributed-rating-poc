@@ -64,8 +64,8 @@ operation GetChildren {
 }
 
 operation Deposit{
-    input: DespoitRequest
-    output: String
+    input: DepositRequest
+    output: Balance
 }
 
 
@@ -272,7 +272,7 @@ structure DeductBalance {
     data: String
 }
 @codegenRust(noDeriveEq: true )
-structure DespoitRequest{
+structure DepositRequest{
     @required
     amount: Float,
     @required
