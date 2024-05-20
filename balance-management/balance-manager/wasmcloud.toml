@@ -1,4 +1,4 @@
-name = "balance_manager"
+name = "Balancr Manager"
 language = "rust"
 type = "actor"
 version = "0.1.0"

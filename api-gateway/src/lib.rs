@@ -57,7 +57,7 @@ impl HttpServer for ApiGatewayActor {
                 get_party_offers(ctx, party_id, inventory_agent_id).await
             }
 
-            ("POST", ["usage", "balance", "topup"]) => topup_balance(ctx, deser(&req.body)?).await,
+            ("POST", ["balance", "topup"]) => topup_balance(ctx, deser(&req.body)?).await,
 
             (_, _) => Ok(HttpResponse::not_found()),
         }
@@ -203,15 +203,5 @@ async fn topup_balance(_ctx: &Context, _request: DepositRequest) -> RpcResult<Ht
         .deposit(_ctx, &_request)
         .await?;
 
-    let mut headers: HashMap<String, Vec<String>> = HashMap::new();
-    headers.insert(
-        "Access-Control-Allow-Headers".to_owned(),
-        vec!["Content-Type, api_key, Authorization".to_string()],
-    );
-    headers.insert(
-        "Access-Control-Allow-Origin".to_owned(),
-        vec!["https://editor.swagger.io".to_owned()],
-    );
-
-    HttpResponse::json_with_headers(balance, 200, headers)
+    HttpResponse::json_with_headers(balance, 200, get_response_headers())
 }

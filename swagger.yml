@@ -72,14 +72,14 @@ paths:
           content: {}
       x-codegen-request-body-name: body
 
-  /usage/balance/topup:
+  /balance/topup:
     post:
       tags:
-        - Inventory
+        - Balance Management
       summary: Topup user balance
       operationId: topupUserBalance
       requestBody:
-        description: Usage that needs to be rated
+        description: Adds balance to user
         content:
           application/json:
             schema:
