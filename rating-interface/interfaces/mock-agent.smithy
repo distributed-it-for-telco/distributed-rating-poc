@@ -80,3 +80,4 @@ structure UsageProofDetails {
   @required
   value: String
 }
+

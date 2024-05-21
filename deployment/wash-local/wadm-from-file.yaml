@@ -42,6 +42,34 @@ spec:
     #       properties:
     #         replicas: 1
 
+#    - name: balance-manager
+#      type: actor
+#      properties:
+#        image: file:///Users/mariem/IdeaProjects/distributed-it-for-telco/distributed-rating-poc/balance-management/balance-manager/build/balance_manager_s.wasm
+#      traits:
+#        - type: spreadscaler
+#          properties:
+#            replicas: 1
+#        - type: linkdef
+#          properties:
+#            target: redis
+#            values:
+#              URL: redis://0.0.0.0:6379/
+#
+#    - name: orange-vod-metaverse-agent
+#      type: actor
+#      properties:
+#        image: file:///Users/mariem/IdeaProjects/distributed-it-for-telco/distributed-rating-poc/rating-agents/orange-vod-metaverse-agent/build/prepaid_orange_vod_oneshot_metaverse_agent_s.wasm
+#      traits:
+#        - type: spreadscaler
+#          properties:
+#            replicas: 1
+#        - type: linkdef
+#          properties:
+#            target: redis
+#            values:
+#              URL: redis://0.0.0.0:6379/
+
     # - name: orange-vod-rating-agent
     #   type: actor
     #   properties:

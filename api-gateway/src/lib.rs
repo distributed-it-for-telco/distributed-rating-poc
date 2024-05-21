@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
 use rating_interface::{
-    CustomerInventoryAgent, CustomerInventoryAgentSender, MockAgent, MockAgentSender,
-    RatingCoordinator, RatingCoordinatorSender, RatingProcessRequest, RatingRequest,
-    UsageCollector, UsageCollectorSender,
+    BalanceManager, BalanceManagerSender, CustomerInventoryAgent, CustomerInventoryAgentSender,
+    DepositRequest, MockAgent, MockAgentSender, RatingCoordinator, RatingCoordinatorSender,
+    RatingProcessRequest, RatingRequest, UsageCollector, UsageCollectorSender,
 };
+
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -55,6 +56,9 @@ impl HttpServer for ApiGatewayActor {
             ("GET", ["party", party_id, "offers", inventory_agent_id]) => {
                 get_party_offers(ctx, party_id, inventory_agent_id).await
             }
+
+            ("POST", ["balance", "topup"]) => topup_balance(ctx, deser(&req.body)?).await,
+
             (_, _) => Ok(HttpResponse::not_found()),
         }
     }
@@ -192,4 +196,12 @@ fn get_response_headers() -> HashMap<String, Vec<String>> {
         vec!["https://editor.swagger.io".to_owned()],
     );
     headers
+}
+
+async fn topup_balance(_ctx: &Context, _request: DepositRequest) -> RpcResult<HttpResponse> {
+    let balance = BalanceManagerSender::to_actor("balancemanager")
+        .deposit(_ctx, &_request)
+        .await?;
+
+    HttpResponse::json_with_headers(balance, 200, get_response_headers())
 }
