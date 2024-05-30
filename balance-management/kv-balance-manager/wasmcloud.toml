@@ -1,8 +1,8 @@
-name = "Balancr Manager"
+name = "KV Balance Manager"
 language = "rust"
 type = "actor"
 version = "0.1.0"
 
 [actor]
 claims = ["wasmcloud:keyvalue"]
-call_alias = "balancemanager"
+call_alias = "kv_balancemanager"

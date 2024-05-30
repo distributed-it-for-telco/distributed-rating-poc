@@ -199,7 +199,7 @@ fn get_response_headers() -> HashMap<String, Vec<String>> {
 }
 
 async fn topup_balance(_ctx: &Context, _request: DepositRequest) -> RpcResult<HttpResponse> {
-    let balance = BalanceManagerSender::to_actor("balancemanager")
+    let balance = BalanceManagerSender::to_actor("kv_balancemanager")
         .deposit(_ctx, &_request)
         .await?;
 
