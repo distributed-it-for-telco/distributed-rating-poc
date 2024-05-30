@@ -16,8 +16,8 @@ serde_bytes = "0.11"
 futures = "0.3"
 form_urlencoded = "1.0"
 new_string_template = "1.4"
-wasmbus-rpc = "0.14.0"
-wasmcloud-interface-logging = "0.10.0"
+wasmbus-rpc = "0.15.0"
+wasmcloud-interface-logging = "0.11.0"
 rating_interface = { path = "../../rating-interface/rust" }
 
 [profile.release]
