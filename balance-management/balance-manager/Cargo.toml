@@ -6,7 +6,7 @@ edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "balance_manager"
+name = "kv_balance_manager"
 
 [dependencies]
 async-trait = "0.1"
