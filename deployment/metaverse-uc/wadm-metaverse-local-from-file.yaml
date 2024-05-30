@@ -21,94 +21,60 @@ spec:
     - name: api-gateway
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/api_gateway:0.1.0
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/api-gateway/build/api_gateway_s.wasm
       traits:
         - type: spreadscaler
           properties:
             replicas: 1
-            spread:
-              - name: oncosmonic
-                requirements:
-                  cosmonic_managed: "true"
         - type: linkdef
           properties:
             target: httpserver
+            values:
+              address: 0.0.0.0:8070
+
           
     - name: rating-coordinator
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/rating_coordinator:0.1.0
+        image: file:////Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-coordinator/build/rating_coordinator_s.wasm
       traits:
         - type: spreadscaler
           properties:
             replicas: 1
-            spread:
-              - name: oncosmonic
-                requirements:
-                  cosmonic_managed: "true"
-
+          
     - name: orange-vod-metaverse-agent
       type: actor
       properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/prepaid_orange_vod_oneshot_metaverse_agent:0.1.0
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/rating-agents/orange-vod-metaverse-agent/build/prepaid_orange_vod_oneshot_metaverse_agent_s.wasm
       traits:
         - type: spreadscaler
           properties:
             replicas: 1
-            spread:
-              - name: oncosmonic
-                requirements:
-                  cosmonic_managed: "true"
         - type: linkdef
           properties:
             target: redis
             values:
-              URL: rediss://default:AVNS_3CJXm0AdMq84moV8g9p@redis-distributed-rating-mostafa-f430.k.aivencloud.com:26788
-
-    - name: balance-manager
-      type: actor
-      properties:
-        image: ghcr.io/distributed-it-for-telco/distributed-rating-poc/kv_balance_manager:0.1.0
-      traits:
-        - type: spreadscaler
-          properties:
-            replicas: 1
-            spread:
-              - name: oncosmonic
-                requirements:
-                  cosmonic_managed: "true"
-        - type: linkdef
-          properties:
-            target: redis
-            values:
+              # URL: redis://0.0.0.0:6379/
               URL: rediss://default:AVNS_3CJXm0AdMq84moV8g9p@redis-distributed-rating-mostafa-f430.k.aivencloud.com:26788
 
     - name: httpserver
       type: capability
       properties:
-        # image: wasmcloud.azurecr.io/httpserver:0.17.0
-        image: cosmonic.azurecr.io/httpserver_wormhole:0.6.2
+        image: wasmcloud.azurecr.io/httpserver:0.17.0
         contract: wasmcloud:httpserver
       traits:
         - type: spreadscaler
           properties:
             replicas: 1
-            spread:
-              - name: oncosmonic
-                requirements:
-                  cosmonic_managed: "true"
 
     - name: redis
       type: capability
       properties:
-        # image: wasmcloud.azurecr.io/kvredis:0.21.0
+        # image: wasmcloud.azurecr.io/kvredis:0.22.0
         image: ghcr.io/brooksmtownsend/kvredis:0.23.0
+        # image: file:///Users/apple/workspace/Orange/disco/rating/capability-providers/kvredis/build/kvredis.par.gz
         contract: wasmcloud:keyvalue
       traits:
         - type: spreadscaler
           properties:
             replicas: 1
-            spread:
-              - name: oncosmonic
-                requirements:
-                  cosmonic_managed: "true"
