@@ -17,7 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: wasmcloud/common-actions/install-wash@main
+      # - uses: wasmcloud/common-actions/install-wash@main
+      - name: Install wash 0.26
+        run: |
+          curl -s https://packagecloud.io/install/repositories/wasmCloud/core/script.deb.sh | sudo bash
+          sudo apt install wash=0.26.0
       - name: Add wasm32-unknown-unknown
         run: rustup target add wasm32-unknown-unknown
       # Once you've written unit tests for your actor, you can uncomment
