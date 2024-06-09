@@ -1,5 +1,5 @@
 [package]
-name = "balance-manager"
+name = "kv-balance-manager"
 version = "0.1.0"
 authors = [ "" ]
 edition = "2021"

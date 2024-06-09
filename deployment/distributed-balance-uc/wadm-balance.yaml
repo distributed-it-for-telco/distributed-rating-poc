@@ -60,7 +60,7 @@ spec:
     - name: catalog
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance/eventcatalog/actor/build/balancecatalog_s.wasm
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance-management/event-sourced-balance/eventcatalog/actor/build/balancecatalog_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -77,7 +77,7 @@ spec:
     - name: projector
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance/projector/build/balance_projector_s.wasm
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance-management/event-sourced-balance/projector/build/balance_projector_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -103,7 +103,7 @@ spec:
     - name: aggregate
       type: actor
       properties:
-        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance/aggregate/build/balance_aggregate_s.wasm
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance-management/event-sourced-balance/aggregate/build/balance_aggregate_s.wasm
       traits:
         - type: spreadscaler
           properties:
