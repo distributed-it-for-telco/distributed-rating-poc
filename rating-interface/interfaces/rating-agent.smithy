@@ -271,13 +271,13 @@ structure DeductBalance {
     @required
     data: String
 }
+
 @codegenRust(noDeriveEq: true )
 structure DepositRequest{
     @required
     amount: Float,
     @required
-    customer_id: String,
+    customerId: String,
     @required
-    offer_id: String
-
+    offerId: String
 }

@@ -1087,8 +1087,10 @@ pub fn decode_deduct_balance(
 pub struct DepositRequest {
     #[serde(default)]
     pub amount: f32,
+    #[serde(rename = "customerId")]
     #[serde(default)]
     pub customer_id: String,
+    #[serde(rename = "offerId")]
     #[serde(default)]
     pub offer_id: String,
 }
@@ -1106,9 +1108,9 @@ where
     e.map(3)?;
     e.str("amount")?;
     e.f32(val.amount)?;
-    e.str("customer_id")?;
+    e.str("customerId")?;
     e.str(&val.customer_id)?;
-    e.str("offer_id")?;
+    e.str("offerId")?;
     e.str(&val.offer_id)?;
     Ok(())
 }
@@ -1147,8 +1149,8 @@ pub fn decode_deposit_request(
             for __i in 0..(len as usize) {
                 match d.str()? {
                     "amount" => amount = Some(d.f32()?),
-                    "customer_id" => customer_id = Some(d.str()?.to_string()),
-                    "offer_id" => offer_id = Some(d.str()?.to_string()),
+                    "customerId" => customer_id = Some(d.str()?.to_string()),
+                    "offerId" => offer_id = Some(d.str()?.to_string()),
                     _ => d.skip()?,
                 }
             }

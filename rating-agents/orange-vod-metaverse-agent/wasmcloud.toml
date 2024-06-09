@@ -1,4 +1,4 @@
-name = "orange-vod-metaverse-agent"
+name = "Orange Vod Metaverse Agent"
 language = "rust"
 type = "actor"
 version = "0.1.0"

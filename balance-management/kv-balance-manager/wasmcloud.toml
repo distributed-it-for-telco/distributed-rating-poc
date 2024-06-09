@@ -4,5 +4,5 @@ type = "actor"
 version = "0.1.0"
 
 [actor]
-claims = ["wasmcloud:keyvalue"]
+claims = ["wasmcloud:keyvalue", "wasmcloud:builtin:logging"]
 call_alias = "kv_balancemanager"

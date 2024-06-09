@@ -63,6 +63,7 @@ spec:
                 requirements:
                   # hostcore.os: macos
                   stargate: "true"
+
     - name: orange-vod-metaverse-agent
       type: actor
       properties:
@@ -88,7 +89,27 @@ spec:
             target: redis
             values:
               # URL: redis://0.0.0.0:6379/
-              URL: redis://default:AVNS_3CJXm0AdMq84moV8g9p@redis-distributed-rating-mostafa-f430.k.aivencloud.com:26788
+              URL: rediss://default:AVNS_3CJXm0AdMq84moV8g9p@redis-distributed-rating-mostafa-f430.k.aivencloud.com:26788
+    
+    - name: balance-manager
+      type: actor
+      properties:
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance-management/kv-balance-manager/build/kv_balance_manager_s.wasm
+      traits:
+        - type: spreadscaler
+          properties:
+            replicas: 1
+            spread:
+              - name: oncosmonic
+                requirements:
+                  # cosmonic_managed: "true"
+                  stargate: "true"
+        - type: linkdef
+          properties:
+            name: test
+            target: redis
+            values:
+              URL: rediss://default:AVNS_3CJXm0AdMq84moV8g9p@redis-distributed-rating-mostafa-f430.k.aivencloud.com:26788
 
     - name: httpserver
       type: capability
@@ -108,8 +129,8 @@ spec:
     - name: redis
       type: capability
       properties:
-        image: wasmcloud.azurecr.io/kvredis:0.21.0
-        # image: cosmonic.azurecr.io/builtin_keyvalue:0.2.5
+        # image: wasmcloud.azurecr.io/kvredis:0.21.0
+        image: ghcr.io/brooksmtownsend/kvredis:0.23.0
         contract: wasmcloud:keyvalue
       traits:
         # - type: spreadscaler

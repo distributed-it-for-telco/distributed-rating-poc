@@ -8,13 +8,17 @@ use wasmbus_rpc::{
     common::Context,
 };
 
+use wasmcloud_interface_logging::info;
+
+const BALANCE_BUCKET_NAME: &str = "balance";
+
 #[derive(Debug, Default, Actor, HealthResponder)]
 #[services(Actor, BalanceManager)]
 pub struct BalanceManagerActor {}
 
 impl BalanceManagerActor {
     pub fn get_key(&self, customer_id: &str, offer_id: &str) -> String {
-        let balance_key = format!("{}:{}:{}", BALANCE_BUCKET_NAME, &customer_id, offer_id);
+        let balance_key = format!("{}:{}:{}", BALANCE_BUCKET_NAME, customer_id, offer_id);
 
         balance_key
     }
@@ -63,23 +67,24 @@ impl BalanceManagerActor {
     // }
 }
 
-const BALANCE_BUCKET_NAME: &str = "balance";
-
 #[async_trait]
 impl BalanceManager for BalanceManagerActor {
-    async fn deposit(&self, _ctx: &Context, depositRequest: &DepositRequest) -> RpcResult<Balance> {
+    async fn deposit(&self, _ctx: &Context, deposit_request: &DepositRequest) -> RpcResult<Balance> {
 
-        let balance_key: String = self.get_key(depositRequest.customer_id.as_str(), depositRequest.offer_id.as_str());
+        let balance_key: String = self.get_key(deposit_request.customer_id.as_str(), deposit_request.offer_id.as_str());
+        
+        info!("Balance key to be deposited: {:?}", balance_key);
+        
         let mut balance: Balance = self
             .get_balance(
                 _ctx,
-                depositRequest.customer_id.as_str(),
-                depositRequest.offer_id.as_str(),
+                deposit_request.customer_id.as_str(),
+                deposit_request.offer_id.as_str(),
             )
             .await?;
 
         // here we can add any business validations
-        balance.balance_characteristic.count += depositRequest.amount;
+        balance.balance_characteristic.count += deposit_request.amount;
 
         self.put_to_store(_ctx, &balance_key, balance.clone())
             .await?;

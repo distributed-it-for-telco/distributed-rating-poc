@@ -40,8 +40,6 @@ impl HttpServer for ApiGatewayActor {
         let trimmed_path: Vec<&str> = req.path.trim_matches('/').split('/').collect();
         info!("Trimmed Path: {:?}", trimmed_path);
 
-        info!("Headers: {:?}", req.header);
-
         match (req.method.as_ref(), trimmed_path.as_slice()) {
             ("OPTIONS", _) => get_options_response(ctx).await,
             ("POST", ["usage", "rating"]) => {
