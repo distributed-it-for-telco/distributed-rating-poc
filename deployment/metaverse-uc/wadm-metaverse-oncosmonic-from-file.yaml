@@ -106,7 +106,6 @@ spec:
                   stargate: "true"
         - type: linkdef
           properties:
-            name: test
             target: redis
             values:
               URL: rediss://default:AVNS_3CJXm0AdMq84moV8g9p@redis-distributed-rating-mostafa-f430.k.aivencloud.com:26788

@@ -57,6 +57,20 @@ spec:
               # URL: redis://0.0.0.0:6379/
               URL: rediss://default:AVNS_3CJXm0AdMq84moV8g9p@redis-distributed-rating-mostafa-f430.k.aivencloud.com:26788
 
+    - name: balance-manager
+      type: actor
+      properties:
+        image: file:///Users/apple/workspace/Orange/disco/rating/distributed-rating-poc/balance-management/kv-balance-manager/build/kv_balance_manager_s.wasm
+      traits:
+      - type: spreadscaler
+          properties:
+            replicas: 1
+      - type: linkdef
+          properties:
+            target: redis
+            values:
+              URL: rediss://default:AVNS_3CJXm0AdMq84moV8g9p@redis-distributed-rating-mostafa-f430.k.aivencloud.com:26788
+
     - name: httpserver
       type: capability
       properties:
