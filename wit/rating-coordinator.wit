@@ -1,0 +1,60 @@
+interface rating-coordinator {
+    handle-rating-process: func(request: rating-process-request) -> rating-response;
+
+    record rating-process-request {
+        rating-request: rating-request,
+        headers: list<headers-map>
+    }
+
+    record headers-map {
+        key: string,
+        value: string
+    }
+
+    record rating-request {
+        customer-id: string,
+        agent-id: string,
+        language: string,
+        offer-id: string,
+        usage: usage,
+        rating-history: list<rating-record>
+    }
+
+    record rating-record {
+        producer: string,
+        unit: string,
+        price: string
+    }
+
+    record rating-response {
+        authorization-status: authorization-status,
+        billing-information: billing-information,
+        next-agent: agent-identification
+    }
+
+    record usage {
+        usage-characteristic-list: list<usage-characteristic>
+    }
+
+    record usage-characteristic {
+        name: string,
+        value: string,
+        value-type: string
+    }
+
+    record billing-information {
+        price: string,
+        unit: string,
+        messages: list<string>
+    }
+
+    record authorization-status {
+        code: u16,
+        key: string
+    }
+
+    record agent-identification {
+        name: string,
+        partner-id: string
+    }
+}
