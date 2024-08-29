@@ -10,7 +10,10 @@ struct Ratingagent;
 impl Guest for Ratingagent {
     /// Say hello!
     fn rate_usage(_request:RatingRequest) ->  RatingResponse{
-        
+        wasi::logging::logging::log( 
+            wasi::logging::logging::Level::Info,
+            "",&_request.offer_id
+        );
         RatingResponse{
             authorization_status:AuthorizationStatus {code: 12345, key: "hello".to_string()},
             billing_information:BillingInformation {price:"myPriceAbc".to_string(), unit:"woow".to_string(), messages:(&["".to_string()]).to_vec()},

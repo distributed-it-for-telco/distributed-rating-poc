@@ -10,5 +10,9 @@ interface  ratingagent {
 
 }
 world rating-agent {
+  import wasi:keyvalue/atomics@0.2.0-draft; 
+  import wasi:keyvalue/store@0.2.0-draft; 
+  import wasi:logging/logging; 
+  
   export ratingagent;
 }
