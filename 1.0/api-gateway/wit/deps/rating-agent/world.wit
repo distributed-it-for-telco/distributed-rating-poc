@@ -1,0 +1,14 @@
+package orange:ratingagent;
+
+interface  ratingagent {
+  use types.{rating-request,rating-response, validation-request, validation-response,
+             get-children-request, agent-list, agent, agent-identification, usage,
+             usage-characteristic, rating-record, billing-information, authorization-status};
+  rate-usage: func(request: rating-request) -> rating-response;
+  validate: func(request: validation-request) -> validation-response;
+  get-children: func(request: get-children-request) -> agent-list;
+
+}
+world rating-agent {
+  export ratingagent;
+}
