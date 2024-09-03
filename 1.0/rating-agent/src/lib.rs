@@ -1,9 +1,10 @@
-wit_bindgen::generate!({
-    generate_all
-});
-
 use exports::orange::ratingagent::ratingagent::*;
 use crate::orange::ratingagent::types::{AgentIdentification, BillingInformation, AuthorizationStatus};
+wit_bindgen::generate!({
+    generate_all,
+    additional_derives: [serde::Serialize, serde::Deserialize]
+});
+
 
 struct Ratingagent;
 

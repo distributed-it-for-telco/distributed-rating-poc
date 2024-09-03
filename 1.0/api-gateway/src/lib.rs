@@ -6,6 +6,7 @@ use crate::orange::ratingagent::*;
 use crate::orange::ratingagent::types::{RatingRequest, RatingResponse, Usage};
 use exports::wasi::http::incoming_handler::Guest;
 use wasi::http::types::*;
+mod dtos;
 // use exports::wasi::logging::logging::*;
 
 struct HttpServer;
@@ -28,10 +29,12 @@ impl Guest for HttpServer {
         let response_body = response.body().unwrap();
         ResponseOutparam::set(response_out, Ok(response));
         let usageResult: RatingResponse = ratingagent::rate_usage(&rating_request);
+        
+
         response_body
             .write()
             .unwrap()
-            .blocking_write_and_flush(b"Hello from Rust!\n")
+            .blocking_write_and_flush(serde_json::to_string(&dtos::types::DTORatingResponse::from(usageResult)).unwrap())
             .unwrap();
         OutgoingBody::finish(response_body, None).expect("failed to finish response body");
     }

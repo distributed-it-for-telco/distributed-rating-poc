@@ -9,4 +9,11 @@ version = "0.1.0"
 crate-type = ["cdylib"]
 
 [dependencies]
+serde = { version = "1.0.209", features = ["derive"] }
 wit-bindgen = "0.30"
+
+[package.metadata.component.dependencies]
+
+[package.metadata.component.target.dependencies]
+"wasi:keyvalue" = { path = "wit/deps/keyvalue" }
+"wasi:logging" = { path = "wit/deps/logging" }
