@@ -1,5 +1,5 @@
 
-pub mod types {
+pub mod dto_types {
     use serde::{Serialize, Deserialize};
     use o2o::o2o;
     use crate::orange::ratingagent::types::*;
@@ -97,6 +97,7 @@ pub mod types {
     pub struct DTOBillingInformation {
         pub price: String,
         pub unit: String,
+        #[map(messages, ~.iter().map(|p|p.into()).collect())]
         pub messages: Vec<String>,
     }
 
@@ -109,7 +110,7 @@ pub mod types {
     }
 
     #[derive(Clone, Serialize, Deserialize, o2o)]
-    #[from_owned(RatingResponse)]
+    #[from_owned(RatingResponse)]BillingInformation
     #[owned_try_into(RatingResponse, std::io::Error)]
     pub struct DTORatingResponse {
         #[map(~.into())]

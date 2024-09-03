@@ -29,12 +29,13 @@ impl Guest for HttpServer {
         let response_body = response.body().unwrap();
         ResponseOutparam::set(response_out, Ok(response));
         let usageResult: RatingResponse = ratingagent::rate_usage(&rating_request);
-        
+        let responseDTO = dtos::dto_types::DTORatingResponse::from(usageResult);
+        let serializedResponse  = serde_json::to_string(&responseDTO).unwrap().as_bytes();
 
         response_body
             .write()
             .unwrap()
-            .blocking_write_and_flush(serde_json::to_string(&dtos::types::DTORatingResponse::from(usageResult)).unwrap())
+            .blocking_write_and_flush(&serializedResponse)
             .unwrap();
         OutgoingBody::finish(response_body, None).expect("failed to finish response body");
     }
