@@ -16,14 +16,14 @@ impl Guest for Ratingagent {
             "",&_request.offer_id
         );
         let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
-        let object_name = "";
+        let object_name = "count";
         let count = wasi::keyvalue::atomics::increment(&bucket, &object_name, 1)
             .expect("failed to increment count");
             
         RatingResponse{
             authorization_status:AuthorizationStatus {code: 12345, key: "hello".to_string()},
-            billing_information:BillingInformation {price:"myPriceAbc".to_string(), unit:"woow".to_string(), messages:(&["".to_string()]).to_vec()},
-            next_agent:AgentIdentification{name:"hola".to_string(), partner_id:"amigos".to_string()}
+            billing_information:BillingInformation {price:"myPriceAbc".to_string(), unit:"unit".to_string(), messages:(&["message1".to_string()]).to_vec()},
+            next_agent:AgentIdentification{name:"agent".to_string(), partner_id:"partner".to_string()}
         }
     }
 

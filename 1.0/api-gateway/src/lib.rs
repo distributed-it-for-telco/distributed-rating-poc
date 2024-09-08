@@ -38,6 +38,7 @@ impl Guest for HttpServer {
         response.set_status_code(200).unwrap();
         let response_body = response.body().unwrap();
         let usageResult: RatingResponse = ratingagent::rate_usage(&rating_request);
+        
         ResponseOutparam::set(response_out, Ok(response));
         let serializedRatingReslult: SerializedRatingResponse = usageResult.into();
 
