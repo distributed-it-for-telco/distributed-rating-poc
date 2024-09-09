@@ -15,6 +15,7 @@ impl Guest for Ratingagent {
             wasi::logging::logging::Level::Info,
             "",&_request.offer_id
         );
+        
         let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
         let object_name = "count";
         let count = wasi::keyvalue::atomics::increment(&bucket, &object_name, 1)
