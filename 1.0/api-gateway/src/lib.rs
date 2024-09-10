@@ -1,27 +1,42 @@
-wit_bindgen::generate!({
-    generate_all
-});
+wit_bindgen::generate!({ generate_all });
 
-use crate::orange::ratingagent::*;
 use crate::orange::ratingagent::types::{RatingRequest, RatingResponse, Usage};
+use crate::orange::ratingagent::*;
 use exports::wasi::http::incoming_handler::Guest;
-use wasi::http::types::*;
-
-mod serializer;
 use serializer::*;
+use wasi::http::types::*;
+use wasi::io::streams::InputStream;
+use wasi::logging::logging::log;
+mod serializer;
 
-use std::io::*;
+struct ApiGateway;
 
-struct HttpServer;
+impl ApiGateway {
+    pub fn readInputStream(_input: &InputStream) -> String {
+        return Self::readInputStreamWithBufferSize(_input, 100);
+    }
+    pub fn readInputStreamWithBufferSize(_input: &InputStream, _buffer_size: u64) -> String {
+        let mut stream_data: Vec<u8> = Vec::new();
+        loop {
+            let stream_read = _input.blocking_read(_buffer_size).unwrap();
+            let dataLength = stream_read.len();
+            stream_data.extend(stream_read);
+            if dataLength < _buffer_size.try_into().unwrap() {
+                break;
+            }
+        }
+        let _result = String::from_utf8(stream_data).unwrap();
+        return _result;
+    }
+}
 
-impl Guest for HttpServer {
-
+impl Guest for ApiGateway {
     fn handle(_request: IncomingRequest, response_out: ResponseOutparam) {
-       
         let body: IncomingBody = _request.consume().unwrap();
-        let body_stream = body.stream().unwrap().blocking_read(10000).unwrap();
-        let serialized_rating_request: SerializedRatingRequest = serde_json::from_str(&String::from_utf8(body_stream).unwrap()).unwrap();
-        let rating_request: RatingRequest =  serialized_rating_request.into();
+        let body_stream = body.stream().unwrap();
+        let serialized_rating_request: SerializedRatingRequest =
+            serde_json::from_str(&(Self::readInputStream(&body_stream))).unwrap();
+        let rating_request: RatingRequest = serialized_rating_request.into();
 
         let response = OutgoingResponse::new(Fields::new());
         response.set_status_code(200).unwrap();
@@ -31,8 +46,8 @@ impl Guest for HttpServer {
         ResponseOutparam::set(response_out, Ok(response));
         let serializedRatingReslult: SerializedRatingResponse = usageResult.into();
         let binding = serde_json::to_string(&serializedRatingReslult).unwrap();
-        let serializedResponse  = binding.as_bytes();
-        
+        let serializedResponse = binding.as_bytes();
+
         response_body
             .write()
             .unwrap()
@@ -43,4 +58,4 @@ impl Guest for HttpServer {
     }
 }
 
-export!(HttpServer);
+export!(ApiGateway);
