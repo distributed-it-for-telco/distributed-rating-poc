@@ -81,7 +81,7 @@ impl Guest for MetaverseRatingagent {
         RatingResponse {
             authorization_status: AuthorizationStatus {
                 code: 12345,
-                key: "hello".to_string(),
+                key: "two".to_string(),
             },
             billing_information: BillingInformation {
                 price: price.to_string(),

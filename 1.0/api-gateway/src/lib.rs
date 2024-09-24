@@ -1,7 +1,7 @@
 wit_bindgen::generate!({ generate_all });
 
-use crate::orange::ratingagent::types::{RatingRequest, RatingResponse};
-use crate::orange::ratingagent::*;
+use crate::orange::rating::types::{RatingRequest, RatingResponse};
+use crate::orange::rating::*;
 use exports::wasi::http::incoming_handler::Guest;
 use serializer::*;
 use wasi::http::types::*;
@@ -47,6 +47,7 @@ impl ApiGateway {
         match (request_parts.method, request_parts.path.as_str()) {
             // ("OPTIONS", _) => get_options_response(ctx).await,
             (POST, "/usage/rating") => {
+                
                 Self::request_rate(body,response_out);
             }
             // ("GET", ["usage", "rating-proofs", usage_collector_id]) => {
@@ -81,6 +82,9 @@ impl ApiGateway {
     }
 
     fn request_rate(body: String ,response_out: ResponseOutparam){
+
+        log(wasi::logging::logging::Level::Info, "", &"requesting rate");
+
         let serialized_rating_request: SerializedRatingRequest =
             serde_json::from_str(&body).unwrap();
         let rating_request: RatingRequest = serialized_rating_request.into();
@@ -88,8 +92,16 @@ impl ApiGateway {
         let response = OutgoingResponse::new(Fields::new());
         response.set_status_code(200).unwrap();
         let response_body = response.body().unwrap();
-        let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
+        log(wasi::logging::logging::Level::Info, "", &"before calling rating agent");
+        let yourinterface = wasmcloud::bus::lattice::CallTargetInterface::new(
+            "orange",
+            "rating",
+            "ratingagent",
+        );
+        wasmcloud::bus::lattice::set_link_name("metaverse", vec![yourinterface]);
 
+        let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
+        log(wasi::logging::logging::Level::Info, "", &"after calling rating agent");
         ResponseOutparam::set(response_out, Ok(response));
         let serialized_rating_result: SerializedRatingResponse = usage_result.into();
         let binding = serde_json::to_string(&serialized_rating_result).unwrap();

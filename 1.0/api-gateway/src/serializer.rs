@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use crate::orange::ratingagent::types::*;
+use crate::orange::rating::types::*;
 
 // -----------------------------------------------------------------------------
 // Serialization Structs

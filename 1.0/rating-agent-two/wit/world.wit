@@ -1,6 +1,6 @@
-package orange:metaverse-ratingagent;
+package orange:orange-vod-ratingagent;
 
-world metaverse-rating {
+world orange-vod-rating {
     import wasi:keyvalue/atomics@0.2.0-draft; 
     import wasi:keyvalue/store@0.2.0-draft; 
     import wasi:logging/logging;  
