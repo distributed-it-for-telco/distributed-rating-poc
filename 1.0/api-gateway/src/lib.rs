@@ -93,12 +93,15 @@ impl ApiGateway {
         response.set_status_code(200).unwrap();
         let response_body = response.body().unwrap();
         log(wasi::logging::logging::Level::Info, "", &"before calling rating agent");
+
+        //invoke the rating interface implementation based on agent id sent in the request
         let yourinterface = wasmcloud::bus::lattice::CallTargetInterface::new(
             "orange",
             "rating",
             "ratingagent",
         );
-        wasmcloud::bus::lattice::set_link_name("metaverse", vec![yourinterface]);
+        wasmcloud::bus::lattice::set_link_name(&rating_request.agent_id.to_string(), vec![rating_interface]);
+        log(wasi::logging::logging::Level::Info, "", &rating_request.agent_id.to_string());
 
         let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
         log(wasi::logging::logging::Level::Info, "", &"after calling rating agent");
