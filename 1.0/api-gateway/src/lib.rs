@@ -67,8 +67,11 @@ impl ApiGateway {
         
     }
     fn not_found(response_out: ResponseOutparam){
-        let response = OutgoingResponse::new(Fields::new());
+        let mut headers = Fields::new();
+        headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
+        let response = OutgoingResponse::new(headers);
         response.set_status_code(404).unwrap();
+        
         let response_body = response.body().unwrap();
         ResponseOutparam::set(response_out, Ok(response));
 
@@ -89,18 +92,23 @@ impl ApiGateway {
             serde_json::from_str(&body).unwrap();
         let rating_request: RatingRequest = serialized_rating_request.into();
 
-        let response = OutgoingResponse::new(Fields::new());
+        let mut headers = Fields::new();
+        headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
+        let response = OutgoingResponse::new(headers);
+
         response.set_status_code(200).unwrap();
         let response_body = response.body().unwrap();
         log(wasi::logging::logging::Level::Info, "", &"before calling rating agent");
 
         //invoke the rating interface implementation based on agent id sent in the request
-        let yourinterface = wasmcloud::bus::lattice::CallTargetInterface::new(
+        let rating_interface = wasmcloud::bus::lattice::CallTargetInterface::new(
             "orange",
             "rating",
             "ratingagent",
         );
         wasmcloud::bus::lattice::set_link_name(&rating_request.agent_id.to_string(), vec![rating_interface]);
+
+        
         log(wasi::logging::logging::Level::Info, "", &rating_request.agent_id.to_string());
 
         let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
