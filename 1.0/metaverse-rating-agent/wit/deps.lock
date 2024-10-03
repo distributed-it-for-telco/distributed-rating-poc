@@ -1,7 +1,12 @@
+[balance-manager]
+path = "../../balance-management/wit"
+sha256 = "fd6127dae2f0d5c6e4bba685af4c6c5a1291a87df98a22023b3f52e3196f0ccd"
+sha512 = "49142f231f724f9131082cb99859a200b408ed5e73d52157efbe6ee555f86c394de32ffbccd89735b16a6c579ccd5a69f4bd962902739285a20eb1ce1a46acbe"
+deps = ["keyvalue"]
+
 [keyvalue]
-url = "https://github.com/WebAssembly/wasi-keyvalue/archive/main.tar.gz"
-sha256 = "d2de617fe31ec0abc6072f75f97dd22bf95b3231d5b3111471d73871df9081cd"
-sha512 = "6f0b4e44c684d760c54552e2bde9bc976e0a4f6525fc1d47acb98625e030847276436242f42a41f4da1bb9169fb2968c53d659d61af9b2f709f4eb6f9880e2c7"
+sha256 = "943072d4a418f617258d0e2040e469b476389463c0de069f0182f8664deea455"
+sha512 = "8b72224dd255dd51fe991436bf09cb1bef48106afb2d360660e1738660245e1ad958303008d63cce1af87198264deed82de5cb7c1d9f380318f2f2ca0b6fcc21"
 
 [logging]
 url = "https://github.com/WebAssembly/wasi-logging/archive/main.tar.gz"

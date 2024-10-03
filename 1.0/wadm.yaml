@@ -49,6 +49,24 @@ spec:
         - type: spreadscaler
           properties:
             instances: 1
+        - type: link
+          properties:
+            target: balance-manager-component
+            namespace: orange
+            package: balancemanager
+            interfaces: [balancemanager]
+
+    - name: balance-manager-component
+      type: component
+      properties:
+        image: file://./balance-management/build/balance_manager_s.wasm
+        # To use the a precompiled version of this component, use the line below instead:
+        # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
 
         - type: link
           properties:
@@ -60,6 +78,7 @@ spec:
               - name: redis-url
                 properties:
                   url: redis://127.0.0.1:6379
+
 
     - name: orange-vod-rating-agent-component
       type: component
