@@ -1,0 +1,3 @@
+logging = "https://github.com/WebAssembly/wasi-logging/archive/main.tar.gz"
+rating-interface = "../../rating-interface/wit"
+balance-manager = "../../balance-management/wit"

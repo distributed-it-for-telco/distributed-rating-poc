@@ -1,0 +1,5 @@
+package component:ratingagent;
+
+world rating-world {
+    export ratingagent;
+}

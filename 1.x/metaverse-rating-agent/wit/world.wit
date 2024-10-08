@@ -1,0 +1,10 @@
+package orange:metaverse-ratingagent;
+
+world metaverse-rating {
+    // import wasi:keyvalue/atomics@0.2.0-draft; 
+    // import wasi:keyvalue/store@0.2.0-draft; 
+    import orange:balancemanager/balancemanager;
+    import wasi:logging/logging;  
+
+    export orange:rating/ratingagent;
+}

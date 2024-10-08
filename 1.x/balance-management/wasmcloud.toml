@@ -1,0 +1,8 @@
+name = "balance-manager"
+version = "0.1.0"
+language = "rust"
+type = "component"
+
+[component]
+wit_world = "balance-manager-world"
+wasm_target = "wasm32-wasi-preview2"
