@@ -3,7 +3,7 @@ package orange:orange-vod-ratingagent;
 world orange-vod-rating {
     import wasi:keyvalue/atomics@0.2.0-draft; 
     import wasi:keyvalue/store@0.2.0-draft; 
-    import wasi:logging/logging;  
+    import wasi:logging/logging@0.1.0-draft;  
 
     export orange:rating/ratingagent;
 }
