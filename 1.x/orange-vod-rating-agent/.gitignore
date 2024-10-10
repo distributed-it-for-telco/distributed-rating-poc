@@ -4,3 +4,5 @@ Cargo.lock
 # Wash build artifacts
 build/
 target/
+
+wit/deps
