@@ -1,5 +1,8 @@
-package wasmcloud:hello;
+package orange:ratingcoordinator;
 
-world hello {
-  export wasi:http/incoming-handler@0.2.0;
+world ratingcoordinator-wrold {
+  import orange:rating/ratingagent;
+  import wasi:logging/logging@0.1.0-draft; 
+  import wasmcloud:bus/lattice@1.0.0;
+  export types;
 }

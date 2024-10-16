@@ -42,8 +42,8 @@ impl ApiGateway {
             Self::get_request_parts(_request.path_with_query().unwrap(), _request.method());
         let http_request_body: IncomingBody = _request.consume().unwrap();
         let body = StreamReader::read_input_stream(&http_request_body.stream().unwrap());
-        // log(wasi::logging::logging::Level::Info, "", &request_parts.method.to_string());
         log(wasi::logging::logging::Level::Info, "", &request_parts.path);
+        
         match (request_parts.method, request_parts.path.as_str()) {
             // ("OPTIONS", _) => get_options_response(ctx).await,
             (POST, "/usage/rating") => {
