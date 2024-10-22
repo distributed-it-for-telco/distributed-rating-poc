@@ -4,7 +4,7 @@ use crate::orange::rating::types::{
     BillingInformation
 };
 
-#[derive(Debug, PartialEq, Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct RatingResponseBuilder {
     // Probably lots of optional fields.
     authorized: bool,
@@ -49,8 +49,15 @@ impl RatingResponseBuilder {
     }
 
     pub fn build(&mut self) -> RatingResponse {
-        let mut billing_info = BillingInformation::default();
-        let mut authorization_status = AuthorizationStatus::default();
+        let mut billing_info = BillingInformation{
+            price: "0".to_string(),
+            unit: "0".to_string(),
+            messages: vec![]
+        };
+        let mut authorization_status = AuthorizationStatus{
+            code: 0,
+            key: "".to_string()
+        };
         billing_info.unit = self.unit.to_string();
         billing_info.price = self.price.to_string();
 
@@ -63,12 +70,12 @@ impl RatingResponseBuilder {
         } else {
             authorization_status.code = 401;
         }
-        authorization_status.key = Some(self.authorization_message.to_string());
+        authorization_status.key = self.authorization_message.to_string();
         
         RatingResponse {
             authorization_status: authorization_status,
             billing_information: billing_info,
-            next_agent: self.next_agent.to_owned()
+            next_agent: self.next_agent.clone().unwrap()
         }
     }
 }

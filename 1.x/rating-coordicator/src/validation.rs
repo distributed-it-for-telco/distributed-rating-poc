@@ -1,10 +1,9 @@
 use crate::wasi::logging::logging::{log, Level::Info};
 use std::{fmt,collections::HashMap, collections::VecDeque};
 
-use crate::orange::rating::types::{
-    Agent, RatingRequest, RatingResponse, ValidationRequest, ValidationResponse,
-};
 use crate::orange::rating::types::*;
+use crate::orange::rating::ratingagent::Guest;
+
 use crate::exports::orange::ratingcoordinator::types::{RatingProcessRequest};
 
 use crate::agent_graph::AgentGraph;
@@ -18,16 +17,19 @@ pub async fn handle_validation_cycle(
         return Err(ValidationError::Other("Can't validate client usage, client ip not found".to_string()));
     }
 
-    let client_headers = rating_process_request.headers;
-    let mut client_ip = "";
-    let mut client_country = "";
-    if let extracted_client_ip = client_headers.get("client_ip") {
-        client_ip = extracted_client_ip;
+    let client_headers = &rating_process_request.headers;
+    let mut client_ip = "".to_string();
+    let mut client_country = "".to_string();
+
+    let client_ip_bytes = client_headers.get(&"client_ip".to_string());
+    if !client_ip_bytes.is_empty() {
+        client_ip = String::from_utf8(client_ip_bytes[0].clone()).unwrap();
+    }
+    let client_country_bytes = client_headers.get(&"client_country".to_string());
+    if !client_country_bytes.is_empty() {
+        client_country = String::from_utf8(client_country_bytes[0].clone()).unwrap();
     }
 
-    if let lcl_client_country = client_headers.get("client_country") {
-        client_country = lcl_client_country;
-    }
     log(Info, "", format!("Validating against agent: {}",rating_process_request.rating_request.agent_id).as_str());
 
     let mut validation_response;
@@ -87,6 +89,7 @@ pub async fn validate_through_agent(
     client_ip: String,
     client_country: String,
 ) -> Result<ValidationResponse, ValidationError> {
+    
     let rating_agent: ratingagent;
 
     log(Info, "", format!("rating agent: {:?}", rating_agent).as_str());
