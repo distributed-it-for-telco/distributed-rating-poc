@@ -2,6 +2,10 @@ wit_bindgen::generate!({
     generate_all
 });
 
+use crate::orange::rating::types::*;
+use crate::orange::rating::*;
+use wasi::logging::logging::log;
+
 mod agent_graph;
 mod build_agents_hierarchy;
 mod validation;
