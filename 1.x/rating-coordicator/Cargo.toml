@@ -11,9 +11,3 @@ crate-type = ["cdylib"]
 [dependencies]
 async-recursion = "1.1.1"
 wit-bindgen = "0.32"
-
-[package.metadata.component.target.dependencies]
-"orange:rating" = { path = "wit/deps/rating-interface" }
-"wasi:http" = { path = "wit/deps/http" }
-"wasi:logging" = { path = "wit/deps/logging" }
-"wasmcloud:bus" = { path = "wit/deps/bus" }

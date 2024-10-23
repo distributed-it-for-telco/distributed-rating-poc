@@ -1,8 +1,9 @@
 package orange:ratingcoordinator;
 
-world ratingcoordinator-wrold {
+world hello {
   import orange:rating/ratingagent;
   import wasi:logging/logging@0.1.0-draft; 
   import wasmcloud:bus/lattice@1.0.0;
+
   export types;
 }

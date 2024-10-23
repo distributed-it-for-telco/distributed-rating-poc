@@ -9,7 +9,6 @@ use crate::agent_graph::AgentGraph;
 use crate::rating_reponse_builder::{RatingResponseBuilder};
 use crate::wasmcloud::bus::lattice::CallTargetInterface;
 use crate::wasmcloud::bus::lattice;
-use wasi::logging::logging::log;
 
 pub async fn handle_validation_cycle(
     rating_process_request: &RatingProcessRequest,
@@ -99,7 +98,7 @@ pub async fn validate_through_agent(
     );
     lattice::set_link_name(&rating_request.agent_id.to_string(), vec![rating_interface]);
     
-    log(wasi::logging::logging::Level::Info, "", &rating_request.agent_id.to_string());
+    log(Info, "", &rating_request.agent_id.to_string());
 
     let validation_request = ValidationRequest {
         rating_request: rating_request.to_owned(),
