@@ -32,7 +32,6 @@ impl RatingCoordinator{
         return validation_response_as_rating;
         }
         return handle_rating_cycle(&rating_process_request, &agent_graph).await;
-      
     }
 }
 
