@@ -6,7 +6,8 @@ use wasi::http::types::*;
 use wasi::http::types::Method::*;
 use exports::wasi::http::incoming_handler::Guest;
 
-use crate::orange::rating::*;
+use crate::orange::ratingcoordinator::*;
+use crate::orange::ratingcoordinator::{ratingcoordinator::RatingProcessRequest};
 use crate::orange::rating::types::{RatingRequest, RatingResponse};
 
 use serializer::*;
@@ -51,7 +52,7 @@ impl ApiGateway {
             // ("OPTIONS", _) => get_options_response(ctx).await,
             (POST, "/usage/rating") => {
                 
-                Self::request_rate(body,response_out);
+                Self::request_rate(_request.headers(),body,response_out);
             }
             // ("GET", ["usage", "rating-proofs", usage_collector_id]) => {
             //     list_usage_proofs(ctx, usage_collector_id).await
@@ -87,7 +88,7 @@ impl ApiGateway {
         OutgoingBody::finish(response_body, None).expect("failed to finish response body");
     }
 
-    fn request_rate(body: String ,response_out: ResponseOutparam){
+    fn request_rate(request_headers:Fields, body: String ,response_out: ResponseOutparam){
 
         log(wasi::logging::logging::Level::Info, "", &"requesting rate");
 
@@ -103,18 +104,24 @@ impl ApiGateway {
         let response_body = response.body().unwrap();
         log(wasi::logging::logging::Level::Info, "", &"before calling rating agent");
 
+        let rating_process_request = RatingProcessRequest{
+            headers: request_headers,
+            rating_request: rating_request
+        };
+
+        let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(rating_process_request);
         //invoke the rating interface implementation based on agent id sent in the request
-        let rating_interface = wasmcloud::bus::lattice::CallTargetInterface::new(
-            "orange",
-            "rating",
-            "ratingagent",
-        );
-        wasmcloud::bus::lattice::set_link_name(&rating_request.agent_id.to_string(), vec![rating_interface]);
+        // let rating_interface = wasmcloud::bus::lattice::CallTargetInterface::new(
+        //     "orange",
+        //     "rating",
+        //     "ratingagent",
+        // );
+        // wasmcloud::bus::lattice::set_link_name(&rating_request.agent_id.to_string(), vec![rating_interface]);
 
         
-        log(wasi::logging::logging::Level::Info, "", &rating_request.agent_id.to_string());
+        // log(wasi::logging::logging::Level::Info, "", &rating_request.agent_id.to_string());
 
-        let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
+        // let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
         log(wasi::logging::logging::Level::Info, "", &"after calling rating agent");
         ResponseOutparam::set(response_out, Ok(response));
         let serialized_rating_result: SerializedRatingResponse = usage_result.into();

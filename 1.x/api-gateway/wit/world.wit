@@ -2,6 +2,7 @@ package wasmcloud:hello;
 
 world rating-coordinator-world {
   import orange:rating/ratingagent;
+  import orange:ratingcoordinator/ratingcoordinator;
   import wasi:logging/logging@0.1.0-draft; 
   import wasmcloud:bus/lattice@1.0.0;
   
