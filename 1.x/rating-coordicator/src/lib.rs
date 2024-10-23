@@ -2,30 +2,46 @@ wit_bindgen::generate!({
     generate_all
 });
 
+use crate::wasi::logging::logging::{log, Level::Info};
 use crate::orange::rating::types::*;
-use crate::orange::rating::*;
-use wasi::logging::logging::log;
+use crate::exports::orange::ratingcoordinator::ratingcoordinator::{Guest,RatingProcessRequest};
+use build_agents_hierarchy::*;
+use futures::executor::block_on;
+use validation::*;
+use rating::*;
 
 mod agent_graph;
 mod build_agents_hierarchy;
 mod validation;
+mod rating;
 mod types;
+struct RatingCoordinator;
+impl RatingCoordinator{
+   async fn handle_rating_process_async(rating_process_request: RatingProcessRequest,
+    ) -> RatingResponse {
+        log(Info, "", "Hello I'm your rating coordinator");
+        log(Info, "", format!("Current used agent is: {}",rating_process_request.rating_request.agent_id).as_str());
 
-struct HttpServer;
+        let agent_graph = build_agent_hierarchy(&rating_process_request.rating_request).await.unwrap();
 
-impl HttpServer {
-    // fn handle(_request: IncomingRequest, response_out: ResponseOutparam) {
-    //     let response = OutgoingResponse::new(Fields::new());
-    //     response.set_status_code(200).unwrap();
-    //     let response_body = response.body().unwrap();
-    //     ResponseOutparam::set(response_out, Ok(response));
-    //     response_body
-    //         .write()
-    //         .unwrap()
-    //         .blocking_write_and_flush(b"Hello from Rust!\n")
-    //         .unwrap();
-    //     OutgoingBody::finish(response_body, None).expect("failed to finish response body");
-    // }
+        log(Info, "","Graph generated ......");
+
+       let validation_response_as_rating =
+             handle_validation_cycle(&rating_process_request, &agent_graph).await.unwrap();
+        if validation_response_as_rating.authorization_status.code == 401 {
+        return validation_response_as_rating;
+        }
+        return handle_rating_cycle(&rating_process_request, &agent_graph).await;
+      
+    }
 }
 
-// export!(HttpServer);
+impl Guest for RatingCoordinator {
+    fn handle_rating_process(
+        rating_process_request: RatingProcessRequest,
+    ) -> RatingResponse {
+        return block_on(Self::handle_rating_process_async(rating_process_request));
+    }
+}
+
+export!(RatingCoordinator);

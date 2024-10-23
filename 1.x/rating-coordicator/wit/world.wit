@@ -1,9 +1,20 @@
 package orange:ratingcoordinator;
 
-world hello {
+interface ratingcoordinator{
+  use wasi:http/types@0.2.0.{fields};
+  use orange:rating/types.{rating-request,rating-response};
+  record rating-process-request{
+    headers: fields,
+    rating-request: rating-request
+  }
+  handle-rating-process: func(request: rating-process-request) -> rating-response;
+}
+
+world ratingcoordinator-world {
   import orange:rating/ratingagent;
   import wasi:logging/logging@0.1.0-draft; 
   import wasmcloud:bus/lattice@1.0.0;
   import wasi:http/types@0.2.0;
 
+  export ratingcoordinator;
 }

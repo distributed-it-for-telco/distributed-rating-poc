@@ -10,4 +10,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 async-recursion = "1.1.1"
+futures = "0.3.31"
 wit-bindgen = "0.32"

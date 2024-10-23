@@ -5,9 +5,9 @@ use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
 use crate::orange::rating::types::*;
-
+use crate::exports::orange::ratingcoordinator::ratingcoordinator::RatingProcessRequest;
 use crate::agent_graph::AgentGraph;
-use crate::types::{RatingResponseBuilder,RatingProcessRequest};
+use crate::types::{RatingResponseBuilder};
 use crate::wasmcloud::bus::lattice::CallTargetInterface;
 
 pub async fn handle_validation_cycle(
@@ -112,7 +112,7 @@ pub async fn validate_through_agent(
 }
 
 #[derive(Debug)]
-enum ValidationError {
+pub enum ValidationError {
     Other(String), // For generic errors
 }
 impl fmt::Display for ValidationError {

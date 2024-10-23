@@ -1,9 +1,7 @@
 
-use crate::wasi::http::types::{Fields};
 use crate::orange::rating::types::{
-    Agent, RatingRequest, RatingResponse, ValidationRequest, 
-    ValidationResponse,AgentIdentification,AuthorizationStatus,
-    BillingInformation
+    RatingResponse, AgentIdentification,
+    AuthorizationStatus, BillingInformation
 };
 
 #[derive(Debug, Default, Clone)]
@@ -17,11 +15,7 @@ pub struct RatingResponseBuilder {
     next_agent: Option<AgentIdentification>,
 }
 
-#[derive(Debug)]
-pub struct RatingProcessRequest{
-    pub rating_request: RatingRequest,
-    pub headers: Fields
-}
+
 
 impl RatingResponseBuilder {
     pub fn new() -> RatingResponseBuilder {
