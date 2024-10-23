@@ -1,14 +1,14 @@
-use crate::wasi::logging::logging::{log, Level::Info};
 use std::{fmt,collections::HashMap, collections::VecDeque};
+
+use crate::wasi::logging::logging::{log, Level::Info};
+use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
 use crate::orange::rating::types::*;
-use crate::exports::orange::ratingcoordinator::types::{RatingProcessRequest};
 
 use crate::agent_graph::AgentGraph;
-use crate::rating_reponse_builder::{RatingResponseBuilder};
+use crate::types::{RatingResponseBuilder,RatingProcessRequest};
 use crate::wasmcloud::bus::lattice::CallTargetInterface;
-use crate::wasmcloud::bus::lattice;
 
 pub async fn handle_validation_cycle(
     rating_process_request: &RatingProcessRequest,
@@ -106,7 +106,7 @@ pub async fn validate_through_agent(
         client_country: client_country,
     };
 
-    let validation_response = rating_agent::validate(&validation_request).await?;
+    let validation_response = ratingagent::validate(&validation_request);
 
     Ok(validation_response)
 }

@@ -9,7 +9,7 @@ use wasi::logging::logging::log;
 mod agent_graph;
 mod build_agents_hierarchy;
 mod validation;
-mod rating_reponse_builder;
+mod types;
 
 struct HttpServer;
 

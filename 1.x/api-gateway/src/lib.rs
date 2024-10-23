@@ -1,13 +1,16 @@
 wit_bindgen::generate!({ generate_all });
 
-use crate::orange::rating::types::{RatingRequest, RatingResponse};
-use crate::orange::rating::*;
-use exports::wasi::http::incoming_handler::Guest;
-use serializer::*;
-use wasi::http::types::*;
 use wasi::io::streams::InputStream;
 use wasi::logging::logging::log;
+use wasi::http::types::*;
 use wasi::http::types::Method::*;
+use exports::wasi::http::incoming_handler::Guest;
+
+use crate::orange::rating::*;
+use crate::orange::rating::types::{RatingRequest, RatingResponse};
+
+use serializer::*;
+
 mod serializer;
 
 struct ApiGateway;

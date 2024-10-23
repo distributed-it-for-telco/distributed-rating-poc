@@ -1,3 +1,5 @@
+
+use crate::wasi::http::types::{Fields};
 use crate::orange::rating::types::{
     Agent, RatingRequest, RatingResponse, ValidationRequest, 
     ValidationResponse,AgentIdentification,AuthorizationStatus,
@@ -13,6 +15,12 @@ pub struct RatingResponseBuilder {
     price: String,
     messages: Vec<String>,
     next_agent: Option<AgentIdentification>,
+}
+
+#[derive(Debug)]
+pub struct RatingProcessRequest{
+    pub rating_request: RatingRequest,
+    pub headers: Fields
 }
 
 impl RatingResponseBuilder {
