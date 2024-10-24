@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 use crate::wasi::logging::logging::{log, Level::Info};
 use crate::wasmcloud::bus::lattice;
@@ -7,7 +7,6 @@ use crate::orange::rating::*;
 use crate::orange::rating::types::*;
 use crate::exports::orange::ratingcoordinator::ratingcoordinator::RatingProcessRequest;
 use crate::agent_graph::AgentGraph;
-use crate::wasmcloud::bus::lattice::CallTargetInterface;
 use async_recursion::async_recursion;
 
 pub async fn handle_rating_cycle(
@@ -30,7 +29,7 @@ pub async fn handle_rating_cycle(
 pub async fn rate_through_agent(
     rating_request: &RatingRequest,
 ) -> RatingResponse {
-    let rating_interface = CallTargetInterface::new(
+    let rating_interface = lattice::CallTargetInterface::new(
         "orange",
         "rating",
         "ratingagent",
@@ -73,10 +72,7 @@ async fn dfs_recursive(
     let current_agent = vertex.clone();
     rating_request.agent_id = current_agent.identification.name;
     rating_request.customer_id = current_agent.identification.partner_id;
-
-    if let usage = current_agent.usage {
-        rating_request.usage = usage;
-    }
+    rating_request.usage = current_agent.usage;
 
      log(Info, "","Prepare rating history .....");
     let mut child_records = Vec::new();

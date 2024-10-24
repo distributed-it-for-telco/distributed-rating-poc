@@ -5,8 +5,10 @@ wit_bindgen::generate!({
 use crate::wasi::logging::logging::{log, Level::Info};
 use crate::orange::rating::types::*;
 use crate::exports::orange::ratingcoordinator::ratingcoordinator::{Guest,RatingProcessRequest};
-use build_agents_hierarchy::*;
+
 use futures::executor::block_on;
+
+use build_agents_hierarchy::*;
 use validation::*;
 use rating::*;
 
@@ -28,9 +30,11 @@ impl RatingCoordinator{
 
        let validation_response_as_rating =
              handle_validation_cycle(&rating_process_request, &agent_graph).await.unwrap();
+        
         if validation_response_as_rating.authorization_status.code == 401 {
-        return validation_response_as_rating;
+            return validation_response_as_rating;
         }
+
         return handle_rating_cycle(&rating_process_request, &agent_graph).await;
     }
 }
