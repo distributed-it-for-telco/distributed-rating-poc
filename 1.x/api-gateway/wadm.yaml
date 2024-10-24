@@ -3,19 +3,19 @@ kind: Application
 metadata:
   name: api-gateway
   annotations:
-    description: 'HTTP hello world demo in Rust, using the WebAssembly Component Model and WebAssembly Interfaces Types (WIT)'
+    description: 'API gateway for distributed rating services'
     wasmcloud.dev/authors: wasmCloud team
     wasmcloud.dev/source-url: https://github.com/wasmCloud/wasmCloud/blob/main/examples/rust/components/http-hello-world/wadm.yaml
     wasmcloud.dev/readme-md-url: https://github.com/wasmCloud/wasmCloud/blob/main/examples/rust/components/http-hello-world/README.md
     wasmcloud.dev/homepage: https://github.com/wasmCloud/wasmCloud/tree/main/examples/rust/components/http-hello-world
     wasmcloud.dev/categories: |
-      http,http-server,rust,hello-world,example
+      http,http-server,rust,api-gateway
 spec:
   components:
-    - name: http-component
+    - name: api-gateway
       type: component
       properties:
-        image: file://./build/http_hello_world_s.wasm
+        image: file://./build/api_gateway_s.wasm
         # To use the a precompiled version of this component, use the line below instead:
         # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
       traits:

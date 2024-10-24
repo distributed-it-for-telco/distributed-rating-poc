@@ -1,5 +1,5 @@
 [package]
-name = "http-hello-world"
+name = "api-gateway"
 edition = "2021"
 version = "0.1.0"
 

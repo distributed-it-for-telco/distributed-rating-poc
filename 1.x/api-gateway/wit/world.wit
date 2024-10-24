@@ -1,6 +1,6 @@
 package wasmcloud:hello;
 
-world rating-coordinator-world {
+world api-gateway-world {
   import orange:rating/ratingagent;
   import orange:ratingcoordinator/ratingcoordinator;
   import wasi:logging/logging@0.1.0-draft; 
