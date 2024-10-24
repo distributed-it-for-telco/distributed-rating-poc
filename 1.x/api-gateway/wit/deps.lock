@@ -25,10 +25,6 @@ deps = ["cli", "clocks", "filesystem", "io", "random", "sockets"]
 sha256 = "7210e5653539a15478f894d4da24cc69d61924cbcba21d2804d69314a88e5a4c"
 sha512 = "49184a1b0945a889abd52d25271172ed3dc2db6968fcdddb1bab7ee0081f4a3eeee0977ad2291126a37631c0d86eeea75d822fa8af224c422134500bf9f0f2bb"
 
-[keyvalue]
-sha256 = "d2de617fe31ec0abc6072f75f97dd22bf95b3231d5b3111471d73871df9081cd"
-sha512 = "6f0b4e44c684d760c54552e2bde9bc976e0a4f6525fc1d47acb98625e030847276436242f42a41f4da1bb9169fb2968c53d659d61af9b2f709f4eb6f9880e2c7"
-
 [logging]
 url = "https://github.com/WebAssembly/wasi-logging/archive/d31c41d0d9eed81aabe02333d0025d42acf3fb75.tar.gz"
 sha256 = "ad81d8b7f7a8ceb729cf551f1d24586f0de9560a43eea57a9bb031d2175804e1"
@@ -40,9 +36,9 @@ sha512 = "964c4e8925a53078e4d94ba907b54f89a0b7e154f46823a505391471466c17f53c8692
 
 [rating-coordinator]
 path = "../../rating-coordinator/wit"
-sha256 = "6ad18c724737f2873d15dfdeea626f204fbcc4c9d4d96b9e996b2859cdceb569"
-sha512 = "8be959d3814b95e661de80e2ab775e3a968cff8f9b62876057e92d9c444a2bc14069488c3f5e0c791d07a7fdd7509e2361ba21518af8ef187941e1b871cdfbf7"
-deps = ["cli", "clocks", "filesystem", "io", "keyvalue", "random", "sockets"]
+sha256 = "44c986cbdd52090e13cdbe7ca24059dccb77832d5e4275bd2653cb8308366331"
+sha512 = "848ae6c11f51116c298f0aa0a0b519fef3ccc37c86371766c6252481d7328d10c751e0c94126313486ae2834db10d9c9345367c335858b0d0af2234b5fbab2ea"
+deps = ["cli", "clocks", "filesystem", "io", "random", "sockets"]
 
 [rating-interface]
 path = "../../rating-interface/wit"

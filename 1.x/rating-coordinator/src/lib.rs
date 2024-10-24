@@ -4,7 +4,7 @@ wit_bindgen::generate!({
 
 use crate::wasi::logging::logging::{log, Level::Info};
 use crate::orange::rating::types::*;
-use crate::exports::orange::ratingcoordinator::ratingcoordinator::{Guest,RatingProcessRequest};
+use crate::exports::orange::rating_coordinator::ratingcoordinator::{Guest,RatingProcessRequest};
 
 use futures::executor::block_on;
 

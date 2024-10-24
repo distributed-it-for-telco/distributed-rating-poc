@@ -25,18 +25,11 @@ spec:
             instances: 1
         - type: link
           properties:
-            name: metaverse
-            target: metaverse-rating-agent-component
+            name: rating-coordinator
+            target: rating-coordinator-component
             namespace: orange
             package: rating
-            interfaces: [ratingagent]
-        - type: link
-          properties:
-            name: orange-vod
-            target: orange-vod-rating-agent-component
-            namespace: orange
-            package: rating
-            interfaces: [ratingagent]
+            interfaces: [ratingcoordinator]
 
     - name: metaverse-rating-agent-component
       type: component

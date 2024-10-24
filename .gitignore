@@ -17,3 +17,6 @@ host_config.json
 .smithy.lsp.log
 
 dump.rdb
+
+
+mytestscript.sh

@@ -6,8 +6,8 @@ use wasi::http::types::*;
 use wasi::http::types::Method::*;
 use exports::wasi::http::incoming_handler::Guest;
 
-use crate::orange::ratingcoordinator::*;
-use crate::orange::ratingcoordinator::{ratingcoordinator::RatingProcessRequest};
+use crate::orange::rating::*;
+use crate::orange::rating_coordinator::ratingcoordinator;
 use crate::orange::rating::types::{RatingRequest, RatingResponse};
 
 use serializer::*;
@@ -54,17 +54,7 @@ impl ApiGateway {
                 
                 Self::request_rate(_request.headers(),body,response_out);
             }
-            // ("GET", ["usage", "rating-proofs", usage_collector_id]) => {
-            //     list_usage_proofs(ctx, usage_collector_id).await
-            // }
-            // ("POST", ["seed", "orange", "customer", "inventory"]) => {
-            //     seed_data_for_orange_cust_inventory(ctx).await
-            // }
-            // ("GET", ["party", party_id, "offers", inventory_agent_id]) => {
-            //     get_party_offers(ctx, party_id, inventory_agent_id).await
-            // }
-
-            // ("POST", ["balance", "topup"]) => topup_balance(ctx, deser(&req.body)?).await,
+           
 
             (_, _) => Self::not_found(response_out),
         }
@@ -104,34 +94,25 @@ impl ApiGateway {
         let response_body = response.body().unwrap();
         log(wasi::logging::logging::Level::Info, "", &"before calling rating agent");
 
-        let rating_process_request = RatingProcessRequest{
+        let rating_process_request = ratingcoordinator::RatingProcessRequest{
             headers: request_headers,
             rating_request: rating_request
         };
 
         let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(rating_process_request);
-        //invoke the rating interface implementation based on agent id sent in the request
-        // let rating_interface = wasmcloud::bus::lattice::CallTargetInterface::new(
-        //     "orange",
-        //     "rating",
-        //     "ratingagent",
-        // );
-        // wasmcloud::bus::lattice::set_link_name(&rating_request.agent_id.to_string(), vec![rating_interface]);
 
-        
-        // log(wasi::logging::logging::Level::Info, "", &rating_request.agent_id.to_string());
-
-        // let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
-        log(wasi::logging::logging::Level::Info, "", &"after calling rating agent");
-        ResponseOutparam::set(response_out, Ok(response));
-        let serialized_rating_result: SerializedRatingResponse = usage_result.into();
-        let binding = serde_json::to_string(&serialized_rating_result).unwrap();
-        let serialized_response = binding.as_bytes();
+        // // let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
+        // log(wasi::logging::logging::Level::Info, "", &"after calling rating agent");
+        // ResponseOutparam::set(response_out, Ok(response));
+        // let serialized_rating_result: SerializedRatingResponse = usage_result.into();
+        // let binding = serde_json::to_string(&serialized_rating_result).unwrap();
+        // let serialized_response = binding.as_bytes();
 
         response_body
             .write()
             .unwrap()
-            .blocking_write_and_flush(&serialized_response)
+            // .blocking_write_and_flush(&serialized_response)
+            .blocking_write_and_flush(b"ssss")
             .unwrap();
 
         OutgoingBody::finish(response_body, None).expect("failed to finish response body");
@@ -168,3 +149,16 @@ impl Guest for ApiGateway {
 }
 
 export!(ApiGateway);
+
+
+ // ("GET", ["usage", "rating-proofs", usage_collector_id]) => {
+            //     list_usage_proofs(ctx, usage_collector_id).await
+            // }
+            // ("POST", ["seed", "orange", "customer", "inventory"]) => {
+            //     seed_data_for_orange_cust_inventory(ctx).await
+            // }
+            // ("GET", ["party", party_id, "offers", inventory_agent_id]) => {
+            //     get_party_offers(ctx, party_id, inventory_agent_id).await
+            // }
+
+            // ("POST", ["balance", "topup"]) => topup_balance(ctx, deser(&req.body)?).await,
