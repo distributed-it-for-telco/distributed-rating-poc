@@ -28,7 +28,7 @@ spec:
             name: rating-coordinator
             target: rating-coordinator-component
             namespace: orange
-            package: rating
+            package: rating-coordinator
             interfaces: [ratingcoordinator]
 
     - name: metaverse-rating-agent-component

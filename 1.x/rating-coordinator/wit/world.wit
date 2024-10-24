@@ -10,7 +10,7 @@ interface ratingcoordinator{
   handle-rating-process: func(request: rating-process-request) -> rating-response;
 }
 
-world ratingcoordinator-world {
+world rating-coordinator-world {
   import orange:rating/ratingagent;
   import wasi:logging/logging@0.1.0-draft; 
   import wasmcloud:bus/lattice@1.0.0;

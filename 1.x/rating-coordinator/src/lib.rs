@@ -17,7 +17,9 @@ mod build_agents_hierarchy;
 mod validation;
 mod rating;
 mod types;
+
 struct RatingCoordinator;
+
 impl RatingCoordinator{
    async fn handle_rating_process_async(rating_process_request: RatingProcessRequest,
     ) -> RatingResponse {
