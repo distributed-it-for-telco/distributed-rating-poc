@@ -2,9 +2,9 @@
 path = "../../balance-management/wit"
 sha256 = "d9a48a839bd2c3bf67e171759c346fe68e537eccb33b6838fca0c34daf98d8b4"
 sha512 = "c155240fc493c2aab6574ddde2dd5fcc4436453a48818ab7ec4e31dc9b75ff07cb5284c55447c28f7b6653e35ceaa3025d04e97c4aa989736726655a6bae9fa1"
-deps = ["keyvalue"]
 
 [keyvalue]
+url = "https://github.com/WebAssembly/wasi-keyvalue/archive/53ff9402194704cb68b1599c4e35e9182f4c57c4.tar.gz"
 sha256 = "d2de617fe31ec0abc6072f75f97dd22bf95b3231d5b3111471d73871df9081cd"
 sha512 = "6f0b4e44c684d760c54552e2bde9bc976e0a4f6525fc1d47acb98625e030847276436242f42a41f4da1bb9169fb2968c53d659d61af9b2f709f4eb6f9880e2c7"
 

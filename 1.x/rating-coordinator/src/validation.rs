@@ -5,7 +5,7 @@ use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
 use crate::orange::rating::types::*;
-use crate::exports::orange::rating_coordinator::ratingcoordinator::RatingProcessRequest;
+use crate::exports::orange::ratingcoordinator::ratingcoordinator::RatingProcessRequest;
 use crate::agent_graph::AgentGraph;
 use crate::types::{RatingResponseBuilder};
 use crate::wasmcloud::bus::lattice::CallTargetInterface;

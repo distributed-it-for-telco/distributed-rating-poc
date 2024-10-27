@@ -7,7 +7,7 @@ use wasi::http::types::Method::*;
 use exports::wasi::http::incoming_handler::Guest;
 
 use crate::orange::rating::*;
-use crate::orange::rating_coordinator::ratingcoordinator;
+use crate::orange::ratingcoordinator::ratingcoordinator;
 use crate::orange::rating::types::{RatingRequest, RatingResponse};
 
 use serializer::*;
