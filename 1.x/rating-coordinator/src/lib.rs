@@ -44,9 +44,7 @@ impl RatingCoordinator{
 impl Guest for RatingCoordinator {
     fn handle_rating_process(
         rating_process_request: RatingProcessRequest,
-    ) -> RatingResponse {
-        return block_on(Self::handle_rating_process_async(rating_process_request));
-    }
+    ) -> RatingResponse {block_on(Self::handle_rating_process_async(rating_process_request))}
 }
 
-export!(RatingCoordinator);
+export!(RatingCoordinator); 
