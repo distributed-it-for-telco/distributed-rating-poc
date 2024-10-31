@@ -25,7 +25,6 @@ spec:
             instances: 1
         - type: link
           properties:
-            name: rating-coordinator
             target: rating-coordinator-component
             namespace: orange
             package: ratingcoordinator

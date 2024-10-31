@@ -5,4 +5,4 @@ type = "component"
 
 [component]
 wit_world = "api-gateway-world"
-wasm_target = "wasm32-wasi-preview2"
+wasm_target = "wasm32-wasip1"

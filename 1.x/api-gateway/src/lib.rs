@@ -1,7 +1,7 @@
 wit_bindgen::generate!({ generate_all });
 
 use wasi::io::streams::InputStream;
-use wasi::logging::logging::log;
+use wasi::logging::logging::{log, Level::Info};
 use wasi::http::types::*;
 use wasi::http::types::Method::*;
 use exports::wasi::http::incoming_handler::Guest;
@@ -46,7 +46,7 @@ impl ApiGateway {
             Self::get_request_parts(_request.path_with_query().unwrap(), _request.method());
         let http_request_body: IncomingBody = _request.consume().unwrap();
         let body = StreamReader::read_input_stream(&http_request_body.stream().unwrap());
-        log(wasi::logging::logging::Level::Info, "", &request_parts.path);
+        log(Info, "", &request_parts.path);
         
         match (request_parts.method, request_parts.path.as_str()) {
             // ("OPTIONS", _) => get_options_response(ctx).await,
@@ -80,7 +80,7 @@ impl ApiGateway {
 
     fn request_rate(request_headers:Fields, body: String ,response_out: ResponseOutparam){
 
-        log(wasi::logging::logging::Level::Info, "", &"requesting rate");
+        log(Info, "", &"requesting rate");
 
         let serialized_rating_request: SerializedRatingRequest =
             serde_json::from_str(&body).unwrap();
@@ -92,27 +92,22 @@ impl ApiGateway {
 
         response.set_status_code(200).unwrap();
         let response_body = response.body().unwrap();
-        log(wasi::logging::logging::Level::Info, "", &"before calling rating agent");
+        log(Info, "", &"before calling rating agent");
 
-        let rating_process_request = ratingcoordinator::RatingProcessRequest{
-            headers: request_headers,
-            rating_request: rating_request
-        };
+        let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(&rating_request,&request_headers.entries());
+        log(Info, "", &usage_result.billing_information.unit);
 
-        let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(rating_process_request);
-
-        // // let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
-        // log(wasi::logging::logging::Level::Info, "", &"after calling rating agent");
-        // ResponseOutparam::set(response_out, Ok(response));
-        // let serialized_rating_result: SerializedRatingResponse = usage_result.into();
-        // let binding = serde_json::to_string(&serialized_rating_result).unwrap();
-        // let serialized_response = binding.as_bytes();
+        // let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
+        log(Info, "", &"after calling rating agent");
+        ResponseOutparam::set(response_out, Ok(response));
+        let serialized_rating_result: SerializedRatingResponse = usage_result.into();
+        let binding = serde_json::to_string(&serialized_rating_result).unwrap();
+        let serialized_response = binding.as_bytes();
 
         response_body
             .write()
             .unwrap()
-            // .blocking_write_and_flush(&serialized_response)
-            .blocking_write_and_flush(b"ssss")
+            .blocking_write_and_flush(&serialized_response)
             .unwrap();
 
         OutgoingBody::finish(response_body, None).expect("failed to finish response body");
