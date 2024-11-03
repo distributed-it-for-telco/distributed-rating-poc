@@ -5,12 +5,11 @@ use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
 use crate::orange::rating::types::*;
-use crate::exports::orange::ratingcoordinator::ratingcoordinator::RatingProcessRequest;
 use crate::agent_graph::AgentGraph;
 use async_recursion::async_recursion;
 
 pub async fn handle_rating_cycle(
-    rating_process_request: &RatingProcessRequest,
+    rating_request: &RatingRequest,
     agents_graph: &AgentGraph,
 ) -> RatingResponse {
     let mut visited: HashMap<String, bool> = HashMap::new();
@@ -21,7 +20,7 @@ pub async fn handle_rating_cycle(
         agents_graph.get_start_vertex().to_owned().unwrap().clone(),
         &visited,
         &agents_graph,
-        &mut rating_process_request.rating_request.clone(),
+        &mut rating_request.clone(),
     )
     .await
 }
