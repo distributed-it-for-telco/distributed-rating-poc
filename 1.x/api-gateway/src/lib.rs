@@ -42,6 +42,7 @@ impl ApiGateway {
     }
 
     fn map_request_to_service(_request: IncomingRequest, response_out: ResponseOutparam) {
+        log(Info, "", "Http Request recieved");
         let request_parts =
             Self::get_request_parts(_request.path_with_query().unwrap(), _request.method());
         let http_request_body: IncomingBody = _request.consume().unwrap();
