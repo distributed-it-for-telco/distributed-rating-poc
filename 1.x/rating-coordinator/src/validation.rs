@@ -5,33 +5,32 @@ use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
 use crate::orange::rating::types::*;
-use crate::exports::orange::ratingcoordinator::ratingcoordinator::RatingProcessRequest;
 use crate::agent_graph::AgentGraph;
 use crate::types::{RatingResponseBuilder};
 use crate::wasmcloud::bus::lattice::CallTargetInterface;
 
 pub async fn handle_validation_cycle(
-    rating_process_request: &RatingProcessRequest,
+    rating_request: &RatingRequest,
+    headers: HashMap<String,String>,
     agents_graph: &AgentGraph,
 ) -> Result<RatingResponse, ValidationError> {
-    if rating_process_request.headers.entries().is_empty() {
+    if headers.is_empty() {
         return Err(ValidationError::Other("Can't validate client usage, client ip not found".to_string()));
     }
 
-    let client_headers = &rating_process_request.headers;
     let mut client_ip = "".to_string();
     let mut client_country = "".to_string();
 
-    let client_ip_bytes = client_headers.get(&"client_ip".to_string());
+    let client_ip_bytes = headers.get(&"client_ip".to_string()).unwrap();
     if !client_ip_bytes.is_empty() {
-        client_ip = String::from_utf8(client_ip_bytes[0].clone()).unwrap();
+        client_ip = client_ip_bytes.clone();
     }
-    let client_country_bytes = client_headers.get(&"client_country".to_string());
+    let client_country_bytes = headers.get(&"client_country".to_string()).unwrap();
     if !client_country_bytes.is_empty() {
-        client_country = String::from_utf8(client_country_bytes[0].clone()).unwrap();
+        client_country = client_country_bytes.clone();
     }
 
-    log(Info, "", format!("Validating against agent: {}",rating_process_request.rating_request.agent_id).as_str());
+    log(Info, "", format!("Validating against agent: {}",rating_request.agent_id).as_str());
 
     let mut validation_response;
     let mut rating_response_builder = RatingResponseBuilder::new();
@@ -49,7 +48,7 @@ pub async fn handle_validation_cycle(
         let current = queue.pop_front().unwrap();
         println!("Visited vertex: {:?}", current);
 
-        let mut updated_rating_request = rating_process_request.rating_request.clone();
+        let mut updated_rating_request = rating_request.clone();
         updated_rating_request.customer_id = current.identification.partner_id.clone();
         updated_rating_request.agent_id = current.identification.name.clone();
         updated_rating_request.usage = current.clone().usage.clone();

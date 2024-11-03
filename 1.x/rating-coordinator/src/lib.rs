@@ -31,7 +31,7 @@ impl RatingCoordinator{
         log(Info, "","Graph generated ......");
 
        let validation_response_as_rating =
-             handle_validation_cycle(&rating_request, &agent_graph).await.unwrap();
+             handle_validation_cycle(&rating_request, headers, &agent_graph).await.unwrap();
         
         if validation_response_as_rating.authorization_status.code == 401 {
             return validation_response_as_rating;
@@ -46,8 +46,8 @@ impl Guest for RatingCoordinator {
         rating_process_request: RatingRequest,
         headers:  Vec<(String, Vec<u8>)>
     ) -> RatingResponse {
-        let headersMap: HashMap<_, _> = headers.into_iter().map(|(a,b)| (a.String::from_utf8(b))).collect();
-        block_on(Self::handle_rating_process_async(rating_process_request,headersMap));
+        let client_country_bytes: HashMap<String, String> = headers.into_iter().map(|(a,b)| (a,String::from_utf8(b).unwrap())).collect();
+        block_on(Self::handle_rating_process_async(rating_process_request,client_country_bytes));
         RatingResponse{
             authorization_status: AuthorizationStatus{
                 code: 15,
