@@ -47,22 +47,22 @@ impl Guest for RatingCoordinator {
         headers:  Vec<(String, Vec<u8>)>
     ) -> RatingResponse {
         let client_country_bytes: HashMap<String, String> = headers.into_iter().map(|(a,b)| (a,String::from_utf8(b).unwrap())).collect();
-        block_on(Self::handle_rating_process_async(rating_process_request,client_country_bytes));
-        RatingResponse{
-            authorization_status: AuthorizationStatus{
-                code: 15,
-                key: "".to_string()
-            },
-            billing_information: BillingInformation{
-                messages: vec!["".to_string()],
-                price: "".to_string(),
-                unit: "".to_string()
-            },
-            next_agent: AgentIdentification{
-                name: "".to_string(),
-                partner_id: "".to_string()
-            }
-        }
+        block_on(Self::handle_rating_process_async(rating_process_request,client_country_bytes))
+        // RatingResponse{
+        //     authorization_status: AuthorizationStatus{
+        //         code: 15,
+        //         key: "".to_string()
+        //     },
+        //     billing_information: BillingInformation{
+        //         messages: vec!["".to_string()],
+        //         price: "".to_string(),
+        //         unit: "".to_string()
+        //     },
+        //     next_agent: AgentIdentification{
+        //         name: "".to_string(),
+        //         partner_id: "".to_string()
+        //     }
+        // }
     }
 }
 

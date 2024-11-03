@@ -20,16 +20,18 @@ pub async fn handle_validation_cycle(
 
     let mut client_ip = "".to_string();
     let mut client_country = "".to_string();
-
-    let client_ip_bytes = headers.get(&"client_ip".to_string()).unwrap();
-    if !client_ip_bytes.is_empty() {
-        client_ip = client_ip_bytes.clone();
+    if !headers.get(&"client_ip".to_string()).is_none(){
+        let client_ip_bytes = headers.get(&"client_ip".to_string()).unwrap();
+        if !client_ip_bytes.is_empty() {
+            client_ip = client_ip_bytes.clone();
+        }
     }
-    let client_country_bytes = headers.get(&"client_country".to_string()).unwrap();
-    if !client_country_bytes.is_empty() {
-        client_country = client_country_bytes.clone();
+    if !headers.get(&"client_country".to_string()).is_none(){
+        let client_country_bytes = headers.get(&"client_country".to_string()).unwrap();
+        if !client_country_bytes.is_empty() {
+            client_country = client_country_bytes.clone();
+        }
     }
-
     log(Info, "", format!("Validating against agent: {}",rating_request.agent_id).as_str());
 
     let mut validation_response;

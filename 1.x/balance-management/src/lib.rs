@@ -21,6 +21,7 @@ impl Guest for BalanceManager {
        
         let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
         let object_name = format!("{}:{}:{}", "balance", customer_id,offer_id);
+        wasi::logging::logging::log(wasi::logging::logging::Level::Info, "", &object_name);
         
         let balance_utf8 = bucket.get(&object_name).expect("couldn't retrieve count");
         let balance_str = String::from_utf8(balance_utf8.clone().unwrap()).unwrap();

@@ -60,6 +60,10 @@ impl RatingResponseBuilder {
             code: 0,
             key: "".to_string()
         };
+        let mut next_agent = AgentIdentification{
+            name: "".to_string(),
+            partner_id: "".to_string()
+        };
         billing_info.unit = self.unit.to_string();
         billing_info.price = self.price.to_string();
 
@@ -72,12 +76,15 @@ impl RatingResponseBuilder {
         } else {
             authorization_status.code = 401;
         }
+        if  !self.next_agent.is_none(){
+            next_agent = self.next_agent.clone().unwrap();
+        }
         authorization_status.key = self.authorization_message.to_string();
         
         RatingResponse {
             authorization_status: authorization_status,
             billing_information: billing_info,
-            next_agent: self.next_agent.clone().unwrap()
+            next_agent: next_agent
         }
     }
 }
