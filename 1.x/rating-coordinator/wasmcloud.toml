@@ -1,8 +1,8 @@
-name = "api-gateawy"
+name = "rating-coordinator"
 version = "0.1.0"
 language = "rust"
 type = "component"
 
 [component]
-wit_world = "api-gateway-world"
+wit_world = "rating-coordinator-world"
 wasm_target = "wasm32-wasip1"
