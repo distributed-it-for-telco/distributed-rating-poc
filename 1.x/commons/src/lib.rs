@@ -1,13 +1,9 @@
 wit_bindgen::generate!({
     generate_all
-    // additional_derives: [Defauylt]
 });
 
-use crate::orange::commons::*;
-// use crate::rating_response_builder::RatingResponseBuilder;
-
-use exports::orange::commons::*;
-use crate::commons::Guest;
+use crate::exports::orange::commons::commons::*;
+use crate::exports::orange::commons::commons::Guest;
 
 struct Commons;
 
