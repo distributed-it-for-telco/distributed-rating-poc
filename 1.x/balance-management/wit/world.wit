@@ -1,7 +1,7 @@
 package orange:balancemanager;
 
 interface  balancemanager{
-    use types.{balance};
+    use orange:commons/types.{balance};
     // use orange:commons/commons;
      // Function to create a new balance
     get-balance: func(customer-id: string, offer-id: string) -> balance;
