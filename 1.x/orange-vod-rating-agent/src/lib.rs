@@ -1,17 +1,31 @@
 
-use crate::orange::rating::types::{
-    AgentIdentification, AuthorizationStatus, BillingInformation,
-};
-use exports::orange::rating::ratingagent::*;
-use wasi::logging::logging::log;
 use std::fmt;
+use lazy_static::lazy_static;
 use serde::{Serialize, Deserialize};
+use wasi::logging::logging::{log,Level::Info};
+use crate::orange::rating::types::*;
+use exports::orange::rating::ratingagent::*;
 
 wit_bindgen::generate!({
     generate_all,
     additional_derives: [serde::Serialize, serde::Deserialize]
 });
 
+const OFFER_ID: &str = "1";
+const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
+const RATE_FEE: f64 = 0.1;
+const RATING_PROOF_DESC: &str = "Streamzie Movies on demand";
+const RATING_PROOF_USAGE_TYPE: &str = "VoD";
+const RATING_PROOF_PRODUCT_NAME: &str = "Streamzie Movies on demand";
+
+lazy_static! {
+    static ref OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS: HashMap<&'static str, &'static str> = {
+        let mut m = HashMap::new();
+        m.insert("stream", "provider_streaming");
+        m.insert("video", "provider_video");
+        m
+    };
+}
 #[derive(Serialize, Deserialize)]
 struct Balance {
     count: f32,
@@ -47,20 +61,20 @@ struct MetaverseRatingagent;
 impl Guest for MetaverseRatingagent {
     /// Say hello!
     fn rate_usage(_request: RatingRequest) -> RatingResponse {
-        log(wasi::logging::logging::Level::Info, "", &_request.offer_id);
+        log(Info, "", &_request.offer_id);
 
         let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
         let object_name = format!("{}:{}:{}", "balance", _request.customer_id, _request.offer_id);
         
-        log(wasi::logging::logging::Level::Info, "", &object_name);
+        log(Info, "", &object_name);
 
         let balance_utf8 = bucket.get(&object_name).expect("couldn't retrieve count");
         let balance_str = String::from_utf8(balance_utf8.clone().unwrap()).unwrap();
         
-        wasi::logging::logging::log(wasi::logging::logging::Level::Info, "", &balance_str);
+        log(Info, "", &balance_str);
 
         let mut balance: Balance = serde_json::from_str(&balance_str).unwrap();
-        log(wasi::logging::logging::Level::Info, "", &balance.to_string());
+        log(Info, "", &balance.to_string());
 
         let price: f32 = 5.0;
         let purchase_amount = _request.usage.usage_characteristic_list[0].value.parse::<f32>().unwrap() * price;

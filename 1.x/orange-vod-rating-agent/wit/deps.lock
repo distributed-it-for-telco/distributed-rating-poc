@@ -1,3 +1,13 @@
+[balance-manager]
+path = "../../balance-management/wit"
+sha256 = "d9a48a839bd2c3bf67e171759c346fe68e537eccb33b6838fca0c34daf98d8b4"
+sha512 = "c155240fc493c2aab6574ddde2dd5fcc4436453a48818ab7ec4e31dc9b75ff07cb5284c55447c28f7b6653e35ceaa3025d04e97c4aa989736726655a6bae9fa1"
+deps = ["commons"]
+
+[commons]
+sha256 = "1f298312d840738bdd405f30638c6893dbb03ad0f89315672fbc7575034ee1be"
+sha512 = "518bc752881fbf8637a56e9df93c2c579e55252ce6d071d9ae0f5240dacff02afffba4c2325e40c8f4a48893093e69f24552e6576b675cfb9ad1a6111ca78fea"
+
 [keyvalue]
 url = "https://github.com/WebAssembly/wasi-keyvalue/archive/53ff9402194704cb68b1599c4e35e9182f4c57c4.tar.gz"
 sha256 = "d2de617fe31ec0abc6072f75f97dd22bf95b3231d5b3111471d73871df9081cd"
