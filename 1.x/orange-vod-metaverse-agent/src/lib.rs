@@ -21,7 +21,7 @@ struct OrangeVodMetaverseRatingagent;
 // const BUCKET_KEY_PREFIX: &str = "bucket";
 const ROOM_ENTRING_COST: f32 = 1.0;
 const MOVIE_COST: f32 = 2.0;
-const MOVIE_OFFER_ID: &str = "metaverse-vod";
+const METAVERSE_OFFER_ID: &str = "metaverse-vod";
 // const ROOM_OFFER_ID: &str = "metaverse-room-access";
 const ROOM_USAGE_NAME: &str = "room-entering-usage";
 const MOVIE_USAGE_NAME: &str = "movie-usage";
@@ -64,11 +64,11 @@ async fn handle_room_rating(
 }
 
 async fn handle_movie_rating(
-    customer_id: &String,
+    advertiser_id: &String,
     offer_id: &String,
     usage_characteristic: &UsageCharacteristic,
 ) -> RatingResponse {
-    Self::handle_rating(&customer_id, &offer_id, &usage_characteristic, MOVIE_COST).await
+    Self::handle_rating(&advertiser_id, &offer_id, &usage_characteristic, MOVIE_COST).await
 }
 
 async fn handle_rating(
@@ -80,7 +80,7 @@ async fn handle_rating(
     let usage = usage_characteristic.value.parse::<f32>().unwrap();
 
     let mut rating_response_builder = RatingResponseBuilder::new();
-    let balance = balancemanager::get_balance(customer_id, offer_id);
+    let balance = balancemanager::get_balance(customer_id, METAVERSE_OFFER_ID);
     
 
     let rating = Self::calc_rate(usage, unit_charge);
@@ -88,8 +88,7 @@ async fn handle_rating(
     if Self::has_sufficient_balance(balance.count, rating) {
         log(Info, "", format!( "Usage {} , Rating {} ", usage, rating).as_str());
 
-        let new_balance: Balance = balancemanager::purchase(&balance, rating,customer_id, MOVIE_OFFER_ID).expect("Bad balance");
-        // let new_balance: Balance = balancemanager::withdraw(customer_id, MOVIE_OFFER_ID, rating);
+        let new_balance: Balance = balancemanager::purchase(&balance, rating,customer_id, METAVERSE_OFFER_ID).expect("Bad balance");
 
         rating_response_builder
             .unit(new_balance.unit.clone())
