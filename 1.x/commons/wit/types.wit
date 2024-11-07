@@ -1,0 +1,7 @@
+interface types {
+    record balance{
+        count: f32,
+        unit: string,
+        party-id: string,
+    }
+}

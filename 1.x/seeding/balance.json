@@ -1,7 +1,5 @@
 {
-    "balanceCharacteristic": {
-        "count": 990,
-        "unit": "EUR"
-    },
-    "party_id": ""
+    "count": 990,
+    "unit": "EUR",
+    "party_id": "party"
 }

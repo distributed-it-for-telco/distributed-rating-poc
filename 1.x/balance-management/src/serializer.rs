@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use crate::orange::balancemanager::types::*;
+use crate::orange::commons::types::*;
 use std::fmt;
 
 #[derive(Serialize, Deserialize)]

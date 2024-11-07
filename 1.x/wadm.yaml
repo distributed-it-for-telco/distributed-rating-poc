@@ -33,7 +33,7 @@ spec:
     - name: metaverse-rating-agent-component
       type: component
       properties:
-        image: file://./metaverse-rating-agent/build/metaverse_ratingagent_s.wasm
+        image: file://./orange-vod-metaverse-agent/build/orange_vod_metaverse_agent_s.wasm
         # To use the a precompiled version of this component, use the line below instead:
         # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
       traits:

@@ -2,7 +2,7 @@
 set -e
 
 CUSTOMER_ID=${1:-advertiser1}
-OFFER_ID=${2:-offer1}
+OFFER_ID=${2:-metaverse-vod}
 BALANCE_FILE_PATH=${3:-./balance.json}
 
 KEY="balance:$CUSTOMER_ID:$OFFER_ID"

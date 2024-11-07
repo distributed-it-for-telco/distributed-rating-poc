@@ -1,0 +1,8 @@
+name = "commons"
+version = "0.1.0"
+language = "rust"
+type = "component"
+
+[component]
+wit_world = "commons-world"
+wasm_target = "wasm32-wasip1"

@@ -1,7 +1,8 @@
 package orange:balancemanager;
 
 interface  balancemanager{
-    use types.{balance};
+    use orange:commons/types.{balance};
+    // use orange:commons/commons;
      // Function to create a new balance
     get-balance: func(customer-id: string, offer-id: string) -> balance;
 
@@ -17,6 +18,7 @@ world balance-manager-world {
     import wasi:keyvalue/atomics@0.2.0-draft; 
     import wasi:keyvalue/store@0.2.0-draft; 
     import wasi:logging/logging@0.1.0-draft;  
+    import orange:commons/commons;
 
     export balancemanager;
 }

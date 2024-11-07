@@ -1,5 +1,5 @@
 [package]
-name = "metaverse-ratingagent"
+name = "orange-vod-metaverse-agent"
 edition = "2021"
 version = "0.1.0"
 
@@ -12,6 +12,7 @@ crate-type = ["cdylib"]
 serde = { version = "1.0.209", features = ["derive"] }
 wit-bindgen = "0.30"
 serde_json = "1.0.127"
+futures = "0.3.31"
 
 [package.metadata.component.dependencies]
 
