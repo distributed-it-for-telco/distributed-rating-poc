@@ -4,6 +4,7 @@ world orange-vod-rating {
     import wasi:keyvalue/atomics@0.2.0-draft; 
     import wasi:keyvalue/store@0.2.0-draft; 
     import wasi:logging/logging@0.1.0-draft;  
+    import orange:balancemanager/balancemanager;
 
     export orange:rating/ratingagent;
 }
