@@ -9,6 +9,7 @@ interface  balancemanager{
      // Function to check if the balance is sufficient
     has-sufficient-balance: func(balance: balance, amount: f32) -> bool;
  
+    withdraw: func(customer-id: string, offer-id: string, rating: f32)-> balance;
      // Function to purchase and decrement the balance
     purchase: func(balance: balance, amount: f32, customer-id: string, offer-id: string) -> result<balance, string>;
 }

@@ -1,10 +1,14 @@
 
 use crate::orange::rating::types::*;
-use exports::orange::rating::ratingagent::*;
-use wasi::logging::logging::log;
-use std::fmt;
-use serde::{Serialize, Deserialize};
+use exports::orange::rating::ratingagent::Guest;
+use wasi::logging::logging::{log,Level::Info};
+
+use futures::executor::block_on;
 use crate::orange::balancemanager::*;
+use crate::orange::commons::types::Balance;
+use builders::RatingResponseBuilder;
+
+mod builders;
 
 wit_bindgen::generate!({
     generate_all,
@@ -24,14 +28,36 @@ const MOVIE_USAGE_NAME: &str = "movie-usage";
 
 
 impl OrangeVodMetaverseRatingagent{
-    
+   async fn rate_usage_async(_request: RatingRequest) -> Option<RatingResponse> {
+        log(Info, "", "Hello I'm your orange vod Metaverse agent");
+        if let Some(first_usage) = _request.usage.usage_characteristic_list.first() {
+            let advertiser_id = _request.customer_id;
+            let offer_id = _request.offer_id;
+            match first_usage.name.as_str() {
+                ROOM_USAGE_NAME => {
+                    return Some(Self::handle_room_rating( &advertiser_id, &offer_id, first_usage).await);
+                }
+                MOVIE_USAGE_NAME => {
+                    return Some(Self::handle_movie_rating( &advertiser_id, &offer_id, first_usage).await);
+                }
+                _ => {
+                    let usage = first_usage.value.parse::<f32>().unwrap();
+                    log(Info, "", format!("Unknown usage: {}", usage).as_str());
+                    return None;
+                }
+            }
+        }
+        return None;
+    }
     
 async fn handle_room_rating(
     advertiser_id: &String,
+    offer_id: &String,
     usage_characteristic: &UsageCharacteristic,
 ) -> RatingResponse {
     Self::handle_rating(
         &advertiser_id,
+        &offer_id,
         &usage_characteristic,
         ROOM_ENTRING_COST,
     ).await
@@ -39,59 +65,49 @@ async fn handle_room_rating(
 
 async fn handle_movie_rating(
     customer_id: &String,
+    offer_id: &String,
     usage_characteristic: &UsageCharacteristic,
 ) -> RatingResponse {
-    Self::handle_rating(&customer_id, &usage_characteristic, MOVIE_COST).await
+    Self::handle_rating(&customer_id, &offer_id, &usage_characteristic, MOVIE_COST).await
 }
 
 async fn handle_rating(
     customer_id: &String,
+    offer_id: &String,
     usage_characteristic: &UsageCharacteristic,
     unit_charge: f32,
 ) -> RatingResponse {
     let usage = usage_characteristic.value.parse::<f32>().unwrap();
 
     let mut rating_response_builder = RatingResponseBuilder::new();
-    let balance_access_manager = BalanceAccessManager::default();
-
-    let balance = balance_access_manager
-        .get_balance( customer_id, MOVIE_OFFER_ID)
-        .await;
+    let balance = balancemanager::get_balance(customer_id, offer_id);
+    
 
     let rating = Self::calc_rate(usage, unit_charge);
 
-    // not depending on the balance <=0  but calc rate and keep sufficient
-    //balance in has_sufficient_balance to centralize the decision..
-    // may be we have a case the customer has 0 balance but he still can use the service ...... [to be validated]
+    if Self::has_sufficient_balance(balance.count, rating) {
+        log(Info, "", format!( "Usage {} , Rating {} ", usage, rating).as_str());
 
-    if Self::has_sufficient_balance(balance.balance_characteristic.count, rating) {
-        log(wasi::logging::logging::Level::Info, "", 
-            format!( "Usage {} , Rating {} , & balance {}",
-            usage, rating, balance.balance_characteristic.count).as_str());
-        
-
-        let new_balance: Balance = balance_access_manager
-            .withdraw(customer_id, MOVIE_OFFER_ID, rating)
-            .await;
+        let new_balance: Balance = balancemanager::withdraw(customer_id, MOVIE_OFFER_ID, rating);
 
         rating_response_builder
-            .unit(new_balance.balance_unit().to_string())
+            .unit(new_balance.unit.clone())
             .price(rating.to_string())
             .message(&format!(
                 "{} {} deducted from your balance",
                 rating.to_string(),
-                new_balance.balance_unit()
+                new_balance.unit
             ))
             .message(&format!(
                 " Your Balance now is {} {}",
-                new_balance.balance_count(),
-                new_balance.balance_unit()
+                new_balance.count,
+                new_balance.unit
             ))
             .authorized();
 
-            log(wasi::logging::logging::Level::Info, "", 
+            log(Info, "", 
             format!("Usage {} , Rating {} , & balance {}",
-            usage, rating, new_balance.balance_count()).as_str());
+            usage, rating, new_balance.count).as_str());
 
     } else {
         rating_response_builder
@@ -111,8 +127,8 @@ async fn handle_rating(
         }
     }
 
-    fn calc_rate(usage: f32, UNIT_CHARGE: f32) -> f32 {
-        UNIT_CHARGE * usage
+    fn calc_rate(usage: f32, unit_charge: f32) -> f32 {
+        unit_charge * usage
     }
     
     
@@ -121,23 +137,9 @@ async fn handle_rating(
 impl Guest for OrangeVodMetaverseRatingagent {
     /// Say hello!
     fn rate_usage(_request: RatingRequest) -> RatingResponse {
-        log(wasi::logging::logging::Level::Info, "", "Hello I'm your orange vod Metaverse agent");
-        if let Some(first_usage) = _request.usage.usage_characteristic_list.first() {
-            let advertiser_id = _request.customer_id;
-            match first_usage.name.as_str() {
-                ROOM_USAGE_NAME => {
-                    return Self::handle_room_rating( &advertiser_id, first_usage).await;
-                }
-                MOVIE_USAGE_NAME => {
-                    return Self::handle_movie_rating( &advertiser_id, first_usage).await;
-                }
-                _ => {
-                    let usage = first_usage.value.parse::<f32>().unwrap();
-                    log(wasi::logging::logging::Level::Info, "", format!("Unknown usage: {}", usage).as_str());
-                }
-            }
-        }
+        block_on(Self::rate_usage_async(_request)).unwrap()
     }
+    
 
     fn validate(_request: ValidationRequest) -> ValidationResponse {
         ValidationResponse { valid: true }
@@ -149,40 +151,5 @@ impl Guest for OrangeVodMetaverseRatingagent {
         }
     }
 
-// fn rate_usage(_request: RatingRequest) -> RatingResponse {
-    //     let balance = balancemanager::get_balance(&_request.customer_id, &_request.offer_id);
-    //     log(wasi::logging::logging::Level::Info, "", &balance.count.to_string());
-
-    //     let price: f32 = 5.0;
-    //     let purchase_amount = _request.usage.usage_characteristic_list[0].value.parse::<f32>().unwrap() * price;
-
-    //     // Attempt to purchase
-    //     let message: String;
-
-    //     match balancemanager::purchase(&balance, purchase_amount, &_request.customer_id, &_request.offer_id) {
-    //         Ok(updated_balance) => {
-    //             message = "Purchase successful".to_string();
-    //         },
-    //         Err(err) => {
-    //             message = "Purchase failed: ".to_string() + &err;
-    //         },
-    //     }
-
-    //     RatingResponse {
-    //         authorization_status: AuthorizationStatus {
-    //             code: 12345,
-    //             key: "hello".to_string(),
-    //         },
-    //         billing_information: BillingInformation {
-    //             price: price.to_string(),
-    //             unit: balance.unit.to_string(),
-    //             messages: vec![message],
-    //         },
-    //         next_agent: AgentIdentification {
-    //             name: "agent".to_string(),
-    //             partner_id: "partner".to_string(),
-    //         },
-    //     }
-    // }
 }
 export!(OrangeVodMetaverseRatingagent);
