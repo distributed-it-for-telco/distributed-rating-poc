@@ -88,7 +88,8 @@ async fn handle_rating(
     if Self::has_sufficient_balance(balance.count, rating) {
         log(Info, "", format!( "Usage {} , Rating {} ", usage, rating).as_str());
 
-        let new_balance: Balance = balancemanager::withdraw(customer_id, MOVIE_OFFER_ID, rating);
+        let new_balance: Balance = balancemanager::purchase(&balance, rating,customer_id, MOVIE_OFFER_ID).expect("Bad balance");
+        // let new_balance: Balance = balancemanager::withdraw(customer_id, MOVIE_OFFER_ID, rating);
 
         rating_response_builder
             .unit(new_balance.unit.clone())

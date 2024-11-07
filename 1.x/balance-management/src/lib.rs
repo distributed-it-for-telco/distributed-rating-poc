@@ -1,10 +1,8 @@
 use crate::orange::commons::types::{Balance};
 
 use crate::exports::orange::balancemanager::balancemanager::*;
-use wasi::logging::logging::log;
-use serde::{Serialize, Deserialize};
+use wasi::logging::logging::{log,Level::Info};
 use serde_json; // For JSON serialization/deserialization
-use std::fmt;
 mod serializer;
 use serializer::*;
 
@@ -21,15 +19,15 @@ impl Guest for BalanceManager {
        
         let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
         let object_name = format!("{}:{}:{}", "balance", customer_id,offer_id);
-        wasi::logging::logging::log(wasi::logging::logging::Level::Info, "", &object_name);
+        log(Info, "", &object_name);
         
         let balance_utf8 = bucket.get(&object_name).expect("couldn't retrieve count");
         let balance_str = String::from_utf8(balance_utf8.clone().unwrap()).unwrap();
         
-        wasi::logging::logging::log(wasi::logging::logging::Level::Info, "", &balance_str);
+        log(Info, "", &balance_str);
 
-        let mut balance_dto: BalanceDTO = serde_json::from_str(&balance_str).unwrap();
-        log(wasi::logging::logging::Level::Info, "", &balance_dto.to_string());
+        let balance_dto: BalanceDTO = serde_json::from_str(&balance_str).unwrap();
+        log(Info, "", &balance_dto.to_string());
         
         balance_dto.into()
     }
@@ -47,7 +45,7 @@ impl Guest for BalanceManager {
             let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
             let object_name = format!("{}:{}:{}", "balance", customer_id,offer_id);
             let balance_dto:BalanceDTO = balance.clone().into();
-            bucket.set(&object_name, &serde_json::to_vec(&balance_dto).unwrap());
+            let _ =  bucket.set(&object_name, &serde_json::to_vec(&balance_dto).unwrap());
 
             Ok(Balance { count: balance.count, unit: balance.unit.clone(), party_id: balance.party_id.clone() })
         } else {
