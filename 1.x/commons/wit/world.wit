@@ -1,0 +1,12 @@
+package orange:commons;
+
+interface commons {
+  use types.{balance};
+  create-balance: func(count: f32, unit: string, party-id: string) -> balance;
+}
+
+world commons-world {
+  // import orange:rating/ratingagent;
+  // import wasi:logging/logging@0.1.0-draft; 
+  export commons;
+}

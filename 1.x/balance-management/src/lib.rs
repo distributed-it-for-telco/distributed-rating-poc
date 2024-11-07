@@ -1,4 +1,4 @@
-use crate::orange::balancemanager::types::{Balance};
+use crate::orange::commons::types::{Balance};
 
 use crate::exports::orange::balancemanager::balancemanager::*;
 use wasi::logging::logging::log;

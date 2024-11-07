@@ -1,13 +1,15 @@
 package orange:balancemanager;
 
 interface  balancemanager{
-    use types.{balance};
+    use orange:commons/types.{balance};
+    // use orange:commons/commons;
      // Function to create a new balance
     get-balance: func(customer-id: string, offer-id: string) -> balance;
 
      // Function to check if the balance is sufficient
     has-sufficient-balance: func(balance: balance, amount: f32) -> bool;
  
+    withdraw: func(customer-id: string, offer-id: string, rating: f32)-> balance;
      // Function to purchase and decrement the balance
     purchase: func(balance: balance, amount: f32, customer-id: string, offer-id: string) -> result<balance, string>;
 }
@@ -17,6 +19,7 @@ world balance-manager-world {
     import wasi:keyvalue/atomics@0.2.0-draft; 
     import wasi:keyvalue/store@0.2.0-draft; 
     import wasi:logging/logging@0.1.0-draft;  
+    import orange:commons/commons;
 
     export balancemanager;
 }

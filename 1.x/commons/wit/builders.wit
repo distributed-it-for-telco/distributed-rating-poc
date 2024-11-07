@@ -1,0 +1,18 @@
+
+// Define the interface
+// interface RatingResponseBuilder {
+//     use crate::orange::rating::ratingagent::types.{}
+//     // Constructor
+//     new() -> RatingResponseBuilder
+
+//     // Methods to set fields
+//     unit(self: RatingResponseBuilder, unit: string) -> RatingResponseBuilder
+//     price(self: RatingResponseBuilder, price: string) -> RatingResponseBuilder
+//     message(self: RatingResponseBuilder, message: string) -> RatingResponseBuilder
+//     authorized(self: RatingResponseBuilder) -> RatingResponseBuilder
+//     not_authorized(self: RatingResponseBuilder) -> RatingResponseBuilder
+//     next_agent(self: RatingResponseBuilder, next_agent: AgentIdentification) -> RatingResponseBuilder
+
+//     // Method to build the response
+//     build(self: RatingResponseBuilder) -> RatingResponse
+// }
