@@ -20,3 +20,6 @@ dump.rdb
 
 
 mytestscript.sh
+
+deps/
+deps.lock
