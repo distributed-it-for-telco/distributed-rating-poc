@@ -1,0 +1,8 @@
+name = "video-rating-agent"
+version = "0.1.0"
+language = "rust"
+type = "component"
+
+[component]
+wit_world = "video-rating"
+wasm_target = "wasm32-wasip1"

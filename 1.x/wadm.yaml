@@ -96,7 +96,14 @@ spec:
             namespace: orange
             package: rating
             interfaces: [ratingagent]
-        
+        - type: link
+          properties:
+            name: video-rating
+            target: video-rating-agent-component
+            namespace: orange
+            package: rating
+            interfaces: [ratingagent]
+
     - name: orange-vod-rating-agent-component
       type: component
       properties:
@@ -120,6 +127,16 @@ spec:
                 properties:
                   url: redis://127.0.0.1:6379
 
+    - name: video-rating-agent-component
+      type: component
+      properties:
+        image: file://./video-rating-agent/build/video_rating_agent_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
+            
     # The new capability provider
     - name: kvredis
       type: capability
