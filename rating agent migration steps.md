@@ -31,6 +31,7 @@ Another unwanted part is the deps folder that is added with the template, we del
 
 Then the unwanted dependencies, since our rating agents don't handle the http requests and it's the api gateway's job, we remove the import for it.
 
+remove the `wasmcloud-component` from cargo.toml
 ## Add the deps.toml file
 The deps.toml file is the way we manage our wit dependencies, we add the wit dependency name and its location to the file, 
 
