@@ -13,6 +13,7 @@ wit-bindgen = "0.30"
 serde = { version = "1.0.209", features = ["derive"] }
 serde_json = "1.0.127"
 futures = "0.3.31"
+lazy_static = "1.5.0"
 
 [package.metadata.component.dependencies]
 

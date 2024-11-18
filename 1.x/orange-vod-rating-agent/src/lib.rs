@@ -1,9 +1,11 @@
 
-use std::fmt;
+use std::collections::HashMap;
 use lazy_static::lazy_static;
+use futures::executor::block_on;
 use serde::{Serialize, Deserialize};
 use wasi::logging::logging::{log,Level::Info};
 use crate::orange::rating::types::*;
+use crate::orange::rating::types::{AgentList,RatingRequest, RatingResponse, GetChildrenRequest,ValidationRequest, ValidationResponse};
 use exports::orange::rating::ratingagent::*;
 
 wit_bindgen::generate!({
@@ -26,98 +28,134 @@ lazy_static! {
         m
     };
 }
-#[derive(Serialize, Deserialize)]
-struct Balance {
-    count: f32,
-    unit: String,
-    party_id: String,
-}
 
-impl fmt::Display for Balance {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {} (Party ID: {})", self.count, self.unit, self.party_id)
+struct OrangeVodRatingagent;
+
+impl OrangeVodRatingagent {
+    async fn rate_usage_async(_request: RatingRequest) -> RatingResponse {
+        RatingResponse{
+                authorization_status: AuthorizationStatus{
+                    code: 15,
+                    key: "".to_string()
+                },
+                billing_information: BillingInformation{
+                    messages: vec!["".to_string()],
+                    price: "".to_string(),
+                    unit: "".to_string()
+                },
+                next_agent: AgentIdentification{
+                    name: "".to_string(),
+                    partner_id: "".to_string()
+                }
+            }
     }
-}
 
-impl Balance {
-    // Check if the balance is sufficient
-    fn has_sufficient_balance(&self, amount: f32) -> bool {
-        self.count >= amount
-    }
-
-    // Decrement the balance
-    fn purchase(&mut self, amount: f32) -> Result<(), String> {
-        if self.has_sufficient_balance(amount) {
-            self.count -= amount;
-            Ok(())
+    async fn validate_async(request: ValidationRequest) -> ValidationResponse {
+        let mut validation_response: ValidationResponse = ValidationResponse{
+            valid: true
+        };
+        if !request.client_country.is_empty() && request.client_country.to_owned() == "EG" {
+            validation_response.valid = true;
         } else {
-            Err(String::from("Insufficient balance to purchase"))
+            validation_response.valid = false;
         }
+        validation_response
+    }
+
+    async fn get_children_async(request: GetChildrenRequest) -> AgentList {
+        let mut children_list = AgentList{
+            agents: vec![]
+        };
+
+        if !request.atomic_offer_id.is_empty()
+            && OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
+                .contains_key(request.atomic_offer_id.to_owned().as_str())
+        {
+            let child = Agent {
+                identification: AgentIdentification {
+                    name: OFFER_PROVIDERS_OFFERS_IDS_TO_AGENTS
+                        .get(request.atomic_offer_id.to_owned().as_str())
+                        .unwrap()
+                        .to_string(),
+                    partner_id: ORANGE_PARTY_ID_AT_PARTNER_SIDE.to_string(),
+                },
+                usage: request.usage.clone(),
+            };
+            children_list.agents.push(child);
+        }
+        children_list
     }
 }
 
-struct MetaverseRatingagent;
+impl Guest for OrangeVodRatingagent {
+    fn rate_usage(request: RatingRequest) -> RatingResponse {
+        block_on(Self::rate_usage_async(request))
+    }
+    fn validate(request: ValidationRequest) -> ValidationResponse {
+        block_on(Self::validate_async(request))
+    }
+    fn get_children(request: GetChildrenRequest) -> AgentList {
+        block_on(Self::get_children_async(request))
+    }
 
-impl Guest for MetaverseRatingagent {
-    /// Say hello!
-    fn rate_usage(_request: RatingRequest) -> RatingResponse {
-        log(Info, "", &_request.offer_id);
+    // fn rate_usage(_request: RatingRequest) -> RatingResponse {
+    //     log(Info, "", &_request.offer_id);
 
-        let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
-        let object_name = format!("{}:{}:{}", "balance", _request.customer_id, _request.offer_id);
+    //     let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
+    //     let object_name = format!("{}:{}:{}", "balance", _request.customer_id, _request.offer_id);
         
-        log(Info, "", &object_name);
+    //     log(Info, "", &object_name);
 
-        let balance_utf8 = bucket.get(&object_name).expect("couldn't retrieve count");
-        let balance_str = String::from_utf8(balance_utf8.clone().unwrap()).unwrap();
+    //     let balance_utf8 = bucket.get(&object_name).expect("couldn't retrieve count");
+    //     let balance_str = String::from_utf8(balance_utf8.clone().unwrap()).unwrap();
         
-        log(Info, "", &balance_str);
+    //     log(Info, "", &balance_str);
 
-        let mut balance: Balance = serde_json::from_str(&balance_str).unwrap();
-        log(Info, "", &balance.to_string());
+    //     let mut balance: Balance = serde_json::from_str(&balance_str).unwrap();
+    //     log(Info, "", &balance.to_string());
 
-        let price: f32 = 5.0;
-        let purchase_amount = _request.usage.usage_characteristic_list[0].value.parse::<f32>().unwrap() * price;
+    //     let price: f32 = 5.0;
+    //     let purchase_amount = _request.usage.usage_characteristic_list[0].value.parse::<f32>().unwrap() * price;
 
-        // Attempt to purchase
-        let message: String;
+    //     // Attempt to purchase
+    //     let message: String;
 
-        match balance.purchase(purchase_amount) {
-            Ok(()) => {
-                message = "Purchase successful".to_string();
-                bucket.set(&object_name, &serde_json::to_vec(&balance).unwrap());
-            },
-            Err(err) => {
-                message = "Purchase failed: ".to_string() + &err;
-            },
-        }
+    //     match balance.purchase(purchase_amount) {
+    //         Ok(()) => {
+    //             message = "Purchase successful".to_string();
+    //             bucket.set(&object_name, &serde_json::to_vec(&balance).unwrap());
+    //         },
+    //         Err(err) => {
+    //             message = "Purchase failed: ".to_string() + &err;
+    //         },
+    //     }
 
-        RatingResponse {
-            authorization_status: AuthorizationStatus {
-                code: 12345,
-                key: "two".to_string(),
-            },
-            billing_information: BillingInformation {
-                price: price.to_string(),
-                unit: balance.unit.to_string(),
-                messages: vec![message],
-            },
-            next_agent: AgentIdentification {
-                name: "agent".to_string(),
-                partner_id: "partner".to_string(),
-            },
-        }
-    }
+    //     RatingResponse {
+    //         authorization_status: AuthorizationStatus {
+    //             code: 12345,
+    //             key: "two".to_string(),
+    //         },
+    //         billing_information: BillingInformation {
+    //             price: price.to_string(),
+    //             unit: balance.unit.to_string(),
+    //             messages: vec![message],
+    //         },
+    //         next_agent: AgentIdentification {
+    //             name: "agent".to_string(),
+    //             partner_id: "partner".to_string(),
+    //         },
+    //     }
+    // }
 
-    fn validate(_request: ValidationRequest) -> ValidationResponse {
-        ValidationResponse { valid: true }
-    }
+    // fn validate(_request: ValidationRequest) -> ValidationResponse {
+    //     ValidationResponse { valid: true }
+    // }
 
-    fn get_children(_request: GetChildrenRequest) -> AgentList {
-        AgentList {
-            agents: vec![],
-        }
-    }
+    // fn get_children(_request: GetChildrenRequest) -> AgentList {
+    //     AgentList {
+    //         agents: vec![],
+    //     }
+    // }
 }
 
-export!(MetaverseRatingagent);
+export!(OrangeVodRatingagent);
