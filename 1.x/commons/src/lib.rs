@@ -15,6 +15,9 @@ impl Guest for Commons {
     fn create_balance(count: f32, unit: String, party_id: String) -> Balance {
         Balance { count, unit, party_id }
     }
+    fn generate_rating_proof(request: UsageProofRequest) -> String{
+            "".to_string()
+    }
 }
 
 export!(Commons);

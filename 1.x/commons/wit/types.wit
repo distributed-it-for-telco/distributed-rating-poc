@@ -4,4 +4,22 @@ interface types {
         unit: string,
         party-id: string,
     }
+
+    record usage-characteristic {
+        name: string,
+        value: string,
+        value-type: string
+    }
+
+    record usage-proof-request {
+        party-id: string,
+        usage-id: string,
+        usage-characteristic-list: list<usage-characteristic>,
+        rating: string, 
+        usage-date: string,
+        offer-id: string,
+        description: string,
+        usage-type: string,
+        product-name: string,
+    }
 }
