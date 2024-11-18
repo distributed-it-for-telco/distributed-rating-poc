@@ -32,22 +32,53 @@ lazy_static! {
 struct OrangeVodRatingagent;
 
 impl OrangeVodRatingagent {
-    async fn rate_usage_async(_request: RatingRequest) -> RatingResponse {
-        RatingResponse{
+    async fn rate_usage_async(request: RatingRequest) -> RatingResponse {
+        log(Info,"","Hello I'm your orange postpaid vod rating agent");
+        let usage_date = "04/04/2023";
+        let usage_id: String = "".to_string();// generate_guid().await?;
+/*
+         *  Contract or Offer is 10% added to provider price
+         */
+
+         let previouse_rating_price_str = request.rating_history.clone().pop().unwrap().price;
+         let previouse_rating_price = previouse_rating_price_str.parse::<f64>().unwrap();
+         let rating = previouse_rating_price + (previouse_rating_price * RATE_FEE);
+
+        //  let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
+        //     party_id: _arg.customer_id.to_owned(),
+        //     rating: rating.to_string(),
+        //     usage_characteristic_list: _arg.usage.usage_characteristic_list.to_owned(),
+        //     usage_id: usage_id.as_str().to_owned(),
+        //     usage_date: usage_date.to_owned(),
+        //     offer_id: OFFER_ID.to_owned(),
+        //     description: RATING_PROOF_DESC.to_owned(),
+        //     usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
+        //     product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
+        // });
+
+        log(Info,"",
+            format!("Sending usage proof to usage collector for party with id: {}",
+            request.customer_id).as_str()
+        );
+        let rating_response = RatingResponse{
                 authorization_status: AuthorizationStatus{
-                    code: 15,
+                    code: 200,
                     key: "".to_string()
                 },
                 billing_information: BillingInformation{
-                    messages: vec!["".to_string()],
-                    price: "".to_string(),
-                    unit: "".to_string()
+                    messages: vec![
+                        "You can now enjoy your movie on Streamzie".to_string(),
+                        format!("The cost of this transaction is {} EUR",rating.to_string())
+                    ],
+                    price: rating.to_string(),
+                    unit: "EUR".to_string()
                 },
                 next_agent: AgentIdentification{
                     name: "".to_string(),
                     partner_id: "".to_string()
                 }
             }
+        rating_response
     }
 
     async fn validate_async(request: ValidationRequest) -> ValidationResponse {
