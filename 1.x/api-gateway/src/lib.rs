@@ -93,7 +93,7 @@ impl ApiGateway {
 
         response.set_status_code(200).unwrap();
         let response_body = response.body().unwrap();
-        log(Info, "", &"before calling rating agent");
+        log(Info, "", "before calling rating agent");
 
         let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(&rating_request,&request_headers.entries());
         log(Info, "", &usage_result.billing_information.unit);

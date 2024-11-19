@@ -1,17 +1,17 @@
-
-use std::collections::HashMap;
-use lazy_static::lazy_static;
-use futures::executor::block_on;
-use serde::{Serialize, Deserialize};
-use wasi::logging::logging::{log,Level::Info};
-use crate::orange::rating::types::*;
-use crate::orange::rating::types::{AgentList,RatingRequest, RatingResponse, GetChildrenRequest,ValidationRequest, ValidationResponse};
-use exports::orange::rating::ratingagent::*;
-
 wit_bindgen::generate!({
     generate_all,
     additional_derives: [serde::Serialize, serde::Deserialize]
 });
+
+use std::collections::HashMap;
+use lazy_static::lazy_static;
+use futures::executor::block_on;
+use wasi::logging::logging::{log,Level::Info};
+use crate::orange::commons::commons::{generate_rating_proof,UsageProofRequest};
+use crate::orange::rating::types::*;
+use crate::orange::rating::types::{AgentList,RatingRequest, RatingResponse, GetChildrenRequest,ValidationRequest, ValidationResponse};
+use exports::orange::rating::ratingagent::*;
+
 
 const OFFER_ID: &str = "1";
 const ORANGE_PARTY_ID_AT_PARTNER_SIDE: &str = "orange_my_partner";
@@ -36,25 +36,27 @@ impl OrangeVodRatingagent {
         log(Info,"","Hello I'm your orange postpaid vod rating agent");
         let usage_date = "04/04/2023";
         let usage_id: String = "".to_string();// generate_guid().await?;
-/*
+        
+        /*
          *  Contract or Offer is 10% added to provider price
          */
 
-         let previouse_rating_price_str = request.rating_history.clone().pop().unwrap().price;
-         let previouse_rating_price = previouse_rating_price_str.parse::<f64>().unwrap();
-         let rating = previouse_rating_price + (previouse_rating_price * RATE_FEE);
 
-        //  let usage_template_str = UsageProofHandler::generate_rating_proof(&UsageProofRequest {
-        //     party_id: _arg.customer_id.to_owned(),
-        //     rating: rating.to_string(),
-        //     usage_characteristic_list: _arg.usage.usage_characteristic_list.to_owned(),
-        //     usage_id: usage_id.as_str().to_owned(),
-        //     usage_date: usage_date.to_owned(),
-        //     offer_id: OFFER_ID.to_owned(),
-        //     description: RATING_PROOF_DESC.to_owned(),
-        //     usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
-        //     product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
-        // });
+        let previouse_rating_price_str = 12.5;//request.rating_history.clone().pop().unwrap().price;
+        let previouse_rating_price = previouse_rating_price_str.parse::<f64>().unwrap();
+        let rating = previouse_rating_price + (previouse_rating_price * RATE_FEE);
+
+        let _usage_template_str = generate_rating_proof(&UsageProofRequest {
+            party_id: request.customer_id.to_owned(),
+            rating: rating.to_string(),
+            usage_characteristic_list: Self::map_usage_characteristic_list(request.usage.usage_characteristic_list.to_owned()),
+            usage_id: usage_id.as_str().to_owned(),
+            usage_date: usage_date.to_owned(),
+            offer_id: OFFER_ID.to_owned(),
+            description: RATING_PROOF_DESC.to_owned(),
+            usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
+            product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
+        });
 
         log(Info,"",
             format!("Sending usage proof to usage collector for party with id: {}",
@@ -77,9 +79,21 @@ impl OrangeVodRatingagent {
                     name: "".to_string(),
                     partner_id: "".to_string()
                 }
-            }
+            };
         rating_response
     }
+
+    fn map_usage_characteristic_list(usage_characteristic_list: Vec<orange::rating::types::UsageCharacteristic>) -> Vec<orange::commons::types::UsageCharacteristic>{
+        fn map_item(item: orange::rating::types::UsageCharacteristic) -> orange::commons::types::UsageCharacteristic {
+            orange::commons::types::UsageCharacteristic{
+                name: item.name,
+                value: item.value,
+                value_type: item.value_type
+            }
+        }
+        usage_characteristic_list.iter().map(|item: &orange::rating::types::UsageCharacteristic| map_item(item.clone())).collect::<Vec<orange::commons::types::UsageCharacteristic>>()
+    }
+
 
     async fn validate_async(request: ValidationRequest) -> ValidationResponse {
         let mut validation_response: ValidationResponse = ValidationResponse{
