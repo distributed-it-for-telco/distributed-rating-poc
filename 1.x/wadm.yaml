@@ -96,7 +96,33 @@ spec:
             namespace: orange
             package: rating
             interfaces: [ratingagent]
-        
+        - type: link
+          properties:
+            name: video-rating
+            target: video-rating-agent-component
+            namespace: orange
+            package: rating
+            interfaces: [ratingagent]
+        - type: link
+          properties:
+            name: streaming
+            target: streaming-rating-agent-component
+            namespace: orange
+            package: rating
+            interfaces: [ratingagent]
+
+    - name: streaming-rating-agent-component
+      type: component
+      properties:
+        image: file://./streaming-rating-agent/build/streaming_ratingagent_s.wasm
+        # To use the a precompiled version of this component, use the line below instead:
+        # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
+
     - name: orange-vod-rating-agent-component
       type: component
       properties:
@@ -120,6 +146,43 @@ spec:
                 properties:
                   url: redis://127.0.0.1:6379
 
+    - name: video-rating-agent-component
+      type: component
+      properties:
+        image: file://./video-rating-agent/build/video_rating_agent_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
+
+        - type: link
+          properties:
+            target: video-provider-usage-collector-component
+            namespace: orange
+            package: usagecollector
+            interfaces: [usagecollector]
+
+    - name: video-provider-usage-collector-component
+      type: component
+      properties:
+        image: file://./usage-collectors/usage-collector-video-provider/build/usage_collector_video_provider_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1 
+        - type: link
+          properties:
+            target: kvredis
+            namespace: wasi
+            package: keyvalue
+            interfaces: [atomics, store]
+            target_config:
+              - name: redis-url
+                properties:
+                  url: redis://127.0.0.1:6379
+    
     # The new capability provider
     - name: kvredis
       type: capability

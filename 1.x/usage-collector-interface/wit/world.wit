@@ -1,0 +1,11 @@
+package orange:usagecollector;
+
+interface usagecollector{
+    use types.{usage-proof-details, usage-proof-list};
+    store: func(arg: string);
+    get-list: func() -> usage-proof-list;
+}
+
+world usage-collector-world{
+    export usagecollector;
+}

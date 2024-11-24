@@ -1,0 +1,6 @@
+interface types{
+    record usage-proof-details{
+        value: string
+    }
+    type usage-proof-list = list<usage-proof-details>;
+}
