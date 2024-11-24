@@ -7,5 +7,6 @@ interface commons {
 }
 
 world commons-world {
+  export mappers;
   export commons;
 }

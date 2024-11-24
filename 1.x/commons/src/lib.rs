@@ -2,8 +2,13 @@ wit_bindgen::generate!({
     generate_all
 });
 
-use crate::exports::orange::commons::commons::*;
+mod dtos;
+
+use crate::orange::commons::types::*;
+
 use crate::exports::orange::commons::commons::Guest;
+use crate::exports::orange::commons::mappers::Guest as Mappers;
+use dtos::SerializedRatingRequest;
 use serde_json::json;
 
 struct Commons;
@@ -48,4 +53,16 @@ impl Guest for Commons {
     }
 }
 
+impl Mappers for Commons{
+    fn rate_usage_to_string(request: RatingRequest) -> String{
+        let serialized_rating_result: SerializedRatingRequest = request.into();
+        serde_json::to_string(&serialized_rating_result).unwrap()
+    }
+    
+    fn string_to_rate_usage(request: String) -> RatingRequest{
+        let serialized_rating_request: SerializedRatingRequest =
+            serde_json::from_str::<SerializedRatingRequest>(&request).unwrap().into();
+            serialized_rating_request.into()
+    }
+}
 export!(Commons);
