@@ -2,6 +2,6 @@ package orange:commons;
 
 interface mappers{
     use types.{rating-request};
-    rate-usage-to-string: func(request: rating-request) -> string;
-    string-to-rate-usage: func(request: string) -> rating-request;
+    rating-request-to-string: func(request: rating-request) -> string;
+    string-to-rating-request: func(value: string) -> rating-request;
 }

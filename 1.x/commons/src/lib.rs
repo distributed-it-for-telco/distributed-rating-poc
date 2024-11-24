@@ -54,12 +54,12 @@ impl Guest for Commons {
 }
 
 impl Mappers for Commons{
-    fn rate_usage_to_string(request: RatingRequest) -> String{
+    fn rating_request_to_string(request: RatingRequest) -> String{
         let serialized_rating_result: SerializedRatingRequest = request.into();
         serde_json::to_string(&serialized_rating_result).unwrap()
     }
     
-    fn string_to_rate_usage(request: String) -> RatingRequest{
+    fn string_to_rating_request(request: String) -> RatingRequest{
         let serialized_rating_request: SerializedRatingRequest =
             serde_json::from_str::<SerializedRatingRequest>(&request).unwrap().into();
             serialized_rating_request.into()
