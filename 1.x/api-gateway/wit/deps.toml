@@ -1,5 +1,6 @@
 http = "https://github.com/WebAssembly/wasi-http/archive/v0.2.0.tar.gz"
 logging = "https://github.com/WebAssembly/wasi-logging/archive/d31c41d0d9eed81aabe02333d0025d42acf3fb75.tar.gz"
 bus =  "https://github.com/wasmCloud/wasmCloud/releases/download/wit-wasmcloud-bus-v1.0.0/wit-wasmcloud-bus-1.0.0.tar.gz"
+commons = "../../commons/wit"
 rating-interface = "../../rating-interface/wit"
 rating-coordinator = "../../rating-coordinator/wit"

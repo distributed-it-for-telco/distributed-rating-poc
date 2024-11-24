@@ -40,7 +40,7 @@ impl Guest for Commons {
             "relatedParty": {
                 "id": usage_proof_request.party_id
             },
-            "usageCharacteristic": usage_proof_request.usage_characteristic_list
+            // "usageCharacteristic": usage_proof_request.usage_characteristic_list
         });
 
         usage_template_str.to_string()

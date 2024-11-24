@@ -1,14 +1,17 @@
-wit_bindgen::generate!({ generate_all });
+wit_bindgen::generate!({ 
+    with: {
+        // "orange::commons/types": orange::commons::types
+    },
+    generate_all 
+});
 
 use wasi::io::streams::InputStream;
 use wasi::logging::logging::{log, Level::Info};
 use wasi::http::types::*;
-use wasi::http::types::Method::*;
 use exports::wasi::http::incoming_handler::Guest;
 
-use crate::orange::rating::*;
 use crate::orange::ratingcoordinator::ratingcoordinator;
-use crate::orange::rating::types::{RatingRequest, RatingResponse};
+use crate::orange::commons::types::{RatingRequest, RatingResponse};
 
 use serializer::*;
 
@@ -29,7 +32,7 @@ impl ApiGateway {
         // and extract query paramters to separate map
         if let Some((path, query)) = path_with_query.split_once('?') {
             path_without_query = path.to_string();
-            let query_params = query
+            let _query_params = query
                 .split('&')
                 .filter_map(|v| v.split_once('='))
                 .collect::<Vec<(&str, &str)>>();
@@ -51,7 +54,7 @@ impl ApiGateway {
         
         match (request_parts.method, request_parts.path.as_str()) {
             // ("OPTIONS", _) => get_options_response(ctx).await,
-            (POST, "/usage/rating") => {
+            (wasi::http::types::Method::Post, "/usage/rating") => {
                 
                 Self::request_rate(_request.headers(),body,response_out);
             }
@@ -62,8 +65,8 @@ impl ApiGateway {
         
     }
     fn not_found(response_out: ResponseOutparam){
-        let mut headers = Fields::new();
-        headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
+        let headers = Fields::new();
+        let _ = headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
         let response = OutgoingResponse::new(headers);
         response.set_status_code(404).unwrap();
         
@@ -87,8 +90,8 @@ impl ApiGateway {
             serde_json::from_str(&body).unwrap();
         let rating_request: RatingRequest = serialized_rating_request.into();
 
-        let mut headers = Fields::new();
-        headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
+        let headers = Fields::new();
+        let _ = headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
         let response = OutgoingResponse::new(headers);
 
         response.set_status_code(200).unwrap();

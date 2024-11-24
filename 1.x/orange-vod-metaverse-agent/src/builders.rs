@@ -1,4 +1,4 @@
-use crate::orange::rating::types::*;
+use crate::orange::commons::types::*;
 
 
 pub struct RatingResponseBuilder {

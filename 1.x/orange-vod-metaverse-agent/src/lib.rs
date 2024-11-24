@@ -1,5 +1,5 @@
 
-use crate::orange::rating::types::*;
+use crate::orange::commons::types::*;
 use exports::orange::rating::ratingagent::Guest;
 use wasi::logging::logging::{log,Level::Info};
 

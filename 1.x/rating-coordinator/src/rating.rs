@@ -4,7 +4,7 @@ use crate::wasi::logging::logging::{log, Level::Info};
 use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
-use crate::orange::rating::types::*;
+use crate::orange::commons::types::*;
 use crate::agent_graph::AgentGraph;
 use async_recursion::async_recursion;
 

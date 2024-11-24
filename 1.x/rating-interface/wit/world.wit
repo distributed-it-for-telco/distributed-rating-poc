@@ -1,7 +1,7 @@
 package orange:rating;
 
 interface  ratingagent{
-  use types.{rating-request,rating-response, validation-request, validation-response,
+  use orange:commons/types.{rating-request,rating-response, validation-request, validation-response,
              get-children-request, agent-list, agent, agent-identification, usage,
              usage-characteristic, rating-record, billing-information, authorization-status};
   rate-usage: func(request: rating-request) -> rating-response;

@@ -1,5 +1,5 @@
 
-use crate::orange::rating::types::{
+use crate::orange::commons::types::{
     RatingResponse, AgentIdentification,
     AuthorizationStatus, BillingInformation
 };

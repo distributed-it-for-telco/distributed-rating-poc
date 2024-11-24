@@ -1,7 +1,7 @@
 package orange:ratingcoordinator;
 
 interface ratingcoordinator{
-  use orange:rating/types.{rating-request,rating-response};
+  use orange:commons/types.{rating-request,rating-response};
   handle-rating-process: func(request: rating-request, headers: list<tuple<string,list<u8>>>) -> rating-response;
 }
 

@@ -4,7 +4,7 @@ wit_bindgen::generate!({
 
 use std::collections::HashMap;
 use crate::wasi::logging::logging::{log, Level::Info};
-use crate::orange::rating::types::*;
+use crate::orange::commons::types::*;
 use crate::exports::orange::ratingcoordinator::ratingcoordinator::Guest;
 use futures::executor::block_on;
 

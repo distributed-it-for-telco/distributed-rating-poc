@@ -1,4 +1,4 @@
-use crate::orange::rating::types::{ Agent };
+use crate::orange::commons::types::{ Agent };
 use std::collections::HashMap;
 
 pub struct AgentGraph {

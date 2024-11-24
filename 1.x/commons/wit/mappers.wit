@@ -1,0 +1,6 @@
+interface mapper{
+    use types.{rating-request};
+    rate-usage-to-string: func(request: rating-request) -> string;
+    string-to-rate-usage: func(request: string) -> rating-request;
+
+}
