@@ -8,7 +8,7 @@ use crate::orange::commons::types::*;
 
 use crate::exports::orange::commons::commons::Guest;
 use crate::exports::orange::commons::mappers::Guest as Mappers;
-use dtos::SerializedRatingRequest;
+use dtos::{SerializedRatingRequest, SerializedRatingResponse};
 use serde_json::json;
 
 struct Commons;
@@ -59,10 +59,21 @@ impl Mappers for Commons{
         serde_json::to_string(&serialized_rating_result).unwrap()
     }
     
-    fn string_to_rating_request(request: String) -> RatingRequest{
+    fn string_to_rating_request(value: String) -> RatingRequest{
         let serialized_rating_request: SerializedRatingRequest =
-            serde_json::from_str::<SerializedRatingRequest>(&request).unwrap().into();
+            serde_json::from_str::<SerializedRatingRequest>(&value).unwrap().into();
             serialized_rating_request.into()
+    }
+
+    fn rating_response_to_string(request: RatingResponse) -> String{
+        let serialized_rating_result: SerializedRatingResponse = request.into();
+        serde_json::to_string(&serialized_rating_result).unwrap()
+    }
+
+    fn string_to_rating_response(value: String) -> RatingResponse{
+        let serialized_rating_response: SerializedRatingResponse =
+            serde_json::from_str::<SerializedRatingResponse>(&value).unwrap().into();
+            serialized_rating_response.into()
     }
 }
 export!(Commons);

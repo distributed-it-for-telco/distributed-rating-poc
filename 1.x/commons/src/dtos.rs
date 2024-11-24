@@ -120,15 +120,15 @@ impl From<RatingRequest> for SerializedRatingRequest {
     }
 }
 
-// impl From<RatingResponse> for SerializedRatingResponse {
-//     fn from(res: RatingResponse) -> Self {
-//         Self {
-//             authorization_status: res.authorization_status.into(),
-//             billing_information: res.billing_information.into(),
-//             next_agent: res.next_agent.into(),
-//         }
-//     }
-// }
+impl From<RatingResponse> for SerializedRatingResponse {
+    fn from(res: RatingResponse) -> Self {
+        Self {
+            authorization_status: res.authorization_status.into(),
+            billing_information: res.billing_information.into(),
+            next_agent: res.next_agent.into(),
+        }
+    }
+}
 
 // impl From<ValidationRequest> for SerializedValidationRequest {
 //     fn from(req: ValidationRequest) -> Self {
@@ -172,14 +172,14 @@ impl From<RatingRequest> for SerializedRatingRequest {
 //     }
 // }
 
-// impl From<AgentIdentification> for SerializedAgentIdentification {
-//     fn from(id: AgentIdentification) -> Self {
-//         Self {
-//             name: id.name,
-//             partner_id: id.partner_id,
-//         }
-//     }
-// }
+impl From<AgentIdentification> for SerializedAgentIdentification {
+    fn from(id: AgentIdentification) -> Self {
+        Self {
+            name: id.name,
+            partner_id: id.partner_id,
+        }
+    }
+}
 
 impl From<Usage> for SerializedUsage {
     fn from(usage: Usage) -> Self {
@@ -213,24 +213,24 @@ impl From<RatingRecord> for SerializedRatingRecord {
     }
 }
 
-// impl From<BillingInformation> for SerializedBillingInformation {
-//     fn from(info: BillingInformation) -> Self {
-//         Self {
-//             price: info.price,
-//             unit: info.unit,
-//             messages: info.messages,
-//         }
-//     }
-// }
+impl From<BillingInformation> for SerializedBillingInformation {
+    fn from(info: BillingInformation) -> Self {
+        Self {
+            price: info.price,
+            unit: info.unit,
+            messages: info.messages,
+        }
+    }
+}
 
-// impl From<AuthorizationStatus> for SerializedAuthorizationStatus {
-//     fn from(status: AuthorizationStatus) -> Self {
-//         Self {
-//             code: status.code,
-//             key: status.key,
-//         }
-//     }
-// }
+impl From<AuthorizationStatus> for SerializedAuthorizationStatus {
+    fn from(status: AuthorizationStatus) -> Self {
+        Self {
+            code: status.code,
+            key: status.key,
+        }
+    }
+}
 
 // // // -----------------------------------------------------------------------------
 // // // From Implementations for Deserialization
@@ -249,15 +249,15 @@ impl From<SerializedRatingRequest> for RatingRequest {
     }
 }
 
-// impl From<SerializedRatingResponse> for RatingResponse {
-//     fn from(res: SerializedRatingResponse) -> Self {
-//         Self {
-//             authorization_status: res.authorization_status.into(),
-//             billing_information: res.billing_information.into(),
-//             next_agent: res.next_agent.into(),
-//         }
-//     }
-// }
+impl From<SerializedRatingResponse> for RatingResponse {
+    fn from(res: SerializedRatingResponse) -> Self {
+        Self {
+            authorization_status: res.authorization_status.into(),
+            billing_information: res.billing_information.into(),
+            next_agent: res.next_agent.into(),
+        }
+    }
+}
 
 // impl From<SerializedValidationRequest> for ValidationRequest {
 //     fn from(req: SerializedValidationRequest) -> Self {
@@ -301,14 +301,14 @@ impl From<SerializedRatingRequest> for RatingRequest {
 //     }
 // }
 
-// impl From<SerializedAgentIdentification> for AgentIdentification {
-//     fn from(id: SerializedAgentIdentification) -> Self {
-//         Self {
-//             name: id.name,
-//             partner_id: id.partner_id,
-//         }
-//     }
-// }
+impl From<SerializedAgentIdentification> for AgentIdentification {
+    fn from(id: SerializedAgentIdentification) -> Self {
+        Self {
+            name: id.name,
+            partner_id: id.partner_id,
+        }
+    }
+}
 
 impl From<SerializedUsage> for Usage {
     fn from(usage: SerializedUsage) -> Self {
@@ -342,21 +342,21 @@ impl From<SerializedRatingRecord> for RatingRecord {
     }
 }
 
-// impl From<SerializedBillingInformation> for BillingInformation {
-//     fn from(info: SerializedBillingInformation) -> Self {
-//         Self {
-//             price: info.price,
-//             unit: info.unit,
-//             messages: info.messages,
-//         }
-//     }
-// }
+impl From<SerializedBillingInformation> for BillingInformation {
+    fn from(info: SerializedBillingInformation) -> Self {
+        Self {
+            price: info.price,
+            unit: info.unit,
+            messages: info.messages,
+        }
+    }
+}
 
-// impl From<SerializedAuthorizationStatus> for AuthorizationStatus {
-//     fn from(status: SerializedAuthorizationStatus) -> Self {
-//         Self {
-//             code: status.code,
-//             key: status.key,
-//         }
-//     }
-// }
+impl From<SerializedAuthorizationStatus> for AuthorizationStatus {
+    fn from(status: SerializedAuthorizationStatus) -> Self {
+        Self {
+            code: status.code,
+            key: status.key,
+        }
+    }
+}
