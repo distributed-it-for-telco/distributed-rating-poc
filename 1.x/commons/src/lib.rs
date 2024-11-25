@@ -76,5 +76,8 @@ impl Mappers for Commons{
     fn string_to_balance(value: String) -> Balance{
         mappers::string_to_balance(value)
     }
+ fn balance_to_stringified_array(value: Balance) -> Vec<u8>{
+        mappers::balance_to_stringified_array(value)
+    }
 }
 export!(Commons);

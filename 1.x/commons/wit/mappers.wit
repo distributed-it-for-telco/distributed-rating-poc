@@ -8,4 +8,5 @@ interface mappers{
     string-to-rating-response: func(value: string) -> rating-response;
     balance-to-string: func(response: balance) -> string;
     string-to-balance: func(value: string) -> balance;
+    balance-to-stringified-array: func(response: balance) -> list<u8>;
 }

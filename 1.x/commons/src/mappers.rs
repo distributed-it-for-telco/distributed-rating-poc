@@ -27,6 +27,10 @@ pub fn balance_to_string(value: Balance) -> String{
     let serialized_balance: SerializedBalance = value.into();
     serde_json::to_string(&serialized_balance).unwrap()
 }
+pub fn balance_to_stringified_array(value: Balance) -> Vec<u8>{
+    let serialized_balance: SerializedBalance = value.clone().into();
+    serde_json::to_vec(&serialized_balance).unwrap()
+}
 
 pub fn string_to_balance(value: String) -> Balance{
     let serialized_balance: SerializedBalance =

@@ -3,9 +3,6 @@ use crate::orange::commons::mappers;
 
 use crate::exports::orange::balancemanager::balancemanager::*;
 use wasi::logging::logging::{log,Level::Info};
-use serde_json; // For JSON serialization/deserialization
-mod serializer;
-use serializer::*;
 
 wit_bindgen::generate!({
     generate_all
@@ -41,8 +38,7 @@ impl Guest for BalanceManager {
 
             let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
             let object_name = format!("{}:{}:{}", "balance", customer_id,offer_id);
-            let balance_dto:BalanceDTO = balance.clone().into();
-            let _ =  bucket.set(&object_name, &serde_json::to_vec(&balance_dto).unwrap());
+            let _ =  bucket.set(&object_name, &mappers::balance_to_stringified_array(&balance));
 
             Ok(Balance { count: balance.count, unit: balance.unit.clone(), party_id: balance.party_id.clone() })
         } else {
