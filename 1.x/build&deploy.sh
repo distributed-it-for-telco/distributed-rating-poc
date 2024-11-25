@@ -17,6 +17,7 @@ wac plug ./build/orange_vod_ratingagent_s.wasm --plug ../commons/build/rating_co
 cd $homeDir/balance-management
 wit-deps
 wash build
+wac plug ./build/balance_manager_s.wasm --plug ../commons/build/rating_commons_s.wasm -o ./build/balance_manager_s.wasm
 ##===========Rating Coordinator==============
 cd $homeDir/rating-coordinator
 wit-deps
@@ -25,6 +26,7 @@ wash build
 cd $homeDir/api-gateway
 wit-deps
 wash build
+wac plug ./build/api_gateway_s.wasm --plug ../commons/build/rating_commons_s.wasm -o ./build/api_gateway_s.wasm
 ##===========================================
 cd $homeDir
 wash up -d

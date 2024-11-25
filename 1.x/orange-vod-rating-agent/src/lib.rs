@@ -42,8 +42,8 @@ impl OrangeVodRatingagent {
          */
 
 
-        let previouse_rating_price_str = 12.5;//request.rating_history.clone().pop().unwrap().price;
-        let previouse_rating_price = previouse_rating_price_str.parse::<f64>().unwrap();
+        // let previouse_rating_price_str = request.rating_history.clone().pop().unwrap().price;
+        let previouse_rating_price = 12.5;//previouse_rating_price_str.parse::<f64>().unwrap();
         let rating = previouse_rating_price + (previouse_rating_price * RATE_FEE);
 
         let _usage_template_str = generate_rating_proof(&UsageProofRequest {
