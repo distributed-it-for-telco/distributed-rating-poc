@@ -1,7 +1,4 @@
 wit_bindgen::generate!({ 
-    with: {
-        // "orange::commons/types": orange::commons::types
-    },
     generate_all 
 });
 
@@ -11,11 +8,9 @@ use wasi::http::types::*;
 use exports::wasi::http::incoming_handler::Guest;
 
 use crate::orange::ratingcoordinator::ratingcoordinator;
+use crate::orange::commons::mappers;
 use crate::orange::commons::types::{RatingRequest, RatingResponse};
 
-use serializer::*;
-
-mod serializer;
 
 struct ApiGateway;
 struct HttpRequestParts {
@@ -86,10 +81,8 @@ impl ApiGateway {
 
         log(Info, "", &"requesting rate");
 
-        let serialized_rating_request: SerializedRatingRequest =
-            serde_json::from_str(&body).unwrap();
-        let rating_request: RatingRequest = serialized_rating_request.into();
-
+        let rating_request: RatingRequest = mappers::string_to_rating_request(&body);
+        
         let headers = Fields::new();
         let _ = headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
         let response = OutgoingResponse::new(headers);
@@ -99,15 +92,13 @@ impl ApiGateway {
         log(Info, "", "before calling rating agent");
 
         let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(&rating_request,&request_headers.entries());
+
+        log(Info, "", &"after calling rating agent");
         log(Info, "", &usage_result.billing_information.unit);
 
-        // let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
-        log(Info, "", &"after calling rating agent");
         ResponseOutparam::set(response_out, Ok(response));
-        let serialized_rating_result: SerializedRatingResponse = usage_result.into();
-        let binding = serde_json::to_string(&serialized_rating_result).unwrap();
+        let binding = mappers::rating_response_to_string(&usage_result);
         let serialized_response = binding.as_bytes();
-
         response_body
             .write()
             .unwrap()
