@@ -1,9 +1,11 @@
 package orange:commons;
 
 interface mappers{
-    use types.{rating-request, rating-response};
+    use types.{rating-request, rating-response, balance};
     rating-request-to-string: func(request: rating-request) -> string;
     string-to-rating-request: func(value: string) -> rating-request;
     rating-response-to-string: func(response: rating-response) -> string;
     string-to-rating-response: func(value: string) -> rating-response;
+    balance-to-string: func(response: balance) -> string;
+    string-to-balance: func(value: string) -> balance;
 }

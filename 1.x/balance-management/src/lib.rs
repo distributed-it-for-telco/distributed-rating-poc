@@ -1,4 +1,5 @@
 use crate::orange::commons::types::{Balance};
+use crate::orange::commons::mappers;
 
 use crate::exports::orange::balancemanager::balancemanager::*;
 use wasi::logging::logging::{log,Level::Info};
@@ -25,11 +26,7 @@ impl Guest for BalanceManager {
         let balance_str = String::from_utf8(balance_utf8.clone().unwrap()).unwrap();
         
         log(Info, "", &balance_str);
-
-        let balance_dto: BalanceDTO = serde_json::from_str(&balance_str).unwrap();
-        log(Info, "", &balance_dto.to_string());
-        
-        balance_dto.into()
+        mappers::string_to_balance(&balance_str)
     }
     
     // Function to check if the balance is sufficient

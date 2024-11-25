@@ -3,12 +3,11 @@ wit_bindgen::generate!({
 });
 
 mod dtos;
-
+mod mappers;
 use crate::orange::commons::types::*;
 
 use crate::exports::orange::commons::commons::Guest;
 use crate::exports::orange::commons::mappers::Guest as Mappers;
-use dtos::{SerializedRatingRequest, SerializedRatingResponse};
 use serde_json::json;
 
 struct Commons;
@@ -55,25 +54,27 @@ impl Guest for Commons {
 
 impl Mappers for Commons{
     fn rating_request_to_string(request: RatingRequest) -> String{
-        let serialized_rating_result: SerializedRatingRequest = request.into();
-        serde_json::to_string(&serialized_rating_result).unwrap()
+        mappers::rating_request_to_string(request)
     }
     
     fn string_to_rating_request(value: String) -> RatingRequest{
-        let serialized_rating_request: SerializedRatingRequest =
-            serde_json::from_str::<SerializedRatingRequest>(&value).unwrap().into();
-            serialized_rating_request.into()
+        mappers::string_to_rating_request(value)
     }
 
     fn rating_response_to_string(request: RatingResponse) -> String{
-        let serialized_rating_result: SerializedRatingResponse = request.into();
-        serde_json::to_string(&serialized_rating_result).unwrap()
+        mappers::rating_response_to_string(request)
     }
 
     fn string_to_rating_response(value: String) -> RatingResponse{
-        let serialized_rating_response: SerializedRatingResponse =
-            serde_json::from_str::<SerializedRatingResponse>(&value).unwrap().into();
-            serialized_rating_response.into()
+        mappers::string_to_rating_response(value)
+    }
+
+    fn balance_to_string(value: Balance) -> String{
+        mappers::balance_to_string(value)
+    }
+
+    fn string_to_balance(value: String) -> Balance{
+        mappers::string_to_balance(value)
     }
 }
 export!(Commons);

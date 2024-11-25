@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 use crate::orange::commons::types::*;
-
+use std::fmt;
 // -----------------------------------------------------------------------------
 // Serialization Structs
 // -----------------------------------------------------------------------------
@@ -103,6 +103,18 @@ pub struct SerializedAuthorizationStatus {
     key: String,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct SerializedBalance {
+    count: f32,
+    unit: String,
+    party_id: String,
+}
+
+impl fmt::Display for SerializedBalance {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} {} (Party ID: {})", self.count, self.unit, self.party_id)
+    }
+}  
 // // -----------------------------------------------------------------------------
 // // From Implementations for Serialization
 // // -----------------------------------------------------------------------------
@@ -126,6 +138,16 @@ impl From<RatingResponse> for SerializedRatingResponse {
             authorization_status: res.authorization_status.into(),
             billing_information: res.billing_information.into(),
             next_agent: res.next_agent.into(),
+        }
+    }
+}
+
+impl From<Balance> for SerializedBalance {
+    fn from(balance: Balance) -> Self {
+        SerializedBalance {
+            count: balance.count,
+            unit: balance.unit,
+            party_id: balance.party_id,
         }
     }
 }
@@ -357,6 +379,16 @@ impl From<SerializedAuthorizationStatus> for AuthorizationStatus {
         Self {
             code: status.code,
             key: status.key,
+        }
+    }
+}
+
+impl From<SerializedBalance> for Balance {
+    fn from(dto: SerializedBalance) -> Self {
+        Balance {
+            count: dto.count,
+            unit: dto.unit,
+            party_id: dto.party_id,
         }
     }
 }
