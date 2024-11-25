@@ -27,6 +27,7 @@ pub fn balance_to_string(value: Balance) -> String{
     let serialized_balance: SerializedBalance = value.into();
     serde_json::to_string(&serialized_balance).unwrap()
 }
+
 pub fn balance_to_stringified_array(value: Balance) -> Vec<u8>{
     let serialized_balance: SerializedBalance = value.clone().into();
     serde_json::to_vec(&serialized_balance).unwrap()
@@ -37,3 +38,8 @@ pub fn string_to_balance(value: String) -> Balance{
     serde_json::from_str::<SerializedBalance>(&value).unwrap().into();
     serialized_balance.into()
 }
+
+// pub fn usage_characteristic_list_to_string(value: Vec<UsageCharacteristic>) -> String{
+//     let serialized_balance: SerializedUsageCharacteristic = value.into();
+//     serde_json::to_string(&serialized_balance).unwrap()
+// }

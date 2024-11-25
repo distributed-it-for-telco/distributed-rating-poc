@@ -5,6 +5,7 @@ wit_bindgen::generate!({
 mod dtos;
 mod mappers;
 use crate::orange::commons::types::*;
+use crate::dtos::SerializedUsageCharacteristic;
 
 use crate::exports::orange::commons::commons::Guest;
 use crate::exports::orange::commons::mappers::Guest as Mappers;
@@ -22,7 +23,6 @@ impl Guest for Commons {
     }
     fn generate_rating_proof(usage_proof_request: UsageProofRequest) -> String{
         let rating_date = "04/04/2023";
-
         let usage_template_str = json!({
             "id": usage_proof_request.usage_id,
             "usageDate": usage_proof_request.usage_date,
@@ -44,7 +44,7 @@ impl Guest for Commons {
             "relatedParty": {
                 "id": usage_proof_request.party_id
             },
-            // "usageCharacteristic": usage_proof_request.usage_characteristic_list
+            "usageCharacteristic": usage_proof_request.usage_characteristic_list.into_iter().map(Into::<SerializedUsageCharacteristic>::into).collect::<Vec<_>>(),
         });
 
         usage_template_str.to_string()
