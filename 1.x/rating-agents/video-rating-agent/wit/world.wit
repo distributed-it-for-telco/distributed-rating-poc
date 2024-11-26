@@ -1,6 +1,7 @@
 package orange:video-ratingagent;
 
 world video-rating {
+   import orange:commons/types;
    import orange:balancemanager/balancemanager;
    import orange:usagecollector/usagecollector;
    import wasi:logging/logging@0.1.0-draft;  

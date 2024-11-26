@@ -1,6 +1,6 @@
 
 
-use crate::orange::rating::types::{
+use crate::orange::commons::types::{
     AgentIdentification, AuthorizationStatus, BillingInformation,
 };
 use exports::orange::rating::ratingagent::*;

@@ -33,7 +33,7 @@ spec:
     - name: metaverse-rating-agent-component
       type: component
       properties:
-        image: file://./orange-vod-metaverse-agent/build/orange_vod_metaverse_agent_s.wasm
+        image: file://./rating-agents/orange-vod-metaverse-agent/build/orange_vod_metaverse_agent_s.wasm
         # To use the a precompiled version of this component, use the line below instead:
         # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
       traits:
@@ -114,7 +114,7 @@ spec:
     - name: streaming-rating-agent-component
       type: component
       properties:
-        image: file://./streaming-rating-agent/build/streaming_ratingagent_s.wasm
+        image: file://./rating-agents/streaming-rating-agent/build/streaming_ratingagent_s.wasm
         # To use the a precompiled version of this component, use the line below instead:
         # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
       traits:
@@ -123,10 +123,27 @@ spec:
           properties:
             instances: 1
 
+    - name: video-rating-agent-component
+      type: component
+      properties:
+        image: file://./rating-agents/video-rating-agent/build/video_rating_agent_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
+
+        - type: link
+          properties:
+            target: video-provider-usage-collector-component
+            namespace: orange
+            package: usagecollector
+            interfaces: [usagecollector]
+
     - name: orange-vod-rating-agent-component
       type: component
       properties:
-        image: file://./orange-vod-rating-agent/build/orange_vod_ratingagent_s.wasm
+        image: file://./rating-agents/orange-vod-rating-agent/build/orange_vod_ratingagent_s.wasm
         # To use the a precompiled version of this component, use the line below instead:
         # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
       traits:
@@ -146,27 +163,50 @@ spec:
                 properties:
                   url: redis://127.0.0.1:6379
 
-    - name: video-rating-agent-component
-      type: component
-      properties:
-        image: file://./video-rating-agent/build/video_rating_agent_s.wasm
-      traits:
-        # Govern the spread/scheduling of the component
-        - type: spreadscaler
-          properties:
-            instances: 1
-
-        - type: link
-          properties:
-            target: video-provider-usage-collector-component
-            namespace: orange
-            package: usagecollector
-            interfaces: [usagecollector]
-
     - name: video-provider-usage-collector-component
       type: component
       properties:
         image: file://./usage-collectors/usage-collector-video-provider/build/usage_collector_video_provider_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1 
+        - type: link
+          properties:
+            target: kvredis
+            namespace: wasi
+            package: keyvalue
+            interfaces: [atomics, store]
+            target_config:
+              - name: redis-url
+                properties:
+                  url: redis://127.0.0.1:6379
+    
+    - name: orange-usage-collector-component
+      type: component
+      properties:
+        image: file://./usage-collectors/usage-collector-orange/build/usage_collector_video_provider_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1 
+        - type: link
+          properties:
+            target: kvredis
+            namespace: wasi
+            package: keyvalue
+            interfaces: [atomics, store]
+            target_config:
+              - name: redis-url
+                properties:
+                  url: redis://127.0.0.1:6379
+    
+    - name: orange-connectivity-usage-collector-component
+      type: component
+      properties:
+        image: file://./usage-collectors/usage-collector-orange-connectivity/build/usage_collector_video_provider_s.wasm
       traits:
         # Govern the spread/scheduling of the component
         - type: spreadscaler
