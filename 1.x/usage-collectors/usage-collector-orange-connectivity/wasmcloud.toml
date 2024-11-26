@@ -1,0 +1,8 @@
+name = "orange-connectivity-usage-collector"
+version = "0.1.0"
+language = "rust"
+type = "component"
+
+[component]
+wit_world = "orange-connectivity-usage-collector-world"
+wasm_target = "wasm32-wasip1"
