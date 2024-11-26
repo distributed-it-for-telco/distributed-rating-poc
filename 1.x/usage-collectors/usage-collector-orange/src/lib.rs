@@ -10,13 +10,13 @@ wit_bindgen::generate!({
     generate_all
 });
 
-struct OrangeConnectivityUsageCollector;
+struct OrangeUsageCollector;
 
-const USAGE_LIST_KEY: &str = "rating:usage:orange:connectivity";
+const USAGE_LIST_KEY: &str = "rating:usage";
 
-impl Guest for OrangeConnectivityUsageCollector {
+impl Guest for OrangeUsageCollector {
     fn store(arg: String) {
-        log(wasi::logging::logging::Level::Info, "", &"Orange Connectivity Usage Collector".to_string());
+        log(wasi::logging::logging::Level::Info, "", &"Orange Usage Collector".to_string());
 
         //open bucket
         let bucket = wasi::keyvalue::store::open("").expect("Failed to open bucket");
@@ -60,4 +60,4 @@ impl Guest for OrangeConnectivityUsageCollector {
     }
 }
 
-export!(OrangeConnectivityUsageCollector);
+export!(OrangeUsageCollector);

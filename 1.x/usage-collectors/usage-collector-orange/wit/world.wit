@@ -1,0 +1,9 @@
+package orange:orange-usage-collector;
+
+world orange-usage-collector-world {
+   import wasi:keyvalue/atomics@0.2.0-draft; 
+   import wasi:keyvalue/store@0.2.0-draft; 
+   import wasi:logging/logging@0.1.0-draft; 
+
+   export orange:usagecollector/usagecollector;
+}
