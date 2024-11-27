@@ -5,4 +5,4 @@ type = "component"
 
 [component]
 wit_world = "rating-agent"
-wasm_target = "wasm32-wasi-p1"
+wasm_target = "wasm32-wasip1"
