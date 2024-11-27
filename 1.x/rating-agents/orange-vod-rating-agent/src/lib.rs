@@ -1,6 +1,5 @@
 wit_bindgen::generate!({
-    generate_all,
-    additional_derives: [serde::Serialize, serde::Deserialize]
+    generate_all
 });
 
 use std::collections::HashMap;

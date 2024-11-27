@@ -4,6 +4,7 @@ use futures::executor::block_on;
 use crate::orange::commons::types::*;
 use crate::orange::usagecollector::usagecollector;
 use crate::orange::commons::commons::{generate_rating_proof};
+use uuid::Uuid;
 
 wit_bindgen::generate!({
     generate_all
@@ -32,7 +33,7 @@ impl AwsStoreRatingagent{
             log(Info,"","Hello I'm your AWS stor postpaid rating agent");
     
             let usage_date = "07/08/2023";
-            let usage_id: String = "".to_string();//generate_guid().await?;
+            let usage_id: String = Uuid::new_v4().to_string();
     
             /*
              *  Contract or Offer is 1 GB = 1 EUR
