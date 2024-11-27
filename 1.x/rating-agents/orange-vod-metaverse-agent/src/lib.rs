@@ -72,7 +72,7 @@ async fn handle_movie_rating(
 
 async fn handle_rating(
     customer_id: &String,
-    offer_id: &String,
+    _offer_id: &String,
     usage_characteristic: &UsageCharacteristic,
     unit_charge: f32,
 ) -> RatingResponse {

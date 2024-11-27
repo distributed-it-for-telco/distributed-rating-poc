@@ -2,9 +2,7 @@ use crate::orange::usagecollector::types::{UsageProofDetails, UsageProofList};
 
 use crate::exports::orange::usagecollector::usagecollector::*;
 use wasi::logging::logging::log;
-use serde::{Serialize, Deserialize};
 use serde_json; // For JSON serialization/deserialization
-use std::fmt;
 
 wit_bindgen::generate!({
     generate_all
@@ -24,13 +22,13 @@ impl Guest for OrangeUsageCollector {
         match bucket.exists(USAGE_LIST_KEY) {
             Ok(true) => (),
             Ok(false) => {
-                bucket.set(USAGE_LIST_KEY, &serde_json::to_vec::<Vec<String>>(&vec![]).unwrap());   
+                let _ = bucket.set(USAGE_LIST_KEY, &serde_json::to_vec::<Vec<String>>(&vec![]).unwrap());   
             },
-            Err(e) => panic!("Wasi exists returns an error"),
+            Err(_e) => panic!("Wasi exists returns an error"),
         }
 
         //get the already existing list
-        let mut usage_list_result = bucket.get(USAGE_LIST_KEY).expect("Failed to get usage list");
+        let usage_list_result = bucket.get(USAGE_LIST_KEY).expect("Failed to get usage list");
         //deserialize the list
         let mut usage_list: Vec<String> = serde_json::from_str(&String::from_utf8(usage_list_result.clone().unwrap()).unwrap()).unwrap();
         //push new value and set in kv store
@@ -48,7 +46,7 @@ impl Guest for OrangeUsageCollector {
             Ok(false) => {
                 panic!("Usage list key still doesn't exist, add some values first");    
             },
-            Err(e) => panic!("Wasi exists returns an error"),
+            Err(_e) => panic!("Wasi exists returns an error"),
         }
 
         //get the already existing list

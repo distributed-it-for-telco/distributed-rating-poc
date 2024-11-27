@@ -5,9 +5,6 @@ use crate::orange::commons::types::{
 };
 use exports::orange::rating::ratingagent::*;
 use wasi::logging::logging::log;
-use std::fmt;
-use serde::{Serialize, Deserialize};
-use crate::orange::balancemanager::*;
 use crate::orange::usagecollector::usagecollector;
 
 
@@ -67,9 +64,6 @@ impl Guest for VideoRatingagent {
         usagecollector::get_list().iter().for_each(|usage| {
             log(wasi::logging::logging::Level::Info, "", &usage.value.to_string());
         });
-
-        // Attempt to purchase
-        let message: String;
 
         RatingResponse {
             authorization_status: AuthorizationStatus {
