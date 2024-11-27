@@ -1,0 +1,10 @@
+package orange:metaverse-ratingagent;
+
+world aws-stor-rating-world {
+    import wasi:logging/logging@0.1.0-draft;  
+    import orange:commons/types;
+    import orange:commons/commons;
+    import orange:usagecollector/usagecollector;
+    
+    export orange:rating/ratingagent;
+}

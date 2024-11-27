@@ -5,7 +5,6 @@ use wasi::logging::logging::{log,Level::Info};
 
 use futures::executor::block_on;
 use crate::orange::balancemanager::*;
-use crate::orange::commons::types::Balance;
 use builders::RatingResponseBuilder;
 
 mod builders;

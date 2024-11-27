@@ -133,65 +133,6 @@ impl Guest for OrangeVodRatingagent {
     fn get_children(request: GetChildrenRequest) -> AgentList {
         block_on(Self::get_children_async(request))
     }
-
-    // fn rate_usage(_request: RatingRequest) -> RatingResponse {
-    //     log(Info, "", &_request.offer_id);
-
-    //     let bucket = wasi::keyvalue::store::open("").expect("failed to open empty bucket");
-    //     let object_name = format!("{}:{}:{}", "balance", _request.customer_id, _request.offer_id);
-        
-    //     log(Info, "", &object_name);
-
-    //     let balance_utf8 = bucket.get(&object_name).expect("couldn't retrieve count");
-    //     let balance_str = String::from_utf8(balance_utf8.clone().unwrap()).unwrap();
-        
-    //     log(Info, "", &balance_str);
-
-    //     let mut balance: Balance = serde_json::from_str(&balance_str).unwrap();
-    //     log(Info, "", &balance.to_string());
-
-    //     let price: f32 = 5.0;
-    //     let purchase_amount = _request.usage.usage_characteristic_list[0].value.parse::<f32>().unwrap() * price;
-
-    //     // Attempt to purchase
-    //     let message: String;
-
-    //     match balance.purchase(purchase_amount) {
-    //         Ok(()) => {
-    //             message = "Purchase successful".to_string();
-    //             bucket.set(&object_name, &serde_json::to_vec(&balance).unwrap());
-    //         },
-    //         Err(err) => {
-    //             message = "Purchase failed: ".to_string() + &err;
-    //         },
-    //     }
-
-    //     RatingResponse {
-    //         authorization_status: AuthorizationStatus {
-    //             code: 12345,
-    //             key: "two".to_string(),
-    //         },
-    //         billing_information: BillingInformation {
-    //             price: price.to_string(),
-    //             unit: balance.unit.to_string(),
-    //             messages: vec![message],
-    //         },
-    //         next_agent: AgentIdentification {
-    //             name: "agent".to_string(),
-    //             partner_id: "partner".to_string(),
-    //         },
-    //     }
-    // }
-
-    // fn validate(_request: ValidationRequest) -> ValidationResponse {
-    //     ValidationResponse { valid: true }
-    // }
-
-    // fn get_children(_request: GetChildrenRequest) -> AgentList {
-    //     AgentList {
-    //         agents: vec![],
-    //     }
-    // }
 }
 
 export!(OrangeVodRatingagent);
