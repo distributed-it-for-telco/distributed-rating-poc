@@ -42,6 +42,11 @@ cd $homeDir/rating-agents/orange-vod-rating-agent
 wit-deps
 wash build
 wac plug ./build/orange_vod_ratingagent_s.wasm --plug ../../commons/build/rating_commons_s.wasm -o ./build/orange_vod_ratingagent_s.wasm
+##===========Video on demand agent=================
+cd $homeDir/rating-agents/aws-stor-rating-agent
+wit-deps
+wash build
+wac plug ./build/aws_stor_rating_agent_s.wasm --plug ../../commons/build/rating_commons_s.wasm -o ./build/orange_vod_ratingagent_s.wasm
 ##===========Rating Coordinator==============
 cd $homeDir/rating-coordinator
 wit-deps

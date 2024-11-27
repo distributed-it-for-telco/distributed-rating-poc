@@ -140,6 +140,18 @@ spec:
             package: usagecollector
             interfaces: [usagecollector]
 
+    - name: aws-stor-rating-agent-component
+      type: component
+      properties:
+        image: file://./rating-agents/aws-stor-rating-agent/build/orange_vod_ratingagent_s.wasm
+        # To use the a precompiled version of this component, use the line below instead:
+        # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
+
     - name: orange-vod-rating-agent-component
       type: component
       properties:
@@ -151,17 +163,6 @@ spec:
         - type: spreadscaler
           properties:
             instances: 1
-
-        - type: link
-          properties:
-            target: kvredis
-            namespace: wasi
-            package: keyvalue
-            interfaces: [atomics, store]
-            target_config:
-              - name: redis-url
-                properties:
-                  url: redis://127.0.0.1:6379
 
     - name: video-provider-usage-collector-component
       type: component
