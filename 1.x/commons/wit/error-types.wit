@@ -1,0 +1,8 @@
+interface error-types{
+    record validation-error{
+        message: string
+    }
+    record usage-error{
+        message: string
+    }
+}

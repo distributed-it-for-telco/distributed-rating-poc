@@ -1,83 +1,15 @@
+
 wit_bindgen::generate!({
     generate_all
 });
 
-mod dtos;
-mod mappers;
-use crate::orange::commons::types::*;
-use crate::dtos::SerializedUsageCharacteristic;
+pub mod dtos;
+pub mod mappers;
+mod mappers_impl;
+mod builders_impl;
+mod commons_impl;
+mod commons_struct;
+use commons_struct::Commons;
 
-use crate::exports::orange::commons::commons::Guest;
-use crate::exports::orange::commons::mappers::Guest as Mappers;
-use serde_json::json;
 
-struct Commons;
-
-impl Guest for Commons {
-    // pub fn create_response_builder() -> RatingResponseBuilder {
-    //     RatingResponseBuilder::new()
-    // }
-
-    fn create_balance(count: f32, unit: String, party_id: String) -> Balance {
-        Balance { count, unit, party_id }
-    }
-    fn generate_rating_proof(usage_proof_request: UsageProofRequest) -> String{
-        let rating_date = "04/04/2023";
-        let usage_template_str = json!({
-            "id": usage_proof_request.usage_id,
-            "usageDate": usage_proof_request.usage_date,
-            "description": usage_proof_request.description,
-            "usageType": usage_proof_request.usage_type,
-            "ratedProductUsage": {
-                "isBilled": false,
-                "ratingAmountType": "Total",
-                "ratingDate": rating_date,
-                "bucketValueConvertedInAmount": {
-                    "unit": "EUR",
-                    "value": usage_proof_request.rating
-                },
-                "productRef": {
-                    "id": usage_proof_request.offer_id,
-                    "name": usage_proof_request.product_name
-                }
-            },
-            "relatedParty": {
-                "id": usage_proof_request.party_id
-            },
-            "usageCharacteristic": usage_proof_request.usage_characteristic_list.into_iter().map(Into::<SerializedUsageCharacteristic>::into).collect::<Vec<_>>(),
-        });
-
-        usage_template_str.to_string()
-
-    }
-}
-
-impl Mappers for Commons{
-    fn rating_request_to_string(request: RatingRequest) -> String{
-        mappers::rating_request_to_string(request)
-    }
-    
-    fn string_to_rating_request(value: String) -> RatingRequest{
-        mappers::string_to_rating_request(value)
-    }
-
-    fn rating_response_to_string(request: RatingResponse) -> String{
-        mappers::rating_response_to_string(request)
-    }
-
-    fn string_to_rating_response(value: String) -> RatingResponse{
-        mappers::string_to_rating_response(value)
-    }
-
-    fn balance_to_string(value: Balance) -> String{
-        mappers::balance_to_string(value)
-    }
-
-    fn string_to_balance(value: String) -> Balance{
-        mappers::string_to_balance(value)
-    }
- fn balance_to_stringified_array(value: Balance) -> Vec<u8>{
-        mappers::balance_to_stringified_array(value)
-    }
-}
 export!(Commons);

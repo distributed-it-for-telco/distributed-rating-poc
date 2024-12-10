@@ -16,3 +16,18 @@
 //     // Method to build the response
 //     build(self: RatingResponseBuilder) -> RatingResponse
 // }
+
+interface rating-response-builder {
+    use types.{rating-response, agent-identification};
+
+    type builder-handle = u32;
+
+    create-builder: func() -> builder-handle;
+    unit: func(handle: builder-handle, value: string) -> builder-handle;
+    price: func(handle: builder-handle, value: string) -> builder-handle;
+    message: func(handle: builder-handle, value: string) -> builder-handle;
+    authorized: func(handle: builder-handle) -> builder-handle;
+    not-authorized: func(handle: builder-handle) -> builder-handle;
+    next-agent: func(handle: builder-handle, value: agent-identification) -> builder-handle;
+    build: func(handle: builder-handle) -> rating-response;
+}

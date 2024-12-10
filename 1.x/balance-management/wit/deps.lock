@@ -1,7 +1,7 @@
 [commons]
 path = "../../commons/wit"
-sha256 = "f9b2ae1ee4648581be3d526a30c6d07921ed2eb458d9ebb202c53ba19e1d45fe"
-sha512 = "4e8c6b19aad8fd322ebb69c0cd6a843b51803208b04a70622333bb0ec4815c7fd2447c327acd255a38986c3bf5c11bb99fd04a371a701c1a05921ea4a20f936d"
+sha256 = "d5ef4034ee9f2deacd2df8ea9ddad6c4d0757a6b488ca5fa1d9f3a87a9101496"
+sha512 = "cbdcc6a023669e816654781b4640f098feadd36330c5ead7de6cc08ea69f5fee5d66adbead9e88cb2f00328167582e0d80dd5fb7a01ee05afe9f57da5ee609b9"
 
 [keyvalue]
 url = "https://github.com/WebAssembly/wasi-keyvalue/archive/53ff9402194704cb68b1599c4e35e9182f4c57c4.tar.gz"

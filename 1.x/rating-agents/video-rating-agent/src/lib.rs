@@ -3,6 +3,9 @@
 use crate::orange::commons::types::{
     AgentIdentification, AuthorizationStatus, BillingInformation,
 };
+use crate::orange::commons::error_types::{
+    UsageError, ValidationError
+};
 use exports::orange::rating::ratingagent::*;
 use wasi::logging::logging::log;
 use crate::orange::usagecollector::usagecollector;
@@ -22,9 +25,9 @@ struct VideoRatingagent;
 
 impl Guest for VideoRatingagent {
     /// Say hello!
-    fn rate_usage(_request: RatingRequest) -> RatingResponse {
+    fn rate_usage(_request: RatingRequest) -> Result<RatingResponse, UsageError> {
 
-        log(wasi::logging::logging::Level::Info, "", &"Hello I'm your video provider postpaid rating agent".to_string());
+        log(wasi::logging::logging::Level::Info, "", "Hello I'm your video provider postpaid rating agent");
 
         let usage_date = "21/06/2023";
         let usage_id: String = "UUID".to_string();
@@ -56,16 +59,16 @@ impl Guest for VideoRatingagent {
             "usageCharacteristic": &_request.usage.usage_characteristic_list
         }).to_string();
 
-        log(wasi::logging::logging::Level::Info, "", &"Sending usage proof to video provider usage collector".to_string());
+        log(wasi::logging::logging::Level::Info, "", "Sending usage proof to video provider usage collector");
 
         usagecollector::store(&usage_template_str);
 
-        log(wasi::logging::logging::Level::Info, "", &"Retrieving usage list from video provider usage collector\n\n\n".to_string());
+        log(wasi::logging::logging::Level::Info, "", "Retrieving usage list from video provider usage collector\n\n\n");
         usagecollector::get_list().iter().for_each(|usage| {
-            log(wasi::logging::logging::Level::Info, "", &usage.value.to_string());
+            log(wasi::logging::logging::Level::Info, "", usage.value);
         });
 
-        RatingResponse {
+        Ok(RatingResponse {
             authorization_status: AuthorizationStatus {
                 code: 12345,
                 key: "hello".to_string(),
@@ -79,11 +82,11 @@ impl Guest for VideoRatingagent {
                 name: "agent".to_string(),
                 partner_id: "partner".to_string(),
             },
-        }
+        })
     }
 
-    fn validate(_request: ValidationRequest) -> ValidationResponse {
-        ValidationResponse { valid: true }
+    fn validate(_request: ValidationRequest) -> Result<ValidationResponse, ValidationError> {
+        Ok(ValidationResponse { valid: true })
     }
 
     fn get_children(_request: GetChildrenRequest) -> AgentList {
