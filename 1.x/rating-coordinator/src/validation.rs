@@ -1,10 +1,11 @@
-use std::{fmt,collections::HashMap, collections::VecDeque};
+use std::{collections::HashMap, collections::VecDeque};
 
 use crate::wasi::logging::logging::{log, Level::Info};
 use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
 use crate::orange::commons::types::*;
+use crate::orange::commons::error_types::*;
 use crate::agent_graph::AgentGraph;
 use crate::types::{RatingResponseBuilder};
 use crate::wasmcloud::bus::lattice::CallTargetInterface;
@@ -15,7 +16,7 @@ pub async fn handle_validation_cycle(
     agents_graph: &AgentGraph,
 ) -> Result<RatingResponse, ValidationError> {
     if headers.is_empty() {
-        return Err(ValidationError::Other("Can't validate client usage, client ip not found".to_string()));
+        return Err(ValidationError{message: "Can't validate client usage, client ip not found".to_string()});
     }
 
     let mut client_ip = "".to_string();
@@ -109,17 +110,5 @@ pub async fn validate_through_agent(
 
     let validation_response = ratingagent::validate(&validation_request);
 
-    Ok(validation_response)
-}
-
-#[derive(Debug)]
-pub enum ValidationError {
-    Other(String), // For generic errors
-}
-impl fmt::Display for ValidationError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            ValidationError::Other(message) => write!(f, "An error occurred: {}", message),
-        }
-    }
+    validation_response
 }

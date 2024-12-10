@@ -2,7 +2,8 @@ package orange:ratingcoordinator;
 
 interface ratingcoordinator{
   use orange:commons/types.{rating-request,rating-response};
-  handle-rating-process: func(request: rating-request, headers: list<tuple<string,list<u8>>>) -> rating-response;
+  use orange:commons/error-types.{generic-error};
+  handle-rating-process: func(request: rating-request, headers: list<tuple<string,list<u8>>>) -> result<rating-response, generic-error>;
 }
 
 world rating-coordinator-world {

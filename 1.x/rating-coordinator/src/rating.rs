@@ -5,13 +5,14 @@ use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
 use crate::orange::commons::types::*;
+use crate::orange::commons::error_types::{GenericError};
 use crate::agent_graph::AgentGraph;
 use async_recursion::async_recursion;
 
 pub async fn handle_rating_cycle(
     rating_request: &RatingRequest,
     agents_graph: &AgentGraph,
-) -> RatingResponse {
+) -> Result<RatingResponse, GenericError> {
     let mut visited: HashMap<String, bool> = HashMap::new();
     for vertex in agents_graph.adjacency_list.keys() {
         visited.insert(vertex.to_string(), false);
@@ -27,7 +28,7 @@ pub async fn handle_rating_cycle(
 
 pub async fn rate_through_agent(
     rating_request: &RatingRequest,
-) -> RatingResponse {
+) -> Result<RatingResponse,GenericError> {
     let rating_interface = lattice::CallTargetInterface::new(
         "orange",
         "rating",
@@ -46,7 +47,7 @@ async fn dfs_recursive(
     visited: &HashMap<String, bool>,
     agents_graph: &AgentGraph,
     rating_request: &mut RatingRequest,
-) -> RatingResponse {
+) -> Result<RatingResponse,GenericError> {
     let mut children_ratings = Vec::new();
     if let Some(neighbors) = agents_graph.adjacency_list.get(&vertex.identification.name) {
         for neighbor in neighbors {
@@ -58,7 +59,7 @@ async fn dfs_recursive(
                     rating_request,
                 ).await;
 
-                if child_rating.authorization_status.code == 401 {
+                if child_rating.clone().unwrap().authorization_status.code == 401 {
                     return child_rating;
                 }
 
@@ -82,15 +83,15 @@ async fn dfs_recursive(
             price: "".to_string()
         };
         rating_record.producer = rating_request.agent_id.to_owned();
-        rating_record.unit = child_rating.billing_information.unit;
-        rating_record.price = child_rating.billing_information.price;
+        rating_record.unit = child_rating.clone().unwrap().billing_information.unit;
+        rating_record.price = child_rating.clone().unwrap().billing_information.price;
         child_records.push(rating_record);
     }
     rating_request.rating_history = child_records;
 
     let rating_response = rate_through_agent(&rating_request).await;
 
-    log(Info, "",format!("Provider Rating status: {}",rating_response.authorization_status.code).as_str());
+    log(Info, "",format!("Provider Rating status: {}",rating_response.clone().unwrap().authorization_status.code).as_str());
 
     rating_response
 }
