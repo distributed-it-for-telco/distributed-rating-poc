@@ -2,10 +2,10 @@ package orange:rating;
 
 interface  ratingagent{
   use orange:commons/types.{rating-request,rating-response, validation-request, validation-response,
-             get-children-request, agent-list, agent, agent-identification, usage,
-             usage-characteristic, rating-record, billing-information, authorization-status};
-  rate-usage: func(request: rating-request) -> rating-response;
-  validate: func(request: validation-request) -> validation-response;
+             get-children-request, agent-list };
+  use orange:commons/error-types.{validation-error, usage-error};
+  rate-usage: func(request: rating-request) -> result<rating-response, usage-error>;
+  validate: func(request: validation-request) -> result<validation-response, validation-error>;
   get-children: func(request: get-children-request) -> agent-list;
 
 }
