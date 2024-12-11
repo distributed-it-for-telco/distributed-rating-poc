@@ -91,7 +91,7 @@ impl ApiGateway {
         let response_body = response.body().unwrap();
         log(Info, "", "before calling rating agent");
 
-        let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(&rating_request,&request_headers.entries());
+        let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(&rating_request,&request_headers.entries()).expect("Failed to call rating agent");
 
         log(Info, "", &"after calling rating agent");
         log(Info, "", &usage_result.billing_information.unit);
