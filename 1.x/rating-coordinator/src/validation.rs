@@ -4,10 +4,11 @@ use crate::wasi::logging::logging::{log, Level::Info};
 use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
-use crate::orange::commons::types::*;
-use crate::orange::commons::error_types::*;
+use crate::orange::commons::types::{RatingRequest, RatingResponse,
+                    ValidationRequest, ValidationResponse, Agent};
+use crate::orange::commons::rating_response_builder as RatingResponseBuilder;
+use crate::orange::commons::error_types::ValidationError;
 use crate::agent_graph::AgentGraph;
-use crate::types::{RatingResponseBuilder};
 use crate::wasmcloud::bus::lattice::CallTargetInterface;
 
 pub async fn handle_validation_cycle(
@@ -36,7 +37,8 @@ pub async fn handle_validation_cycle(
     log(Info, "", format!("Validating against agent: {}",rating_request.agent_id).as_str());
 
     let mut validation_response;
-    let mut rating_response_builder = RatingResponseBuilder::new();
+    // let mut rating_response_builder = RatingResponseBuilder::new();
+    let mut response_builder_handle = RatingResponseBuilder::create_builder();
 
     let mut visited: HashMap<String, bool> = HashMap::new();
     for vertex in agents_graph.adjacency_list.keys() {
@@ -64,10 +66,9 @@ pub async fn handle_validation_cycle(
         .await;
 
         if !validation_response.unwrap().valid {
-            rating_response_builder
-                .message(&"Validation failed")
-                .not_authorized();
-            return Ok(rating_response_builder.build());
+            response_builder_handle= RatingResponseBuilder::message(response_builder_handle, &"Validation failed");
+            response_builder_handle= RatingResponseBuilder::not_authorized(response_builder_handle);
+            return Ok(RatingResponseBuilder::build(response_builder_handle));
         }
 
         if let Some(neighbors) = agents_graph
@@ -83,8 +84,9 @@ pub async fn handle_validation_cycle(
         }
     }
 
-    rating_response_builder.message(&"Valid usage").authorized();
-    Ok(rating_response_builder.build())
+    response_builder_handle= RatingResponseBuilder::message(response_builder_handle, &"Valid usage");
+    response_builder_handle = RatingResponseBuilder::authorized(response_builder_handle);
+    Ok(RatingResponseBuilder::build(response_builder_handle))
 }
 
 pub async fn validate_through_agent(

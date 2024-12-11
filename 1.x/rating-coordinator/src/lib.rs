@@ -5,7 +5,7 @@ wit_bindgen::generate!({
 use std::collections::HashMap;
 use crate::wasi::logging::logging::{log, Level::Info};
 use crate::orange::commons::types::{RatingRequest, RatingResponse};
-use crate::orange::commons::error_types::{GenericError, ValidationError};
+use crate::orange::commons::error_types::GenericError;
 use crate::exports::orange::ratingcoordinator::ratingcoordinator::Guest;
 use futures::executor::block_on;
 
@@ -17,7 +17,6 @@ mod agent_graph;
 mod build_agents_hierarchy;
 mod validation;
 mod rating;
-mod types;
 
 struct RatingCoordinator;
 

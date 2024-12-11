@@ -10,6 +10,7 @@ world rating-coordinator-world {
   import orange:rating/ratingagent;
   import wasi:logging/logging@0.1.0-draft; 
   import wasmcloud:bus/lattice@1.0.0;
+  import orange:commons/rating-response-builder;
 
   export ratingcoordinator;
 }
