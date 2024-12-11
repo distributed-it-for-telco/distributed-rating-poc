@@ -1,46 +1,28 @@
-
-use crate::orange::commons::types::{
-    AgentIdentification, AuthorizationStatus, BillingInformation,
+use crate::orange::commons::types::{ RatingRequest, RatingResponse,
+    ValidationRequest, ValidationResponse
 };
+use crate::orange::commons::error_types::{ UsageError, ValidationError};
 use exports::orange::rating::ratingagent::*;
-use wasi::logging::logging::log;
+use wasi::logging::logging::{log, Level::Info};
 
 wit_bindgen::generate!({
     generate_all,
-    additional_derives: [serde::Serialize, serde::Deserialize]
 });
 struct StreamingRatingagent;
 
 impl Guest for StreamingRatingagent {
 
-    fn rate_usage(_request: RatingRequest) -> RatingResponse {
-        log(wasi::logging::logging::Level::Info, "", &"Streaming Rating Agent".to_string());
-
-        RatingResponse {
-            authorization_status: AuthorizationStatus {
-                code: 12345,
-                key: "two".to_string(),
-            },
-            billing_information: BillingInformation {
-                price: "price".to_string(),
-                unit: "unit".to_string(),
-                messages: vec!["message".to_string()],
-            },
-            next_agent: AgentIdentification {
-                name: "agent".to_string(),
-                partner_id: "partner".to_string(),
-            },
-        }
+    fn rate_usage(_request: RatingRequest) -> Result<RatingResponse, UsageError> {
+        log(Info, "", &"Streaming Rating Agent".to_string());
+        todo!()
     }
 
-    fn validate(_request: ValidationRequest) -> ValidationResponse {
-        ValidationResponse { valid: true }
+    fn validate(_request: ValidationRequest) -> Result<ValidationResponse, ValidationError> {
+        todo!()
     }
 
     fn get_children(_request: GetChildrenRequest) -> AgentList {
-        AgentList {
-            agents: vec![],
-        }
+        todo!()
     }
 }
 

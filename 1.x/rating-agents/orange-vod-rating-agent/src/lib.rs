@@ -6,10 +6,12 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 use futures::executor::block_on;
 use wasi::logging::logging::{log,Level::Info};
-use crate::orange::commons::commons::{generate_rating_proof};
+use crate::orange::commons::commons::generate_rating_proof;
 use crate::orange::commons::types::{RatingResponse, ValidationRequest, UsageProofRequest,
                                     AuthorizationStatus, BillingInformation,AgentIdentification,
                                     Agent};
+use crate::orange::commons::error_types::{UsageError, ValidationError};
+use crate::orange::commons::rating_response_builder as RatingResponseBuilder;
 use crate::orange::usagecollector::usagecollector;
 use exports::orange::rating::ratingagent::*;
 
@@ -32,7 +34,7 @@ lazy_static! {
 struct OrangeVodRatingagent;
 
 impl OrangeVodRatingagent {
-    async fn rate_usage_async(request: RatingRequest) -> RatingResponse {
+    async fn rate_usage_async(request: RatingRequest) -> Result<RatingResponse, UsageError> {
         log(Info,"","Hello I'm your orange postpaid vod rating agent");
         let usage_date = "04/04/2023";
         let usage_id: String = "".to_string();// generate_guid().await?;
@@ -64,28 +66,16 @@ impl OrangeVodRatingagent {
         );
         usagecollector::store(&usage_template_str);
 
-        let rating_response = RatingResponse{
-                authorization_status: AuthorizationStatus{
-                    code: 200,
-                    key: "".to_string()
-                },
-                billing_information: BillingInformation{
-                    messages: vec![
-                        "You can now enjoy your movie on Streamzie".to_string(),
-                        format!("The cost of this transaction is {} EUR",rating.to_string())
-                    ],
-                    price: rating.to_string(),
-                    unit: "EUR".to_string()
-                },
-                next_agent: AgentIdentification{
-                    name: "".to_string(),
-                    partner_id: "".to_string()
-                }
-            };
-        rating_response
+        let mut response_builder_handle = RatingResponseBuilder::create_builder();
+        response_builder_handle= RatingResponseBuilder::unit(response_builder_handle, &"EUR");
+        response_builder_handle= RatingResponseBuilder::price(response_builder_handle, &rating.to_string());
+        response_builder_handle= RatingResponseBuilder::message(response_builder_handle, &rating.to_string());
+        response_builder_handle= RatingResponseBuilder::message(response_builder_handle, &rating.to_string());
+        response_builder_handle= RatingResponseBuilder::authorized(response_builder_handle);
+        Ok(RatingResponseBuilder::build(response_builder_handle))
     }
 
-    async fn validate_async(request: ValidationRequest) -> ValidationResponse {
+    async fn validate_async(request: ValidationRequest) -> Result<ValidationResponse, ValidationError>  {
         let mut validation_response: ValidationResponse = ValidationResponse{
             valid: true
         };
@@ -94,7 +84,7 @@ impl OrangeVodRatingagent {
         } else {
             validation_response.valid = false;
         }
-        validation_response
+        Ok(validation_response)
     }
 
     async fn get_children_async(request: GetChildrenRequest) -> AgentList {
@@ -123,10 +113,10 @@ impl OrangeVodRatingagent {
 }
 
 impl Guest for OrangeVodRatingagent {
-    fn rate_usage(request: RatingRequest) -> RatingResponse {
+    fn rate_usage(request: RatingRequest) -> Result<RatingResponse, UsageError>  {
         block_on(Self::rate_usage_async(request))
     }
-    fn validate(request: ValidationRequest) -> ValidationResponse {
+    fn validate(request: ValidationRequest) -> Result<ValidationResponse, ValidationError> {
         block_on(Self::validate_async(request))
     }
     fn get_children(request: GetChildrenRequest) -> AgentList {

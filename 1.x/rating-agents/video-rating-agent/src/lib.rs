@@ -1,19 +1,18 @@
 
 
-use crate::orange::commons::types::{
-    AgentIdentification, AuthorizationStatus, BillingInformation,
-};
+use crate::orange::commons::types::UsageProofRequest;
 use crate::orange::commons::error_types::{
     UsageError, ValidationError
 };
+use crate::orange::commons::commons::generate_rating_proof;
+use crate::orange::commons::rating_response_builder as RatingResponseBuilder;
 use exports::orange::rating::ratingagent::*;
-use wasi::logging::logging::log;
+use wasi::logging::logging::{log,Level::Info};
 use crate::orange::usagecollector::usagecollector;
-
+use uuid::Uuid;
 
 wit_bindgen::generate!({
     generate_all,
-    additional_derives: [serde::Serialize, serde::Deserialize]
 });
 
 const OFFER_ID: &str = "video";
@@ -30,63 +29,52 @@ impl Guest for VideoRatingagent {
         log(wasi::logging::logging::Level::Info, "", "Hello I'm your video provider postpaid rating agent");
 
         let usage_date = "21/06/2023";
-        let usage_id: String = "UUID".to_string();
-        let rating_date = "04/04/2023";
-        let price: f32 = 1.0;
-        let rating = &_request.usage.usage_characteristic_list[0].value.parse::<f32>().unwrap() * price;
+        let usage_id: String = Uuid::new_v4().to_string();
+        let mut rating: f32 = 0.0;
 
-        let usage_template_str = serde_json::json!({
-            "id": usage_id,
-            "usageDate": usage_date,
-            "description": RATING_PROOF_DESC,
-            "usageType": RATING_PROOF_USAGE_TYPE,
-            "ratedProductUsage": {
-                "isBilled": false,
-                "ratingAmountType": "Total",
-                "ratingDate": rating_date,
-                "bucketValueConvertedInAmount": {
-                    "unit": "EUR",
-                    "value": rating.to_string()
-                },
-                "productRef": {
-                    "id": OFFER_ID,
-                    "name": RATING_PROOF_PRODUCT_NAME
-                }
-            },
-            "relatedParty": {
-                "id": &_request.customer_id
-            },
-            "usageCharacteristic": &_request.usage.usage_characteristic_list
-        }).to_string();
+        if let Some(first) = _request.usage.usage_characteristic_list.first() {
+            rating = first.value.parse::<i32>().unwrap() as f32;
+        }
+        
+        let usage_template_str = generate_rating_proof(&UsageProofRequest {
+            party_id: _request.customer_id.to_owned(),
+            rating: rating.to_string(),
+            usage_characteristic_list: _request.usage.usage_characteristic_list.to_owned(),
+            usage_id: usage_id.as_str().to_owned(),
+            usage_date: usage_date.to_owned(),
+            offer_id: OFFER_ID.to_owned(),
+            description: RATING_PROOF_DESC.to_owned(),
+            usage_type: RATING_PROOF_USAGE_TYPE.to_owned(),
+            product_name: RATING_PROOF_PRODUCT_NAME.to_owned(),
+        });
 
-        log(wasi::logging::logging::Level::Info, "", "Sending usage proof to video provider usage collector");
+        log(Info, "", "Sending usage proof to video provider usage collector");
 
         usagecollector::store(&usage_template_str);
 
         log(wasi::logging::logging::Level::Info, "", "Retrieving usage list from video provider usage collector\n\n\n");
         usagecollector::get_list().iter().for_each(|usage| {
-            log(wasi::logging::logging::Level::Info, "", usage.value);
+            log(wasi::logging::logging::Level::Info, "", &usage.value);
         });
 
-        Ok(RatingResponse {
-            authorization_status: AuthorizationStatus {
-                code: 12345,
-                key: "hello".to_string(),
-            },
-            billing_information: BillingInformation {
-                unit: (&"EUR").to_string(),
-                price: rating.to_string(),
-                messages: vec!["".to_string()],
-            },
-            next_agent: AgentIdentification {
-                name: "agent".to_string(),
-                partner_id: "partner".to_string(),
-            },
-        })
+
+        let mut response_builder_handle = RatingResponseBuilder::create_builder();
+        response_builder_handle= RatingResponseBuilder::unit(response_builder_handle, &"EUR");
+        response_builder_handle= RatingResponseBuilder::price(response_builder_handle, &rating.to_string());
+        response_builder_handle= RatingResponseBuilder::authorized(response_builder_handle);
+        Ok(RatingResponseBuilder::build(response_builder_handle))
     }
 
     fn validate(_request: ValidationRequest) -> Result<ValidationResponse, ValidationError> {
-        Ok(ValidationResponse { valid: true })
+        let mut validation_response: ValidationResponse = ValidationResponse{valid: true};
+
+        if !_request.client_country.is_empty() && _request.client_country.to_owned() == "EG" {
+            validation_response.valid = true;
+        } else {
+            validation_response.valid = false;
+        }
+
+        Ok(validation_response)
     }
 
     fn get_children(_request: GetChildrenRequest) -> AgentList {

@@ -2,11 +2,9 @@ use std::io;
 use async_recursion::async_recursion;
 use crate::wasi::logging::logging::log;
 use crate::wasi::logging::logging::Level::Info;
-use crate::orange::commons::types::{
-    Agent, AgentIdentification, AgentList, GetChildrenRequest, RatingRequest
-};
+use crate::orange::commons::types::{Agent, AgentIdentification, AgentList,
+                                    GetChildrenRequest, RatingRequest};
 use crate::wasmcloud::bus::lattice;
-// use crate::orange::rating::types::{RatingRequest, RatingResponse};
 use crate::orange::rating::*;
 use crate::agent_graph::AgentGraph;
 
