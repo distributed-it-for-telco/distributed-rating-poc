@@ -10,4 +10,5 @@ world commons-world {
   export mappers;
   export rating-response-builder;
   export commons;
+  export error-types;
 }
