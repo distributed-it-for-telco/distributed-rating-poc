@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 use futures::executor::block_on;
 use wasi::logging::logging::{log,Level::Info};
-use crate::orange::commons::commons::{generate_rating_proof};
+use crate::orange::commons::commons::generate_rating_proof;
 use crate::orange::commons::types::{RatingResponse, ValidationRequest, UsageProofRequest,
                                     AuthorizationStatus, BillingInformation,AgentIdentification,
                                     Agent};
