@@ -1,6 +1,6 @@
 
 
-use crate::orange::commons::types::{UsageProofRequest};
+use crate::orange::commons::types::UsageProofRequest;
 use crate::orange::commons::error_types::{
     UsageError, ValidationError
 };
