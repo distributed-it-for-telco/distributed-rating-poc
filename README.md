@@ -16,7 +16,7 @@
     ```
     rustup target add wasm32-wasip1
     ```
-
+- [Tools from the wasmtime build time linking doc](https://wasmcloud.com/docs/concepts/linking-components/linking-at-build)  
 
   ## steps
   - Run sh file "build&deploy.sh", this will build all the components, start the wash host, and deploy the app.
