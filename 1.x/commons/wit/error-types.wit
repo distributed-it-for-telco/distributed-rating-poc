@@ -5,8 +5,14 @@ interface error-types{
     record usage-error{
         message: string
     }
+    
+    record other-error{
+        message: string
+    }
+
     variant generic-error{
-        validation-error,
-        usage-error
+        validation(validation-error),
+        usage(usage-error),
+        other(other-error)
     }
 }

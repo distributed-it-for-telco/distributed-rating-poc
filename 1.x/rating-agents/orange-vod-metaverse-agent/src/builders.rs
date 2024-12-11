@@ -86,50 +86,18 @@ impl RatingResponseBuilder {
     }
 }
 
-// pub struct RatingResponseBuilder {
-//     currentRatingResponse: RatingResponse,
-// }
-
-// impl RatingResponseBuilder {
-//     pub fn new() -> Self {
-//         let builder = RatingResponseBuilder {
-//             currentRatingResponse: RatingResponse {
-//                 authorization_status: AuthorizationStatus {
-//                     code: 0,
-//                     key: "".to_string(),
-//                 },
-//                 billing_information: BillingInformation {
-//                     unit: "".to_string(),
-//                     price: "".to_string(),
-//                     messages: vec![],
-//                 },
-//                 next_agent: AgentIdentification {
-//                     name: "".to_string(),
-//                     partner_id: "".to_string(),
-//                 },
-//             },
-//         };
-//         builder
-//     }
-//     pub fn authorized(self) -> RatingResponseBuilder {
-//         self
-//     }
-//     pub fn not_authorized(self) -> RatingResponseBuilder {
-//         self
-//     }
-//     pub fn message(self, message: &str) -> RatingResponseBuilder {
-//         self
-//     }
-//     pub fn unit(self, unit: &str) -> RatingResponseBuilder {
-//         self
-//     }
-//     pub fn price(self, price: &str) -> RatingResponseBuilder {
-//         self
-//     }
-//     pub fn message2(self, message: &str) -> RatingResponseBuilder {
-//         self
-//     }
-//     pub fn build(self) -> RatingResponse {
-//         self.currentRatingResponse
-//     }
-// }
+ // RatingResponse{
+        //     authorization_status: AuthorizationStatus{
+        //         code: 15,
+        //         key: "".to_string()
+        //     },
+        //     billing_information: BillingInformation{
+        //         messages: vec!["".to_string()],
+        //         price: "".to_string(),
+        //         unit: "".to_string()
+        //     },
+        //     next_agent: AgentIdentification{
+        //         name: "".to_string(),
+        //         partner_id: "".to_string()
+        //     }
+        // }

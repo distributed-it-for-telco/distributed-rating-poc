@@ -26,20 +26,21 @@ impl RatingCoordinator{
     ) -> Result<RatingResponse, GenericError> {
         log(Info, "", "Hello I'm your rating coordinator");
         log(Info, "", format!("Current used agent is: {}",rating_request.agent_id).as_str());
-
         let agent_graph = build_agent_hierarchy(&rating_request).await.unwrap();
-
         log(Info, "","Graph generated ......");
-
-       let validation_response_as_rating =
-             handle_validation_cycle(&rating_request, headers, &agent_graph).await.unwrap();
-        
+        let validation_response_as_rating =
+        match handle_validation_cycle(&rating_request, headers, &agent_graph).await {
+            Ok(validation) => validation,
+            Err(e) => return Err(GenericError::Validation(e))
+        };
         if validation_response_as_rating.authorization_status.code == 401 {
-            // return GenericError::ValidationError(ValidationError{message:validation_response_as_rating});
-            return Err(GenericError::ValidationError);
+            return Ok(validation_response_as_rating)
         }
 
-        handle_rating_cycle(&rating_request, &agent_graph).await
+       match handle_rating_cycle(&rating_request, &agent_graph).await {
+            Ok(rating) => Ok(rating),
+            Err(e) => Err(GenericError::Usage(e)),
+       }
     }
 }
 
@@ -50,21 +51,6 @@ impl Guest for RatingCoordinator {
     ) -> Result<RatingResponse, GenericError> {
         let client_country_bytes: HashMap<String, String> = headers.into_iter().map(|(a,b)| (a,String::from_utf8(b).unwrap())).collect();
         block_on(Self::handle_rating_process_async(rating_process_request,client_country_bytes))
-        // RatingResponse{
-        //     authorization_status: AuthorizationStatus{
-        //         code: 15,
-        //         key: "".to_string()
-        //     },
-        //     billing_information: BillingInformation{
-        //         messages: vec!["".to_string()],
-        //         price: "".to_string(),
-        //         unit: "".to_string()
-        //     },
-        //     next_agent: AgentIdentification{
-        //         name: "".to_string(),
-        //         partner_id: "".to_string()
-        //     }
-        // }
     }
 }
 

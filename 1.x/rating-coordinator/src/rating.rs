@@ -5,14 +5,14 @@ use crate::wasmcloud::bus::lattice;
 
 use crate::orange::rating::*;
 use crate::orange::commons::types::*;
-use crate::orange::commons::error_types::{GenericError};
+use crate::orange::commons::error_types::{UsageError};
 use crate::agent_graph::AgentGraph;
 use async_recursion::async_recursion;
 
 pub async fn handle_rating_cycle(
     rating_request: &RatingRequest,
     agents_graph: &AgentGraph,
-) -> Result<RatingResponse, GenericError> {
+) -> Result<RatingResponse, UsageError> {
     let mut visited: HashMap<String, bool> = HashMap::new();
     for vertex in agents_graph.adjacency_list.keys() {
         visited.insert(vertex.to_string(), false);
@@ -28,7 +28,7 @@ pub async fn handle_rating_cycle(
 
 pub async fn rate_through_agent(
     rating_request: &RatingRequest,
-) -> Result<RatingResponse,GenericError> {
+) -> Result<RatingResponse,UsageError> {
     let rating_interface = lattice::CallTargetInterface::new(
         "orange",
         "rating",
@@ -47,7 +47,7 @@ async fn dfs_recursive(
     visited: &HashMap<String, bool>,
     agents_graph: &AgentGraph,
     rating_request: &mut RatingRequest,
-) -> Result<RatingResponse,GenericError> {
+) -> Result<RatingResponse,UsageError> {
     let mut children_ratings = Vec::new();
     if let Some(neighbors) = agents_graph.adjacency_list.get(&vertex.identification.name) {
         for neighbor in neighbors {
