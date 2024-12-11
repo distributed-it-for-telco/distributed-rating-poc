@@ -4,6 +4,9 @@ use futures::executor::block_on;
 use crate::orange::commons::types::*;
 use crate::orange::usagecollector::usagecollector;
 use crate::orange::commons::commons::{generate_rating_proof};
+use crate::orange::commons::rating_response_builder;
+use crate::orange::commons::error_types::*;
+
 use uuid::Uuid;
 
 wit_bindgen::generate!({
@@ -22,13 +25,11 @@ const RATING_PROOF_PRODUCT_NAME: &str = "AWS Stor";
 struct AwsStoreRatingagent;
 
 impl AwsStoreRatingagent{
-    async fn rate_usage_async(_request: RatingRequest) -> RatingResponse {
+    async fn rate_usage_async(_request: RatingRequest) -> Result<RatingResponse, UsageError> {
         {
-            // if _request.usage.usage_characteristic_list.is_empty() {
-            //     return RpcResult::from(Err(RpcError::Other(
-            //         "Can't rate usage, no characteristic sent!".to_owned(),
-            //     )));
-            // }
+            if _request.usage.usage_characteristic_list.is_empty() {
+                return Err(UsageError{message: "Can't rate usage, no characteristic sent!".to_string()});
+            }
     
             log(Info,"","Hello I'm your AWS stor postpaid rating agent");
     
@@ -63,36 +64,23 @@ impl AwsStoreRatingagent{
                 _request.customer_id.to_string()
             ).as_str());
             usagecollector::store(&usage_template_str);
-            
-            let rating_response = RatingResponse{
-                authorization_status: AuthorizationStatus{
-                    code: 200,
-                    key: "".to_string()
-                },
-                billing_information: BillingInformation{
-                    messages: vec![],
-                    price: rating.to_string(),
-                    unit: "EUR".to_string()
-                },
-                next_agent: AgentIdentification{
-                    name: "".to_string(),
-                    partner_id: "".to_string()
-                }
-            };
-        rating_response
+
+            let mut handler = rating_response_builder::create_builder();
+            handler = rating_response_builder::unit(handler, &"EUR");
+            handler = rating_response_builder::price(handler, &rating.to_string());
+            handler = rating_response_builder::authorized(handler);
+
+            let rating_response = rating_response_builder::build(handler);
+
+            Ok(rating_response)
         }
     }
 
-    async fn validate_async(request: ValidationRequest) -> ValidationResponse {
-        let mut validation_response: ValidationResponse = ValidationResponse{
-            valid: true
+    async fn validate_async(request: ValidationRequest) -> Result<ValidationResponse, ValidationError> {
+        let validation_response = ValidationResponse {            
+            valid: !request.client_country.is_empty() && request.client_country == "EG"
         };
-        if !request.client_country.is_empty() && request.client_country.to_owned() == "EG" {
-            validation_response.valid = true;
-        } else {
-            validation_response.valid = false;
-        }
-        validation_response
+        Ok(validation_response)
     }
 
      async fn get_children_async(arg: &GetChildrenRequest) -> AgentList {
@@ -130,10 +118,10 @@ impl AwsStoreRatingagent{
 }
 
 impl Guest for AwsStoreRatingagent {
-    fn rate_usage(request: RatingRequest) -> RatingResponse {
+    fn rate_usage(request: RatingRequest) -> Result<RatingResponse, UsageError> {
         block_on(Self::rate_usage_async(request))
     }
-    fn validate(request: ValidationRequest) -> ValidationResponse {
+    fn validate(request: ValidationRequest) -> Result<ValidationResponse, ValidationError> {
         block_on(Self::validate_async(request))
     }
     fn get_children(request: GetChildrenRequest) -> AgentList {
