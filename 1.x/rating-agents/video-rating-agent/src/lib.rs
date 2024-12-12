@@ -6,6 +6,7 @@ use crate::orange::commons::error_types::{
 };
 use crate::orange::commons::commons::generate_rating_proof;
 use crate::orange::commons::rating_response_builder as RatingResponseBuilder;
+use crate::orange::commons::some_builder::Builder;
 use exports::orange::rating::ratingagent::*;
 use wasi::logging::logging::{log,Level::Info};
 use crate::orange::usagecollector::usagecollector;
@@ -57,6 +58,9 @@ impl Guest for VideoRatingagent {
             log(wasi::logging::logging::Level::Info, "", &usage.value);
         });
 
+        let mut response_builder = Builder::new();
+        response_builder = response_builder.unit("").price("");
+        log(Info, "", &response_builder.build().next_agent.name);
 
         let mut response_builder_handle = RatingResponseBuilder::create_builder();
         response_builder_handle= RatingResponseBuilder::unit(response_builder_handle, &"EUR");

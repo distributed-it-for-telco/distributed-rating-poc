@@ -6,6 +6,7 @@ wit_bindgen::generate!({
 pub mod dtos;
 pub mod mappers;
 mod mappers_impl;
+mod some_builders_impl;
 mod builders_impl;
 mod commons_impl;
 mod commons_struct;

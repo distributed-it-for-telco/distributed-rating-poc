@@ -31,3 +31,18 @@ interface rating-response-builder {
     next-agent: func(handle: builder-handle, value: agent-identification) -> builder-handle;
     build: func(handle: builder-handle) -> rating-response;
 }
+
+interface some-builder{
+    use types.{rating-response, agent-identification};
+
+    resource builder {
+       constructor(); 
+       unit: func( value: string) -> builder;
+       price: func( value: string) -> builder;
+       message: func( value: string) -> builder;
+       authorized: func() -> builder;
+       not-authorized: func() -> builder;
+       next-agent: func( value: agent-identification) -> builder;
+       build: func() -> rating-response; 
+      }
+   }

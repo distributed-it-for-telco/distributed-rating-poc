@@ -3,6 +3,7 @@ package orange:video-ratingagent;
 world video-rating {
    import orange:commons/commons;
    import orange:commons/rating-response-builder;
+   import orange:commons/some-builder;
    import orange:usagecollector/usagecollector;
    import wasi:logging/logging@0.1.0-draft;  
 
