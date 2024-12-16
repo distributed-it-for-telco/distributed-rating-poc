@@ -1,26 +1,29 @@
 
-# Seeding data
+<a id="seeding"></a>
+# Seeding data 
   ## prerequiests:
-   - Redis installed
-   - Redis cli installed
-  ## steps :
- - Open Folder "seeding" in project
- - run the sh files
-
-# to deploy the app
-  ## prerequiests:
-- wash installed
-- redis kv store installed, and served
+   - Redis kv store installed and served([redis server](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/), docker,...)
+  ## steps:
+- Open Folder "seeding" in project
+- Run the sh files
+-----------
+# To run the app
+## Prerequiests:
+- [wasmCloud Shell (wash)](https://wasmcloud.com/docs/installation), make sure you're installing the versio for wasmcloud 1.x, this project works with wash 0.36.1
 - [The Rust toolchain installed](https://www.rust-lang.org/tools/install)
 - The `wasm32-wasip1` target for Rust
     ```
     rustup target add wasm32-wasip1
     ```
-- [Tools from the wasmtime build time linking doc](https://wasmcloud.com/docs/concepts/linking-components/linking-at-build)  
+- [WebAssembly Composition (wac)](https://github.com/bytecodealliance/wac?tab=readme-ov-file#installation)  
 
-  ## steps
+## Steps:
+  - Run the kv store and seed the data as described in the [seeding section](#seeding)
+  - Change your working directory to 1.x
   - Run sh file "build&deploy.sh", this will build all the components, start the wash host, and deploy the app.
-  - Now you can use the provided postman collection to discover the endpoints.  
+  - Now you can use the provided curl examples below or postman collection in the repo to discover the endpoints. 
+
+--------------
 
 # distributed-rating-poc
 Proof of concept illustrating a sample implementation of wasmCloud-based distributed rating (Not all agents in the diagram are implemented)
