@@ -1,5 +1,5 @@
 use crate::orange::commons::types::Balance;
-use crate::orange::commons::error_types::{GenericError, OtherError};
+use crate::orange::commons::error_types::{GenericError};
 use crate::orange::commons::mappers;
 
 use crate::exports::orange::balancemanager::balancemanager::*;
@@ -44,7 +44,7 @@ impl Guest for BalanceManager {
 
             Ok(Balance { count: balance.count, unit: balance.unit.clone(), party_id: balance.party_id.clone() })
         } else {
-            Err(GenericError::Other(OtherError{message: "Insufficient balance to purchase".to_string()}))
+            Err(GenericError::Other("Insufficient balance to purchase".to_string()))
         }
     }
 

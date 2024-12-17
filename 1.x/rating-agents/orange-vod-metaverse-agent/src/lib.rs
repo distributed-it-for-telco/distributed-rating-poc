@@ -44,7 +44,7 @@ impl OrangeVodMetaverseRatingagent{
                 }
             }
         }
-        return Err(UsageError{message: "Unknown usage".to_string()});
+        return Err(UsageError{message: "Unknown usage".to_string(), cause: "".to_string()});
     }
     
 async fn handle_room_rating(

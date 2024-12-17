@@ -19,6 +19,7 @@ world balance-manager-world {
     import wasi:keyvalue/store@0.2.0-draft; 
     import wasi:logging/logging@0.1.0-draft;  
     import orange:commons/mappers;
+    import orange:commons/error-types;
 
     export balancemanager;
 }

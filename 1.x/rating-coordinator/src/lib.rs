@@ -30,7 +30,7 @@ impl RatingCoordinator{
         let validation_response_as_rating =
         match handle_validation_cycle(&rating_request, headers, &agent_graph).await {
             Ok(validation) => validation,
-            Err(e) => return Err(GenericError::Validation(e))
+            Err(e) => return Err(GenericError::Validation(e.message))
         };
         if validation_response_as_rating.authorization_status.code == 401 {
             return Ok(validation_response_as_rating)
@@ -38,7 +38,7 @@ impl RatingCoordinator{
 
        match handle_rating_cycle(&rating_request, &agent_graph).await {
             Ok(rating) => Ok(rating),
-            Err(e) => Err(GenericError::Usage(e)),
+            Err(e) => Err(GenericError::Usage(e.message)),
        }
     }
 }

@@ -28,7 +28,7 @@ impl AwsStoreRatingagent{
     async fn rate_usage_async(_request: RatingRequest) -> Result<RatingResponse, UsageError> {
         {
             if _request.usage.usage_characteristic_list.is_empty() {
-                return Err(UsageError{message: "Can't rate usage, no characteristic sent!".to_string()});
+                return Err(UsageError{message: "Can't rate usage, no characteristic sent!".to_string(), cause: "".to_string()});
             }
     
             log(Info,"","Hello I'm your AWS stor postpaid rating agent");

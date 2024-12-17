@@ -1,18 +1,25 @@
 interface error-types{
     record validation-error{
-        message: string
+        message: string,
+        cause: string
     }
     record usage-error{
-        message: string
+        message: string,
+        cause: string
     }
     
     record other-error{
-        message: string
+        message: string,
+        cause: string
     }
 
+    type message = string;
     variant generic-error{
-        validation(validation-error),
-        usage(usage-error),
-        other(other-error)
+        validation(message),
+        usage(message),
+        other(message)
     }
+    set-validation-error: func(s: validation-error);
+    set-usage-error: func(s: usage-error);
+    set-other-error: func(s: other-error);
 }

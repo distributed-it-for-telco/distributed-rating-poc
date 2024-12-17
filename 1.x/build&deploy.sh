@@ -87,6 +87,7 @@ cd $homeDir/rating-coordinator
 rm -rf wit/deps
 wit-deps
 wash build
+wac plug ./build/rating_coordinator_s.wasm --plug ../commons/build/rating_commons_s.wasm -o ./build/rating_coordinator_s.wasm
 ##===========Api gateway=====================
 echo "#################################################################"
 echo "Building api-gateway"

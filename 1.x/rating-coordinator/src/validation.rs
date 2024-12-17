@@ -17,7 +17,7 @@ pub async fn handle_validation_cycle(
     agents_graph: &AgentGraph,
 ) -> Result<RatingResponse, ValidationError> {
     if headers.is_empty() {
-        return Err(ValidationError{message: "Can't validate client usage, client ip not found".to_string()});
+        return Err(ValidationError{message: "Can't validate client usage, client ip not found".to_string(), cause: "".to_string()});
     }
 
     let mut client_ip = "".to_string();
