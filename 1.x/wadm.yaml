@@ -12,10 +12,10 @@ metadata:
       http,http-server,rust,hello-world,example
 spec:
   components:
-    - name: http-component
+    - name: api-gateway
       type: component
       properties:
-        image: file://./api-gateway/build/http_hello_world_s.wasm
+        image: file://./api-gateway/build/api_gateway_s.wasm
         # To use the a precompiled version of this component, use the line below instead:
         # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
       traits:
@@ -25,23 +25,15 @@ spec:
             instances: 1
         - type: link
           properties:
-            name: metaverse
-            target: metaverse-rating-agent-component
+            target: rating-coordinator-component
             namespace: orange
-            package: rating
-            interfaces: [ratingagent]
-        - type: link
-          properties:
-            name: orange-vod
-            target: orange-vod-rating-agent-component
-            namespace: orange
-            package: rating
-            interfaces: [ratingagent]
+            package: ratingcoordinator
+            interfaces: [ratingcoordinator]
 
     - name: metaverse-rating-agent-component
       type: component
       properties:
-        image: file://./metaverse-rating-agent/build/metaverse_ratingagent_s.wasm
+        image: file://./rating-agents/orange-vod-metaverse-agent/build/orange_vod_metaverse_agent_s.wasm
         # To use the a precompiled version of this component, use the line below instead:
         # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
       traits:
@@ -78,12 +70,51 @@ spec:
               - name: redis-url
                 properties:
                   url: redis://127.0.0.1:6379
-
-
-    - name: orange-vod-rating-agent-component
+    
+    - name: rating-coordinator-component
       type: component
       properties:
-        image: file://./orange-vod-rating-agent/build/orange_vod_ratingagent_s.wasm
+        image: file://./rating-coordinator/build/rating_coordinator_s.wasm
+        # To use the a precompiled version of this component, use the line below instead:
+        # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
+        - type: link
+          properties:
+            name: metaverse
+            target: metaverse-rating-agent-component
+            namespace: orange
+            package: rating
+            interfaces: [ratingagent]
+        - type: link
+          properties:
+            name: orange-vod
+            target: orange-vod-rating-agent-component
+            namespace: orange
+            package: rating
+            interfaces: [ratingagent]
+        - type: link
+          properties:
+            name: video-rating
+            target: video-rating-agent-component
+            namespace: orange
+            package: rating
+            interfaces: [ratingagent]
+        - type: link
+          properties:
+            name: streaming
+            target: streaming-rating-agent-component
+            namespace: orange
+            package: rating
+            interfaces: [ratingagent]
+
+    - name: streaming-rating-agent-component
+      type: component
+      properties:
+        image: file://./rating-agents/streaming-rating-agent/build/streaming_ratingagent_s.wasm
         # To use the a precompiled version of this component, use the line below instead:
         # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
       traits:
@@ -92,6 +123,46 @@ spec:
           properties:
             instances: 1
 
+    - name: video-rating-agent-component
+      type: component
+      properties:
+        image: file://./rating-agents/video-rating-agent/build/video_rating_agent_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
+
+        - type: link
+          properties:
+            target: video-provider-usage-collector-component
+            namespace: orange
+            package: usagecollector
+            interfaces: [usagecollector]
+
+    - name: aws-stor-rating-agent-component
+      type: component
+      properties:
+        image: file://./rating-agents/aws-stor-rating-agent/build/orange_vod_ratingagent_s.wasm
+        # To use the a precompiled version of this component, use the line below instead:
+        # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
+
+    - name: orange-vod-rating-agent-component
+      type: component
+      properties:
+        image: file://./rating-agents/orange-vod-rating-agent/build/orange_vod_ratingagent_s.wasm
+        # To use the a precompiled version of this component, use the line below instead:
+        # image: ghcr.io/wasmcloud/components/http-hello-world-rust:0.1.0
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1
         - type: link
           properties:
             target: kvredis
@@ -103,6 +174,66 @@ spec:
                 properties:
                   url: redis://127.0.0.1:6379
 
+    - name: video-provider-usage-collector-component
+      type: component
+      properties:
+        image: file://./usage-collectors/usage-collector-video-provider/build/usage_collector_video_provider_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1 
+        - type: link
+          properties:
+            target: kvredis
+            namespace: wasi
+            package: keyvalue
+            interfaces: [atomics, store]
+            target_config:
+              - name: redis-url
+                properties:
+                  url: redis://127.0.0.1:6379
+    
+    - name: orange-usage-collector-component
+      type: component
+      properties:
+        image: file://./usage-collectors/usage-collector-orange/build/usage_collector_video_provider_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1 
+        - type: link
+          properties:
+            target: kvredis
+            namespace: wasi
+            package: keyvalue
+            interfaces: [atomics, store]
+            target_config:
+              - name: redis-url
+                properties:
+                  url: redis://127.0.0.1:6379
+    
+    - name: orange-connectivity-usage-collector-component
+      type: component
+      properties:
+        image: file://./usage-collectors/usage-collector-orange-connectivity/build/usage_collector_video_provider_s.wasm
+      traits:
+        # Govern the spread/scheduling of the component
+        - type: spreadscaler
+          properties:
+            instances: 1 
+        - type: link
+          properties:
+            target: kvredis
+            namespace: wasi
+            package: keyvalue
+            interfaces: [atomics, store]
+            target_config:
+              - name: redis-url
+                properties:
+                  url: redis://127.0.0.1:6379
+    
     # The new capability provider
     - name: kvredis
       type: capability
@@ -121,7 +252,7 @@ spec:
         # The source (this provider) is configured such that the HTTP server listens on 127.0.0.1:8080
         - type: link
           properties:
-            target: http-component
+            target: api-gateway
             namespace: wasi
             package: http
             interfaces: [incoming-handler]

@@ -1,8 +1,8 @@
-name = "http-hello-world"
+name = "api-gateawy"
 version = "0.1.0"
 language = "rust"
 type = "component"
 
 [component]
-wit_world = "hello"
-wasm_target = "wasm32-wasi-preview2"
+wit_world = "api-gateway-world"
+wasm_target = "wasm32-wasip1"

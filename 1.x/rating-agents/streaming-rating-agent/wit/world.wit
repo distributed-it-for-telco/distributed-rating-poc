@@ -1,0 +1,8 @@
+package orange:streaming-ratingagent;
+
+world streaming-rating {
+    import wasi:logging/logging@0.1.0-draft;  
+    import orange:commons/types;
+
+    export orange:rating/ratingagent;
+}

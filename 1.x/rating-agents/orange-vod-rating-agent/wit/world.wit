@@ -1,0 +1,11 @@
+package orange:orange-vod-ratingagent;
+
+world orange-vod-rating {
+    import wasi:logging/logging@0.1.0-draft;  
+    import orange:balancemanager/balancemanager;
+    import orange:usagecollector/usagecollector;
+    import orange:commons/commons;
+    import orange:commons/rating-response-builder;
+
+    export orange:rating/ratingagent;
+}

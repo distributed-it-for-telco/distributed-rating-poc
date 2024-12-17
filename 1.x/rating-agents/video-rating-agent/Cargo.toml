@@ -1,0 +1,13 @@
+[package]
+name = "video-rating-agent"
+edition = "2021"
+version = "0.1.0"
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.32"
+uuid = {version = "1.11.0", features = ["v4", "fast-rng", "macro-diagnostics"]}

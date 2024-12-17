@@ -1,0 +1,9 @@
+package orange:metaverse-ratingagent;
+
+world metaverse-rating {
+    import orange:balancemanager/balancemanager;
+    import wasi:logging/logging@0.1.0-draft;  
+    import orange:commons/rating-response-builder;
+
+    export orange:rating/ratingagent;
+}

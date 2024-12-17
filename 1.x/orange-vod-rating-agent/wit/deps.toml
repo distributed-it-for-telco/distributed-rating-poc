@@ -1,3 +1,0 @@
-keyvalue = "https://github.com/WebAssembly/wasi-keyvalue/archive/53ff9402194704cb68b1599c4e35e9182f4c57c4.tar.gz"
-logging = "https://github.com/WebAssembly/wasi-logging/archive/d31c41d0d9eed81aabe02333d0025d42acf3fb75.tar.gz"
-rating-interface = "../../rating-interface/wit"

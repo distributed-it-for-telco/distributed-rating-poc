@@ -1,14 +1,16 @@
-wit_bindgen::generate!({ generate_all });
+wit_bindgen::generate!({ 
+    generate_all 
+});
 
-use crate::orange::rating::types::{RatingRequest, RatingResponse};
-use crate::orange::rating::*;
-use exports::wasi::http::incoming_handler::Guest;
-use serializer::*;
-use wasi::http::types::*;
 use wasi::io::streams::InputStream;
-use wasi::logging::logging::log;
-use wasi::http::types::Method::*;
-mod serializer;
+use wasi::logging::logging::{log, Level::Info};
+use wasi::http::types::*;
+use exports::wasi::http::incoming_handler::Guest;
+
+use crate::orange::ratingcoordinator::ratingcoordinator;
+use crate::orange::commons::mappers;
+use crate::orange::commons::types::{RatingRequest, RatingResponse};
+
 
 struct ApiGateway;
 struct HttpRequestParts {
@@ -25,7 +27,7 @@ impl ApiGateway {
         // and extract query paramters to separate map
         if let Some((path, query)) = path_with_query.split_once('?') {
             path_without_query = path.to_string();
-            let query_params = query
+            let _query_params = query
                 .split('&')
                 .filter_map(|v| v.split_once('='))
                 .collect::<Vec<(&str, &str)>>();
@@ -38,37 +40,28 @@ impl ApiGateway {
     }
 
     fn map_request_to_service(_request: IncomingRequest, response_out: ResponseOutparam) {
+        log(Info, "", "Http Request recieved");
         let request_parts =
             Self::get_request_parts(_request.path_with_query().unwrap(), _request.method());
         let http_request_body: IncomingBody = _request.consume().unwrap();
         let body = StreamReader::read_input_stream(&http_request_body.stream().unwrap());
-        // log(wasi::logging::logging::Level::Info, "", &request_parts.method.to_string());
-        log(wasi::logging::logging::Level::Info, "", &request_parts.path);
+        log(Info, "", &request_parts.path);
+        
         match (request_parts.method, request_parts.path.as_str()) {
             // ("OPTIONS", _) => get_options_response(ctx).await,
-            (POST, "/usage/rating") => {
+            (wasi::http::types::Method::Post, "/usage/rating") => {
                 
-                Self::request_rate(body,response_out);
+                Self::request_rate(_request.headers(),body,response_out);
             }
-            // ("GET", ["usage", "rating-proofs", usage_collector_id]) => {
-            //     list_usage_proofs(ctx, usage_collector_id).await
-            // }
-            // ("POST", ["seed", "orange", "customer", "inventory"]) => {
-            //     seed_data_for_orange_cust_inventory(ctx).await
-            // }
-            // ("GET", ["party", party_id, "offers", inventory_agent_id]) => {
-            //     get_party_offers(ctx, party_id, inventory_agent_id).await
-            // }
-
-            // ("POST", ["balance", "topup"]) => topup_balance(ctx, deser(&req.body)?).await,
+           
 
             (_, _) => Self::not_found(response_out),
         }
         
     }
     fn not_found(response_out: ResponseOutparam){
-        let mut headers = Fields::new();
-        headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
+        let headers = Fields::new();
+        let _ = headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
         let response = OutgoingResponse::new(headers);
         response.set_status_code(404).unwrap();
         
@@ -84,40 +77,28 @@ impl ApiGateway {
         OutgoingBody::finish(response_body, None).expect("failed to finish response body");
     }
 
-    fn request_rate(body: String ,response_out: ResponseOutparam){
+    fn request_rate(request_headers:Fields, body: String ,response_out: ResponseOutparam){
 
-        log(wasi::logging::logging::Level::Info, "", &"requesting rate");
+        log(Info, "", &"requesting rate");
 
-        let serialized_rating_request: SerializedRatingRequest =
-            serde_json::from_str(&body).unwrap();
-        let rating_request: RatingRequest = serialized_rating_request.into();
-
-        let mut headers = Fields::new();
-        headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
+        let rating_request: RatingRequest = mappers::string_to_rating_request(&body);
+        
+        let headers = Fields::new();
+        let _ = headers.set(&"Content-Type".to_string(),  &vec![b"application/json".to_vec()]);
         let response = OutgoingResponse::new(headers);
 
         response.set_status_code(200).unwrap();
         let response_body = response.body().unwrap();
-        log(wasi::logging::logging::Level::Info, "", &"before calling rating agent");
+        log(Info, "", "before calling rating agent");
 
-        //invoke the rating interface implementation based on agent id sent in the request
-        let rating_interface = wasmcloud::bus::lattice::CallTargetInterface::new(
-            "orange",
-            "rating",
-            "ratingagent",
-        );
-        wasmcloud::bus::lattice::set_link_name(&rating_request.agent_id.to_string(), vec![rating_interface]);
+        let usage_result: RatingResponse = ratingcoordinator::handle_rating_process(&rating_request,&request_headers.entries()).expect("Failed to call rating agent");
 
-        
-        log(wasi::logging::logging::Level::Info, "", &rating_request.agent_id.to_string());
+        log(Info, "", &"after calling rating agent");
+        log(Info, "", &usage_result.billing_information.unit);
 
-        let usage_result: RatingResponse = ratingagent::rate_usage(&rating_request);
-        log(wasi::logging::logging::Level::Info, "", &"after calling rating agent");
         ResponseOutparam::set(response_out, Ok(response));
-        let serialized_rating_result: SerializedRatingResponse = usage_result.into();
-        let binding = serde_json::to_string(&serialized_rating_result).unwrap();
+        let binding = mappers::rating_response_to_string(&usage_result);
         let serialized_response = binding.as_bytes();
-
         response_body
             .write()
             .unwrap()
@@ -158,3 +139,16 @@ impl Guest for ApiGateway {
 }
 
 export!(ApiGateway);
+
+
+ // ("GET", ["usage", "rating-proofs", usage_collector_id]) => {
+            //     list_usage_proofs(ctx, usage_collector_id).await
+            // }
+            // ("POST", ["seed", "orange", "customer", "inventory"]) => {
+            //     seed_data_for_orange_cust_inventory(ctx).await
+            // }
+            // ("GET", ["party", party_id, "offers", inventory_agent_id]) => {
+            //     get_party_offers(ctx, party_id, inventory_agent_id).await
+            // }
+
+            // ("POST", ["balance", "topup"]) => topup_balance(ctx, deser(&req.body)?).await,

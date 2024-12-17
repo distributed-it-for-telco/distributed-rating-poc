@@ -1,7 +1,10 @@
 package wasmcloud:hello;
 
-world hello {
+world api-gateway-world {
+  import orange:commons/mappers;
+  import orange:commons/types;
   import orange:rating/ratingagent;
+  import orange:ratingcoordinator/ratingcoordinator;
   import wasi:logging/logging@0.1.0-draft; 
   import wasmcloud:bus/lattice@1.0.0;
   

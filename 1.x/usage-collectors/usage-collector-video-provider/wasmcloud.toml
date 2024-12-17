@@ -1,0 +1,8 @@
+name = "video-provider-usage-collector"
+version = "0.1.0"
+language = "rust"
+type = "component"
+
+[component]
+wit_world = "video-provider-usage-collector-world"
+wasm_target = "wasm32-wasip1"
