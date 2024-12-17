@@ -53,6 +53,7 @@ Then after adding our depnedencies we run `wit-deps` to have our deps folder gen
 We also need to add the deps folder in our git.ignore file, so it's ignored, as we generated from `deps.toml`, this is done in the .gitignore for the project so you don't need to do it yourself, just make sure youre deps folder is not git managed
 
 ## Specify the target
+Pay attention for the target provided in the newly generated component as wasmcloud changes them frequnently,
 Make sure the `wasm_target` inside the `wasmcloud.toml` file is `"wasm32-wasip1"`
 
 ## Rename variables to match the agent name
