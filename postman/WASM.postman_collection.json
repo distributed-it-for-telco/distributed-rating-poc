@@ -1,0 +1,288 @@
+{
+	"info": {
+		"_postman_id": "742244d5-c562-49e9-a25e-adba1dae4587",
+		"name": "WASM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "14309492",
+		"_collection_link": "https://orangelabs.postman.co/workspace/OLE-Team~72fce054-1fa5-42ac-b866-115c64095909/collection/14309492-742244d5-c562-49e9-a25e-adba1dae4587?action=share&source=collection_link&creator=14309492"
+	},
+	"item": [
+		{
+			"name": "1.x",
+			"item": [
+				{
+					"name": "metaverse rating",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer-id\":\"advertiser1\",\n    \"usage\": {\n       \"usage-characteristic-list\": [\n           {\n                \"name\":\"usage\",\n                \"value\":\"2\",\n                \"value-type\":\"integer\"\n           }\n        ]\n    },   \n    \"agent-id\": \"metaverse\",\n    \"language\": \"en\",\n    \"offer-id\":\"offer1\",\n    \"rating-history\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "orange-vod rating",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer-id\":\"advertiser1\",\n    \"usage\": {\n       \"usage-characteristic-list\": [\n           {\n                \"name\":\"usage\",\n                \"value\":\"2\",\n                \"value-type\":\"integer\"\n           }\n        ]\n    },   \n    \"agent-id\": \"orange-vod\",\n    \"language\": \"en\",\n    \"offer-id\":\"offer1\",\n    \"rating-history\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/usage/rating"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "0.x",
+			"item": [
+				{
+					"name": "Rate Postpaid Vod Oneshot",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"customer1\",\n    \"usage\": \"1\",\n    \"agentId\": \"orange_vod\",\n    \"offerId\": \"video\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{HOST}}/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Dropbox sync stor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"customer1\",\n    \"usage\": {\n       \"usageCharacteristicList\": [\n           {\n                \"name\":\"stor-usage\",\n                \"value\":\"1\",\n                \"valueType\":\"integer\"\n           }\n        ]\n    },\n    \"agentId\": \"dropbox_syncstor\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "https://weathered-mountain-8378.cosmonic.app/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Postpaid Vod With Bucket",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"customer1\",\n    \"usage\": {\n       \"usageCharacteristicList\": [\n           {\n                \"name\":\"movie-usage\",\n                \"value\":\"1\",\n                \"valueType\":\"integer\"\n           }\n        ]\n    },\n     \"agentId\": \"postpaid_orange_vod_bucket\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{HOST}}/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Postpaid Vod With Bucket with Messaging",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"customer1\",\n    \"usage\": {\n       \"usageCharacteristicList\": [\n           {\n                \"name\":\"movie-usage\",\n                \"value\":\"1\",\n                \"valueType\":\"integer\"\n           }\n        ]\n    },\n    \"agentId\": \"postpaid_orange_vod_bucket_messaging\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{HOST}}/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Prepaid Vod Oneshot",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"customer1\",\n    \"usage\": \"1\",\n    \"agentId\": \"postpaid_orange_vod_bucket\"\n}\n\n{\n    \"agentId\":\"prepaid_orange_vod_oneshot\",\n    \"customerId\":\"13\",\n    \"usage\":\"1\"\n}\n\n\n\n{\n    \"agentId\":\"postpaid_orange_vod_threshold_discount\",\n    \"customerId\":\"12\",\n    \"usage\":\"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "https://weathered-mountain-8378.cosmonic.app/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Prepaid Vod Oneshot CQRS",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"ABC123\",\n    \"usage\": {\n       \"usageCharacteristicList\": [\n           {\n                \"name\":\"movie-usage\",\n                \"value\":\"1\",\n                \"valueType\":\"integer\"\n           }\n        ]\n    },   \n    \"agentId\": \"prepaid_orange_vod_oneshot_cqrs\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{HOST}}/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Prepaid Vod Metaverse",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"advertiser1\",\n    \"usage\": {\n       \"usageCharacteristicList\": [\n           {\n                \"name\":\"movie-usage\",\n                \"value\":\"1\",\n                \"valueType\":\"integer\"\n           }\n        ]\n    },   \n    \"agentId\": \"prepaid_orange_vod_metaverse_agent\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{HOST_LOCAL}}/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "Rate Prepaid Vod Metaverse Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\":\"advertiser1\",\n    \"usage\": {\n       \"usageCharacteristicList\": [\n           {\n                \"name\":\"movie-usage\",\n                \"value\":\"1\",\n                \"valueType\":\"integer\"\n           }\n        ]\n    },   \n    \"agentId\": \"prepaid_orange_vod_metaverse_agent\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{HOST_LOCAL}}/usage/rating"
+					},
+					"response": []
+				},
+				{
+					"name": "Seed Orange Inventory Data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "https://weathered-mountain-8378.cosmonic.app/seed/orange/customer/inventory"
+					},
+					"response": []
+				},
+				{
+					"name": "Get party offers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/party/:partyId/offers/:vendor",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"party",
+								":partyId",
+								"offers",
+								":vendor"
+							],
+							"variable": [
+								{
+									"key": "partyId",
+									"value": "customer1"
+								},
+								{
+									"key": "vendor",
+									"value": "Orange"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get rating proofs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{HOST}}/usage/rating-proofs/usage_collector_orange"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "HOST",
+			"value": "http://localhost:8070",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "HOST",
+			"value": "https://quiet-frog-6387.cosmonic.app",
+			"type": "string"
+		}
+	]
+}
