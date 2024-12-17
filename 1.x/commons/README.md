@@ -1,38 +1,17 @@
-# HTTP Hello World
-
-This is a simple Rust Wasm example that responds with a "Hello World" message for each request.
-
-## Prerequisites
-
-- `cargo` 1.75
-- [`wash`](https://wasmcloud.com/docs/installation) 0.27.0
-- `wasmtime` >=19.0.0 (if running with wasmtime)
-
-## Building
-
-```bash
-wash build
-```
-
-## Running with wasmtime
-
-You must have wasmtime >=19.0.0 for this to work. Make sure to follow the build step above first.
-
-```bash
-wasmtime serve -Scommon ./build/http_hello_world_s.wasm
-```
-
-## Running with wasmCloud
-
-Ensuring you've built your component with `wash build`, you can launch wasmCloud and deploy the full hello world application with the following commands. Once the application reports as **Deployed** in the application list, you can use `curl` to send a request to the running HTTP server.
-
-```shell
-wash up -d
-wash app deploy ./wadm.yaml
-wash app list
-curl http://127.0.0.1:8080
-```
-
-## Adding Capabilities
-
-To learn how to extend this example with additional capabilities, see the [Adding Capabilities](https://wasmcloud.com/docs/tour/adding-capabilities?lang=rust) section of the wasmCloud documentation.
+# Commons Component
+- This component contains a set of reusable functionalities, used by other components
+- The functions are used throught wit-interface definition
+- This component is not deployed into wasmcloud directly, instead it needs to be composed to dependant component using wac tool
+- 
+## types interface
+- contains all common types used throughout the application.
+## error-types interface
+- contains all common error types used throughout the application.
+## mappers interface
+- conains functions that maps subset of the common types to and from string
+- used by components that exchange data with external apps/ervices
+-
+## builder interface
+- contiain builder-pattern impleementation for a subset of the common types
+## commons interface
+- contains some utility functions
