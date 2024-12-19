@@ -152,3 +152,36 @@ Proof of concept illustrating a sample implementation of wasmCloud-based distrib
             "unit": "EUR"
         }
         }
+
+# Developer notes:
+- The docs provided by wasmcloud only aren't enough for understanding the mechanism of the new WebAssembly component model utilization in the project so make sure to integrate some reading of the docs for [The WebAssembly component model](https://component-model.bytecodealliance.org) with the docs of [wasmcloud](https://wasmcloud.com/docs/intro).
+
+- When adding a new component make sure to read the doc provided for this in the project [here](/adding-new-component-in-project.md)<!-- path is relative to project directory -->. 
+# Dependency Management for our project
+
+We use the `deps.toml` file for dependency management, and here's how it's used:
+- We declare the dependencied needed for the component in the format
+    ```
+    dependency-name = link to dependency
+    ``` 
+    for example if the component has wit logging as a dependency we declare it in the file as follows
+    ```
+    logging = "https://github.com/WebAssembly/wasi-logging/archive/d31c41d0d9eed81aabe02333d0025d42acf3fb75.tar.gz"
+    ```
+
+- The `deps.toml` located in the wit folder for each component
+
+- To generate the dependencies(deps) folder, in our terminal inside the component directory we run this command
+    ```
+   $ wit-deps
+    ```
+     This will generate a folder `deps` with all the dependencies in it inside the `wit` folder
+
+
+# Components Linking
+Wasmcloud supports two type of linking for components, in this project we use both,
+
+we use *linking at build* to link/compose the commons with all the components, as it is the component that holds most common parts of the code, you can review the [commons README](/1.x/commons/README.md), 
+
+and we use *linking at runtime* to link the api gateway with the rating coordinator, and rating coordinator with the target rating agent,
+you can read on linking in the wasmcloud provided [docs](https://wasmcloud.com/docs/concepts/linking-components/). 
